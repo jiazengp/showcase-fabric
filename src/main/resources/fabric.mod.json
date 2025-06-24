@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "showcase",
+	"version": "${version}",
+	"name": "showcase",
+	"description": "Showcase Mod allows players to easily share their inventory, held items, hotbar, ender chest, or any container with others via clickable share links and Readonly GUI.",
+	"authors": [
+		"Hyouka233"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/project/showcase"
+	},
+	"license": "MIT",
+	"icon": "assets/showcase/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.showcase.ShowcaseMod"
+		]
+	},
+	"mixins": [
+		"showcase.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.10",
+		"minecraft": ">=1.20.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
