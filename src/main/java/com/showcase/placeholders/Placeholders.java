@@ -7,6 +7,7 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -60,15 +61,14 @@ public class Placeholders {
         });
 
         eu.pb4.placeholders.api.Placeholders.register(ITEM, (ctx, arg) -> {
-            ShowcaseMod.LOGGER.info("Processing item placeholder for player1");
             if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
-            ShowcaseMod.LOGGER.info("Processing item placeholder for player2");
+
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ITEM))
                 return PlaceholderResult.invalid("Too fast");
 
 
-            ItemStack stack = player.getInventory().getMainHandStack();
+            ItemStack stack = player.getEquippedStack(EquipmentSlot.MAINHAND);
 
             if (stack.isEmpty()) {
                 return PlaceholderResult.invalid(ShowcaseMod.CONFIG.messages.noItem);

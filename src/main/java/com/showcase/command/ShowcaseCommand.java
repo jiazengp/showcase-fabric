@@ -14,6 +14,7 @@ import com.showcase.utils.ChatPaginator;
 import com.showcase.utils.ContainerOpenWatcher;
 import com.showcase.utils.MessageUtils;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -216,7 +217,7 @@ public class ShowcaseCommand {
 
         if (ShowcaseManager.isOnCooldown(sender, ShowcaseManager.ShareType.ITEM)) return 0;
 
-        ItemStack stack = sender.getInventory().getMainHandStack();
+        ItemStack stack = sender.getEquippedStack(EquipmentSlot.MAINHAND);
         ModConfig.Messages messages = ShowcaseMod.CONFIG.messages;
 
         if (stack.isEmpty()) {
@@ -319,23 +320,17 @@ public class ShowcaseCommand {
         MutableText hoverableName = createClickableTag(itemName, type, shareId);
 
         if ("item".equals(type)) {
-            ItemStack stack = source.getInventory().getMainHandStack();
+            ItemStack stack = source.getEquippedStack(EquipmentSlot.MAINHAND);
             if (!stack.isEmpty()) {
                 hoverableName.setStyle(hoverableName.getStyle()
-                    .withHoverEvent(new HoverEvent(
-                        HoverEvent.Action.SHOW_ITEM,
-                        new HoverEvent.ItemStackContent(stack)
-                    )));
+                    .withHoverEvent(new HoverEvent.ShowItem(stack)));
             }
             return hoverableName;
         }
 
         MutableText preview = createContainerPreviewText(itemName, type, shareId);
         hoverableName.setStyle(hoverableName.getStyle()
-                .withHoverEvent(new HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    preview
-                )));
+                .withHoverEvent(new HoverEvent.ShowText(preview)));
 
         return hoverableName;
     }
@@ -370,8 +365,7 @@ public class ShowcaseCommand {
     }
 
     private static ClickEvent createShareClickEvent(String id) {
-        return new ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
+        return new ClickEvent.RunCommand(
                 "/" + VIEW_COMMAND + " "  + id
         );
     }
@@ -488,8 +482,8 @@ public class ShowcaseCommand {
                 .append(Text.literal("[ID] ").formatted(Formatting.GRAY))
                 .append(Text.literal(shareId).formatted(Formatting.YELLOW)
                         .styled(style -> style
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, shareId))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Copy ID")))))
+                                .withClickEvent(new ClickEvent.CopyToClipboard(shareId))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Copy ID"))))
                 .append(Text.literal("  "))
 
                 .append(Text.literal("[Owner] ").formatted(Formatting.GRAY))
@@ -514,8 +508,8 @@ public class ShowcaseCommand {
                 .append(Text.literal(" | [Cancel Share] ")
                         .styled(style -> style
                                 .withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to cancel share")))))
+                                .withClickEvent(new ClickEvent.RunCommand("/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to cancel share"))))))
                 .append(Text.literal("  "))
 
 
