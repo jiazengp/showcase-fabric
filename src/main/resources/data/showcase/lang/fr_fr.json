@@ -1,0 +1,59 @@
+{
+  "showcase.message.cooldown": "§rVous avez effectué trop de partages rapidement, veuillez attendre §l%d§r secondes avant de réessayer.",
+  "showcase.message.no_item": "§rVeuillez tenir un objet à montrer.",
+  "showcase.message.item_shared": "§r%s a montré son %s.",
+  "showcase.message.inventory_shared": "§r%s a montré son %s.",
+  "showcase.message.other_inventory_shared": "§r%s a montré le %s de %s.",
+  "showcase.message.ender_chest_shared": "§r%s a montré son %s.",
+  "showcase.message.other_ender_chest_shared": "§r%s a montré le %s de %s.",
+  "showcase.message.hotbar_shared": "§r%s a montré sa %s.",
+  "showcase.message.other_hotbar_shared": "§r%s a montré la %s de %s.",
+  "showcase.message.container_shared": "§r%s a montré son %s.",
+  "showcase.message.merchant_shared": "§r%s a montré le panneau d’échange de %s.",
+  "showcase.message.private_share_tip": "§rVous avez montré le %s de %s à %s.",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rVeuillez ouvrir le conteneur que vous souhaitez montrer dans les §l%d§r prochaines secondes.",
+  "showcase.message.share_container_expiry": "§rAucun conteneur valide détecté, partage annulé.",
+  "showcase.message.share_merchant_tip": "§rVeuillez ouvrir le panneau d’échange que vous souhaitez montrer dans les §l%d§r prochaines secondes.",
+  "showcase.message.share_merchant_expiry": "§rAucun panneau d’échange valide détecté, partage annulé.",
+  "showcase.message.expiry_notice": "§r(Ce lien expirera dans §l%d§r minutes.)",
+  "showcase.message.click_to_view": "§rCliquez pour voir",
+  "showcase.message.invalid_or_expired": "§rCe lien de partage est invalide ou expiré.",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s’s %s",
+  "showcase.screen.hotbar_title": "§r%s’s %s",
+  "showcase.screen.item_title": "§r%s’s %s",
+  "showcase.screen.container_title": "§r%s a montré %s",
+  "showcase.screen.merchant_title": "§r%s a montré le panneau d’échange de %s",
+
+  "showcase.message.default.inventory": "§r%s a montré son %s.",
+  "showcase.message.default.ender_chest": "§r%s a montré son %s.",
+  "showcase.message.default.hotbar": "§r%s a montré sa %s.",
+  "showcase.message.default.item": "§r%s a montré son %s.",
+  "showcase.message.default.container": "§r%s a montré un %s.",
+  "showcase.message.default.merchant": "§r%s a montré le contenu d’échange de %s.",
+
+  "showcase.message.invalid_id": "§rID de partage invalide.",
+  "showcase.message.cancel_not_owner": "§rVous ne pouvez annuler que vos propres partages.",
+  "showcase.message.cancel_success": "§rPartage annulé avec succès.",
+  "showcase.message.cancel_failed": "§rÉchec de l’annulation du partage.",
+
+  "showcase.message.manage.empty": "§rAucun partage valide.",
+
+  "showcase.message.manage.cancel.success_id": "§rPartage %s annulé avec succès.",
+  "showcase.message.manage.cancel.tip": "§rCliquez pour annuler ce partage.",
+  "showcase.message.manage.cancel.success_player": "§r%s a annulé %s partages de %s.",
+  "showcase.message.manage.cancel.empty": "§rAucun partage valide trouvé pour %s.",
+  "showcase.message.manage.cancel.not_found": "§rID de partage ou nom de joueur introuvable.",
+
+  "showcase.preview_text.more_trades": "§rEt §l%d§r autres échanges.",
+  "showcase.preview_text.more": "§r%s éléments non affichés…",
+  "showcase.message.invalid_duration_exception": "§rLa durée valide doit être comprise entre §l%d§r et §l%d§r secondes.",
+
+  "showcase.message.about.version": "§rVersion : %s",
+  "showcase.message.about.contributors": "§rContributeurs",
+
+  "showcase.message.reload.success": "§rConfiguration rechargée avec succès !",
+  "showcase.message.reload.fail": "§rÉchec du rechargement de la configuration !"
+}

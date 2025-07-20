@@ -1,5 +1,6 @@
 package com.showcase.listener;
 
+import com.showcase.utils.PermissionChecker;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
@@ -23,6 +24,8 @@ public class ChatMessageListener {
     }
 
     private static boolean messageHandler(SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters params) {
+        if (!PermissionChecker.hasPermission(sender, "chat.placeholder", 1)) return true;
+
         String originalText = message.getContent().getString();
 
         if (containsPlaceholders(originalText)) {

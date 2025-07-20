@@ -29,7 +29,7 @@ public class ChatPaginator<T> {
         return Math.max(1, Math.min(page, getTotalPages()));
     }
 
-    public List<T> getPageItems(int page) {
+    public synchronized List<T> getPageItems(int page) {
         page = clampPage(page);
         int fromIndex = (page - 1) * pageSize;
         int toIndex = Math.min(page * pageSize, items.size());
@@ -60,16 +60,16 @@ public class ChatPaginator<T> {
 
         if (page > 1) {
             nav.append(Text.translatable("spectatorMenu.previous_page").formatted(Formatting.BLUE)
-                    .styled(s -> s.withClickEvent(new ClickEvent.RunCommand(commandPrefix + " " + (page - 1)))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.translatable("spectatorMenu.previous_page")))));
+                    .styled(s -> s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandPrefix + " " + (page - 1)))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("spectatorMenu.previous_page")))));
         }
 
         nav.append(Text.literal(" | ").formatted(Formatting.DARK_GRAY));
 
         if (page < totalPages) {
             nav.append(Text.translatable("spectatorMenu.next_page").formatted(Formatting.BLUE)
-                    .styled(s -> s.withClickEvent(new ClickEvent.RunCommand(commandPrefix + " " + (page + 1)))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.translatable("spectatorMenu.next_page")))));
+                    .styled(s -> s.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandPrefix + " " + (page + 1)))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("spectatorMenu.next_page")))));
         }
 
         return nav;

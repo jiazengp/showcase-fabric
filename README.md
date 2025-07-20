@@ -1,37 +1,41 @@
 # Showcase Mod
 
-Showcase Mod allows players to easily share their inventory, held items, hotbar, ender chest, or any container with others via clickable share links and Readonly GUI.
+> The current description is for V2. For V1, please [click here](https://modrinth.com/mod/showcase/version/1.1.0+mc1.21.6).
+
+Allows players to easily showcase their various items, any container, or even villager trades to others via clickable share links and a read-only GUI.
 
 ## Features ✨
 
-- Share your **held item**, **inventory**, **hotbar**, **ender chest**, or any **container**
-- Generate clickable share links that expire after a configurable time
-- Share publicly or privately to specific players
-- **Multi-language support** (English, Chinese, Japanese, Korean, French)
-- **LuckPerms support** for permission management
-- **Placeholder support** for chat messages
-- Admin commands to share on behalf of others and manage shares
+- Supports sharing any item, container, and even villager trade interfaces
+- Fully server-side mod: all features are provided independently by the server
+- Auto-unpack preview: when sharing shulker boxes or backpacks, users can click to view contents whether shared as items or containers
+- Supports preview interaction such as clicking to open book GUIs and view maps
+- Localization support with multiple languages available
+- Persistent data storage: all shares are saved automatically and deleted only after their configured expiration time
+- LuckPerms integration: all features and commands have corresponding permission nodes registered
+- Placeholder support: use specified placeholders directly in chat messages for dynamic content display
+
 
 ## Commands & Usage ⌨️
 
 ### Player Commands
 
-- `/showcase item [player (optional)] [description (optional)]`  
-  Share the item you are holding
-- `/showcase inventory [player (optional)] [description (optional)]`  
-  Share your inventory
-- `/showcase hotbar [player (optional)] [description (optional)]`  
-  Share your hotbar
-- `/showcase enderchest [player (optional)] [description (optional)]`  
-  Share your ender chest
-- `/showcase container [player (optional)] [description (optional)]`  
+- `/showcase item [player (optional)] [valid duration (optional)] [description (optional)]`
+- `/showcase inventory [player (optional)] [valid duration (optional)] [description (optional)]`
+- `/showcase hotbar [player (optional)] [valid duration (optional)] [description (optional)]`
+- `/showcase enderchest [player (optional)] [valid duration (optional)] [description (optional)]`
+- `/showcase container [player (optional)] [valid duration (optional)] [description (optional)]`  
   Share a container you open within 10 seconds
+- `/showcase merchant [player (optional)] [valid duration (optional)] [description (optional)]`  
+  Share the trade gui you open within 10 seconds
+- `/showcase cancel <id>`  
+  Cancel your share by share link ID
 - `/showcase-view <id>`  
   View shared content by share link ID
 
 ### Admin Commands
 
-- `/adminshare <type> <targetPlayer> [receiver (optional)] [description (optional)]`  
+- `/admin-showcase <type> <targetPlayer> [receiver (optional)] [valid duration (optional)] [description (optional)]`  
   Share on behalf of another player (types: item, inventory, hotbar, enderchest)
 - `/showcase-manage reload`  
   Reload the mod configuration
@@ -49,33 +53,14 @@ Use these placeholders in chat:
 - `%showcase:hotbar%` - Share hotbar
 - `%showcase:ender_chest%` - Share ender chest
 
-## Permissions 🔒
-
-With LuckPerms installed, these permissions are available:
-
-| Permission Node | Default | Description |
-|-----------------|---------|-------------|
-| `showcase.admin` | OP 4 | Full access to all admin commands |
-| `showcase.manage.list` | OP 4 | View active shares with `/showcase-manage list` |
-| `showcase.manage.cancel` | OP 4 | Cancel shares with `/showcase-manage cancel` |
-| `showcase.manage.reload` | OP 4 | Reload config with `/showcase-manage reload` |
-| `showcase.bypass.cooldown` | OP 2 | Bypass command cooldowns |
-| `showcase.share.item` | true | Allow using `/share item` |
-| `showcase.share.inventory` | true | Allow using `/share inventory` |
-| `showcase.share.hotbar` | true | Allow using `/share hotbar` |
-| `showcase.share.enderchest` | true | Allow using `/share enderchest` |
-| `showcase.share.container` | true | Allow using `/share container` |
-
-Without LuckPerms, OP levels are used as fallback (shown in Default column).
-
 ## Configuration ⚙️
 
 ```jsonc
 {
-  "shareLinkExpiryTime": 300,  // Share link expiry in seconds
+  "shareLinkExpiryTime": 300,  // Maximum selectable expiry time for share links
+  "shareLinkMinimumExpiryTime": 60 // Minimum selectable expiry time for share links
   "shareCommandCooldown": 10,  // Cooldown between commands
-  "containerListeningDuration": 10,  // Time to open container
-  "locale": "en_us"  // Default language (en_us, zh_cn, ja_jp, ko_kr, fr_fr)
+  "containerListeningDuration": 10  // Time to open container
 }
 ```
 

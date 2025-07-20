@@ -1,50 +1,73 @@
 package com.showcase;
 
+import com.mojang.serialization.Codec;
 import com.showcase.command.ShowcaseCommand;
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfig;
+import com.showcase.data.GlobalDataManager;
+import com.showcase.data.JsonCodecDataStorage;
+import com.showcase.data.ShareEntry;
 import com.showcase.listener.ChatMessageListener;
-import com.showcase.network.NetworkHandler;
 import com.showcase.placeholders.Placeholders;
+import com.showcase.utils.ContainerOpenWatcher;
+import com.showcase.utils.MapViewer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+
+import static com.showcase.data.ShareEntry.SHARE_ENTRY_CODEC;
 
 public class ShowcaseMod implements ModInitializer {
 	public static final String MOD_ID = "showcase";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ModConfig CONFIG;
+	public static final Identifier PLAYER_SHARE_STORAGE_ID = Identifier.of(MOD_ID, "showcase_storage");
+	public static final Codec<Map<String, ShareEntry>> PLAYER_SHARE_ENTRY_CODEC =
+			Codec.unboundedMap(Codec.STRING, SHARE_ENTRY_CODEC);
+	public static final JsonCodecDataStorage<Map<String, ShareEntry>> PLAYER_SHARE_STORAGE =
+            new JsonCodecDataStorage<>("player_share_entry", PLAYER_SHARE_ENTRY_CODEC);
 
 	@Override
 	public void onInitialize() {
-		try {
-			CONFIG = ModConfig.load();
-			
-			// Register network first as it may be necessary for other components
-			NetworkHandler.register();
+		CONFIG = ModConfig.load();
 
-			// Then register commands
-			CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-				ShowcaseCommand.register(dispatcher);
-				LOGGER.debug("Commands registered");
-			});
+		GlobalDataManager.register(PLAYER_SHARE_STORAGE_ID, PLAYER_SHARE_STORAGE);
 
-			// Register placeholders and chat handlers
-			Placeholders.registerPlaceholders();
-			ChatMessageListener.registerChatHandler();
+		CommandRegistrationCallback.EVENT.register(
+				(dispatcher, registryAccess, environment) ->
+						ShowcaseCommand.register(dispatcher)
+		);
 
-			// Register cleanup hook
-			ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
-				ShowcaseManager.clearAll();
-				LOGGER.info("Cleaned up shared items on server shutdown");
-			});
+		Placeholders.registerPlaceholders();
+		ChatMessageListener.registerChatHandler();
 
-			LOGGER.info("Showcase Mod initialized successfully!");
-		} catch (Exception e) {
-			LOGGER.error("Failed to initialize Showcase Mod", e);
-			throw new RuntimeException("Showcase Mod initialization failed", e);
-		}
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+			try {
+				Map<String, ShareEntry> data = GlobalDataManager.getData(server, PLAYER_SHARE_STORAGE_ID);
+				if (data != null) ShowcaseManager.register(data);
+			} catch (Exception e) {
+				LOGGER.error("Failed to load showcase data", e);
+			}
+		});
+
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			MapViewer.restoreAll(server);
+			ContainerOpenWatcher.cleanup();
+			try {
+				GlobalDataManager.setData(server, PLAYER_SHARE_STORAGE_ID, ShowcaseManager.getActiveShares());
+				GlobalDataManager.saveAll(server);
+			} catch (Exception e) {
+				LOGGER.error("Failed to save showcase data", e);
+			}
+			ShowcaseManager.clearAll();
+			LOGGER.info("Cleaned up shared items on server shutdown");
+		});
+
+		LOGGER.info("Showcase Mod initialized successfully!");
 	}
 }

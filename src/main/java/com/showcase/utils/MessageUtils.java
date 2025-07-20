@@ -4,9 +4,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.showcase.utils.TextUtils.getSafeDisplayName;
 
 public class MessageUtils {
     public static final Pattern PREDEFINED_PLACEHOLDER_PATTERN = Pattern.compile(
@@ -31,12 +32,6 @@ public class MessageUtils {
         );
 
         return format(inputText, placeholders);
-    }
-
-    public static Text getSafeDisplayName(ServerPlayerEntity player) {
-        if (player == null) return Text.translatable("argument.entity.notfound.player");
-        Text displayName = Text.translatable("chat.type.text", player.getDisplayName(), "");
-        return Objects.requireNonNullElseGet(displayName, () -> Text.literal(player.getName().getString()));
     }
 
     public static Text format(String template, Map<String, Text> replacements) {

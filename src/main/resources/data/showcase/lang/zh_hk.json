@@ -1,0 +1,59 @@
+{
+  "showcase.message.cooldown": "§r你连续咁快展示咗几次，请等 §l%d§r 秒先再试。",
+  "showcase.message.no_item": "§r请拿住你想展示嘅物品。",
+  "showcase.message.item_shared": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.inventory_shared": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.other_inventory_shared": "§r%s 我展示咗 %s 嘅 %s。",
+  "showcase.message.ender_chest_shared": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.other_ender_chest_shared": "§r%s 我展示咗 %s 嘅 %s。",
+  "showcase.message.hotbar_shared": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.other_hotbar_shared": "§r%s 我展示咗 %s 嘅 %s。",
+  "showcase.message.container_shared": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.merchant_shared": "§r%s 我展示咗 %s 嘅交易介面。",
+  "showcase.message.private_share_tip": "§r我已經將 %s 嘅 %s 展示俾 %s 睇。",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§r请喺 §l%d§r 秒内开你想展示嘅容器。",
+  "showcase.message.share_container_expiry": "§r未检测到开有效嘅容器，展示失败。",
+  "showcase.message.share_merchant_tip": "§r请喺 §l%d§r 秒内开你想展示嘅交易介面。",
+  "showcase.message.share_merchant_expiry": "§r未检测到开有效嘅交易介面，展示失败。",
+  "showcase.message.expiry_notice": "§r（呢个链接会喺 §l%d§r 分钟后过期）",
+  "showcase.message.click_to_view": "§r点击睇睇",
+  "showcase.message.invalid_or_expired": "§r呢个展示链接无效或者已经过期。",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s 嘅 %s",
+  "showcase.screen.hotbar_title": "§r%s 嘅 %s",
+  "showcase.screen.item_title": "§r%s 嘅 %s",
+  "showcase.screen.container_title": "§r%s 展示嘅 %s",
+  "showcase.screen.merchant_title": "§r%s 展示嘅 %s 交易介面",
+
+  "showcase.message.default.inventory": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.default.ender_chest": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.default.hotbar": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.default.item": "§r%s 我展示咗我嘅 %s。",
+  "showcase.message.default.container": "§r%s 我展示咗一个 %s。",
+  "showcase.message.default.merchant": "§r%s 我展示咗 %s 嘅交易内容。",
+
+  "showcase.message.invalid_id": "§r无效嘅展示ID。",
+  "showcase.message.cancel_not_owner": "§r你只能取消自己嘅展示。",
+  "showcase.message.cancel_success": "§r成功取消咗展示。",
+  "showcase.message.cancel_failed": "§r取消展示失败。",
+
+  "showcase.message.manage.empty": "§r冇任何有效嘅展示。",
+
+  "showcase.message.manage.cancel.success_id": "§r成功取消咗展示 %s。",
+  "showcase.message.manage.cancel.tip": "§r点击取消呢个展示。",
+  "showcase.message.manage.cancel.success_player": "§r成功取消咗 %s 嘅 %s 个展示。",
+  "showcase.message.manage.cancel.empty": "§r未搵到 %s 嘅任何有效展示。",
+  "showcase.message.manage.cancel.not_found": "§r搵唔到对应嘅展示ID或者玩家名。",
+
+  "showcase.preview_text.more_trades": "§r仲有 §l%d§r 个其他交易内容。",
+  "showcase.preview_text.more": "§r仲有 %s 项未显示…",
+  "showcase.message.invalid_duration_exception": "§r有效时间必须係 §l%d§r 到 §l%d§r 秒之间。",
+
+  "showcase.message.about.version": "§r版本： %s",
+  "showcase.message.about.contributors": "§r贡献者",
+
+  "showcase.message.reload.success": "§r成功重新载入配置！",
+  "showcase.message.reload.fail": "§r重新载入配置失败！"
+}

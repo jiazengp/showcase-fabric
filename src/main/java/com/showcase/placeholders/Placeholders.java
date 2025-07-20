@@ -1,8 +1,9 @@
 package com.showcase.placeholders;
 
 import com.showcase.ShowcaseMod;
-import com.showcase.command.ShowcaseCommand;
+import com.showcase.command.ShareCommandUtils;
 import com.showcase.command.ShowcaseManager;
+import com.showcase.utils.TextUtils;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.node.LiteralNode;
@@ -28,13 +29,12 @@ public class Placeholders {
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.INVENTORY))
                 return PlaceholderResult.invalid("Too fast");
 
-            String shareId = ShowcaseManager.createInventoryShare(player);
+            String shareId = ShowcaseManager.createInventoryShare(player, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.INVENTORY);
 
-            MutableText text = ShowcaseCommand.createClickableItemName(
-                    player,
-                    "INVENTORY",
-                    Text.translatable("itemGroup.inventory"),
+            MutableText text = ShareCommandUtils.createClickableItemName(
+                    ShowcaseManager.ShareType.INVENTORY,
+                    TextUtils.INVENTORY,
                     shareId
             );
 
@@ -48,13 +48,12 @@ public class Placeholders {
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.HOTBAR))
                 return PlaceholderResult.invalid("Too fast");
 
-            String shareId = ShowcaseManager.createHotbarShare(player);
+            String shareId = ShowcaseManager.createHotbarShare(player, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.HOTBAR);
 
-            MutableText text = ShowcaseCommand.createClickableItemName(
-                    player,
-                    "HOTBAR",
-                    Text.translatable("itemGroup.hotbar"),
+            MutableText text = ShareCommandUtils.createClickableItemName(
+                    ShowcaseManager.ShareType.HOTBAR,
+                    TextUtils.HOTBAR,
                     shareId
             );
             return PlaceholderResult.value(text);
@@ -71,15 +70,14 @@ public class Placeholders {
             ItemStack stack = player.getEquippedStack(EquipmentSlot.MAINHAND);
 
             if (stack.isEmpty()) {
-                return PlaceholderResult.invalid(ShowcaseMod.CONFIG.messages.noItem);
+                return PlaceholderResult.invalid(Text.translatable("showcase.message.no_item").getString());
             }
 
-            String shareId = ShowcaseManager.createItemShare(player, stack);
+            String shareId = ShowcaseManager.createItemShare(player, stack, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ITEM);
 
-            MutableText text = ShowcaseCommand.createClickableItemName(
-                    player,
-                    "ITEM",
+            MutableText text = ShareCommandUtils.createClickableItemName(
+                    ShowcaseManager.ShareType.ITEM,
                     stack.getName(),
                     shareId
             );
@@ -93,13 +91,12 @@ public class Placeholders {
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST))
                 return PlaceholderResult.invalid("Too fast");
 
-            String shareId = ShowcaseManager.createEnderChestShare(player);
+            String shareId = ShowcaseManager.createEnderChestShare(player, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST);
 
-            MutableText text =  ShowcaseCommand.createClickableItemName(
-                    player,
-                    "ENDER_CHEST",
-                    Text.translatable("container.enderchest"),
+            MutableText text =  ShareCommandUtils.createClickableItemName(
+                    ShowcaseManager.ShareType.ENDER_CHEST,
+                    TextUtils.ENDER_CHEST,
                     shareId
             );
             return PlaceholderResult.value(text);
