@@ -3,6 +3,7 @@ package com.showcase.placeholders;
 import com.showcase.ShowcaseMod;
 import com.showcase.command.ShareCommandUtils;
 import com.showcase.command.ShowcaseManager;
+import com.showcase.utils.PermissionChecker;
 import com.showcase.utils.TextUtils;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
@@ -25,6 +26,9 @@ public class Placeholders {
         eu.pb4.placeholders.api.Placeholders.register(INVENTORY, (ctx, arg) -> {
             if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.inventory", 1))
+                return PlaceholderResult.invalid("No permission");
+
 
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.INVENTORY))
                 return PlaceholderResult.invalid("Too fast");
@@ -44,6 +48,9 @@ public class Placeholders {
         eu.pb4.placeholders.api.Placeholders.register(HOTBAR, (ctx, arg) -> {
             if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.hotbar", 1))
+                return PlaceholderResult.invalid("No permission");
+
 
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.HOTBAR))
                 return PlaceholderResult.invalid("Too fast");
@@ -62,6 +69,8 @@ public class Placeholders {
         eu.pb4.placeholders.api.Placeholders.register(ITEM, (ctx, arg) -> {
             if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.item", 1))
+                return PlaceholderResult.invalid("No permission");
 
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ITEM))
                 return PlaceholderResult.invalid("Too fast");
@@ -87,6 +96,9 @@ public class Placeholders {
         eu.pb4.placeholders.api.Placeholders.register(ENDER_CHEST, (ctx, arg) -> {
             if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.ender_chest", 1))
+                return PlaceholderResult.invalid("No permission");
+
 
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST))
                 return PlaceholderResult.invalid("Too fast");
