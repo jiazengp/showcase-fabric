@@ -203,7 +203,7 @@ public final class ShowcaseManager {
 
     public static ItemStack getItemStackWithID(String shareId) {
         ShareEntry shareEntry = getShareEntry(shareId);
-        if (shareEntry == null) return null;
+        if (shareEntry == null || shareEntry.getType() != ITEM) return null;
         return shareEntry.getInventory().getStack(0).copy();
     }
 
