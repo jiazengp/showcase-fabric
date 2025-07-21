@@ -164,14 +164,14 @@ public class ShareCommandUtils {
 
             if (stack != null && !stack.isEmpty()) {
                 hoverableName.setStyle(hoverableName.getStyle()
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM,  new HoverEvent.ItemStackContent(stack))));
+                        .withHoverEvent(new HoverEvent.ShowItem(stack)));
             }
             return hoverableName;
         }
 
         MutableText preview = getFinalPreviewText(itemName, type, shareId);
         hoverableName.setStyle(hoverableName.getStyle()
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, preview)));
+                .withHoverEvent(new HoverEvent.ShowText(preview)));
 
         return hoverableName;
     }
@@ -219,7 +219,7 @@ public class ShareCommandUtils {
     }
 
     public static ClickEvent createShareClickEvent(String id) {
-        return new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + VIEW_COMMAND + " " + id);
+        return new ClickEvent.RunCommand("/" + VIEW_COMMAND + " " + id);
     }
 
     public static MutableText buildDefaultMessageForReceiver(ServerPlayerEntity sender,
@@ -333,8 +333,8 @@ public class ShareCommandUtils {
                 .append(Text.literal("[ID] ").formatted(Formatting.GRAY))
                 .append(Text.literal(shareId).formatted(Formatting.YELLOW)
                         .styled(style -> style
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, shareId))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Copy ID")))))
+                                .withClickEvent(new ClickEvent.CopyToClipboard(shareId))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Copy ID")))))
                 .append(Text.literal("  "));
     }
 
@@ -376,8 +376,8 @@ public class ShareCommandUtils {
                 .append(Text.literal(" | [Cancel Share] ")
                         .styled(style -> style
                                 .withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("showcase.message.manage.cancel.tip")))))
+                                .withClickEvent(new ClickEvent.RunCommand("/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.translatable("showcase.message.manage.cancel.tip")))))
                 .append(Text.literal("  "));
     }
 
