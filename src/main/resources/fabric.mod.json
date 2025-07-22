@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "showcase",
 	"version": "${version}",
-	"name": "showcase",
+	"name": "Showcase",
 	"description": "Allows players to easily showcase their various items, any container, or even villager trades to others via clickable share links and a read-only GUI.",
 	"authors": [
 		"Hyouka233"
@@ -13,7 +13,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/showcase/icon.png",
-	"environment": "*",
+	"environment": "server",
 	"entrypoints": {
 		"main": [
 			"com.showcase.ShowcaseMod"
@@ -23,13 +23,12 @@
 		"showcase.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": ">=1.21",
-		"sgui": ">=1.10.0",
-		"java": ">=21",
-		"fabric-api": "*"
+		"fabricloader": ">=${fabric_loader_version}",
+		"minecraft": ">=${minecraft_version}",
+		"sgui": ">=${sgui_api_version}",
+		"java": ">=${java_version}"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"luckperms": "*"
 	}
 }

@@ -4,30 +4,23 @@ plugins {
 }
 
 def versionProperties = new Properties()
-def defaultPropertiesFile = file("version_properties/1.21.6.properties")
 def targetPropertiesFile = file("version_properties/${project.minecraft_version}.properties")
 
-// Load properties - use target version if exists, otherwise fallback to default
 if (targetPropertiesFile.exists()) {
     targetPropertiesFile.withInputStream { versionProperties.load(it) }
-} else {
-    defaultPropertiesFile.withInputStream { versionProperties.load(it) }
 }
 
-// Get highest compatible version (last in compatible_minecraft_versions array)
-def compatibleVersions = versionProperties.getProperty("compatible_minecraft_versions")
-def highestVersion = compatibleVersions.split(",").last().replaceAll(/[\[\]"]/, "").trim()
+def compatibleVersions = versionProperties.getProperty("minecraft_version")
 
-version = "${project.mod_version}+${highestVersion}"
+archivesBaseName = project.archives_base_name
+version = "${project.mod_version}+${compatibleVersions}"
 group = project.maven_group
-
-base {
-	archivesName = project.archives_base_name
-}
 
 repositories {
 	// There might be other repos there too, just add it at the end
-	maven {url "https://maven.nucleoid.xyz/" }
+	maven {
+		url "https://maven.nucleoid.xyz/"
+	}
 
 	mavenCentral()
 	mavenLocal()
@@ -45,7 +38,6 @@ dependencies {
 	modImplementation include("eu.pb4:sgui:${versionProperties.getProperty("sgui_api_version")}")
 	modImplementation include("xyz.nucleoid:server-translations-api:${versionProperties.getProperty("server_translations_api_version")}")
 
-	modImplementation "net.luckperms:api:${versionProperties.getProperty("luckperms_api_version")}"
 	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.4.1")))
 
 	include(modImplementation("me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"))
@@ -55,14 +47,18 @@ dependencies {
 processResources {
     inputs.property "version", version
     inputs.property "minecraft_version", versionProperties.getProperty("minecraft_version")
-    inputs.property "compatible_minecraft_versions", versionProperties.getProperty("compatible_minecraft_versions")
+	inputs.property "java_version", versionProperties.getProperty("java_version")
+	inputs.property "sgui_version", versionProperties.getProperty("sgui_api_version")
+	inputs.property "fabricloader_version", versionProperties.getProperty("fabric_loader_version")
 	inputs.property "refmap_name", "showcase.mixins.refmap.json"
 
     filesMatching("fabric.mod.json") {
         expand(
             "version": version,
-            "minecraft_version": inputs.properties.minecraft_version,
-            "compatible_minecraft_versions": inputs.properties.compatible_minecraft_versions
+			"java_version": versionProperties.getProperty("java_version"),
+			"minecraft_version": versionProperties.getProperty("minecraft_version"),
+			"sgui_api_version": versionProperties.getProperty("sgui_api_version"),
+			"fabric_loader_version": versionProperties.getProperty("fabric_loader_version")
         )
     }
 }
@@ -72,9 +68,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
 	sourceCompatibility = JavaVersion.VERSION_21
@@ -82,27 +75,9 @@ java {
 }
 
 jar {
-	inputs.property "archivesName", project.base.archivesName
+	inputs.property "archivesName", archivesBaseName
 
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
 	}
 }
