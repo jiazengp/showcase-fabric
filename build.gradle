@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
+	id "com.modrinth.minotaur" version "2.+"
 }
 
 def versionProperties = new Properties()
@@ -79,5 +80,24 @@ jar {
 
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
+	}
+}
+
+if (System.getenv("MODRINTH")) {
+	modrinth {
+		token = System.getenv("MODRINTH")
+		projectId = 'DC8AYtgP'
+		versionNumber = "" + version
+		versionType = "release"
+		changelog = System.getenv("CHANGELOG")
+		// On fabric, use 'remapJar' instead of 'jar'
+		uploadFile = remapJar
+		gameVersions = [((String) project.minecraft_version)]
+		loaders = ["fabric", "quilt"]
+		syncBodyFrom = rootProject.file("README.md").text
+	}
+
+	remapJar {
+		finalizedBy project.tasks.modrinth
 	}
 }
