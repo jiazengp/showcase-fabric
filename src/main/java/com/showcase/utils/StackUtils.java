@@ -36,7 +36,6 @@ public class StackUtils {
     }
 
     private static final Set<ScreenHandlerType<?>> WHITELISTED_TYPES = Set.of(
-            ScreenHandlerType.LECTERN,
             ScreenHandlerType.GENERIC_9X3,
             ScreenHandlerType.GENERIC_9X6,
             ScreenHandlerType.GENERIC_3X3,
