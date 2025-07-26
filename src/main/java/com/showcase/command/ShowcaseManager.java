@@ -6,6 +6,7 @@ import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
 import com.showcase.utils.*;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.BundleContentsComponent;
 import net.minecraft.component.type.ContainerComponent;
@@ -87,7 +88,7 @@ public final class ShowcaseManager {
     public static String createEnderChestShare(ServerPlayerEntity owner, Integer duration) {
         String id = nextId();
         int size = owner.getEnderChestInventory().size();
-        ReadOnlyInventory inv = new ReadOnlyInventory(size, "", handlerTypeForRows(size / 9));
+        ReadOnlyInventory inv = new ReadOnlyInventory(size, TextUtils.ENDER_CHEST, handlerTypeForRows(size / 9));
         for (int i = 0; i < size; i++) {
             inv.setStack(i, owner.getEnderChestInventory().getStack(i).copy());
         }
@@ -136,6 +137,7 @@ public final class ShowcaseManager {
     }
 
     public static boolean isOnCooldown(ServerPlayerEntity player, ShareType type) {
+        if(FabricLoader.getInstance().isDevelopmentEnvironment()) return false;
         EnumMap<ShareType, Long> map = COOLDOWNS.get(player.getUuid());
         if (map == null) return false;
 
@@ -287,7 +289,7 @@ public final class ShowcaseManager {
 
 
     private static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity p) {
-        ReadOnlyInventory inv = new ReadOnlyInventory(54, "", ScreenHandlerType.GENERIC_9X6);
+        ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, ScreenHandlerType.GENERIC_9X6);
 
         // Armor & offhand (row 0‑5)
         inv.setStack(0, p.getEquippedStack(EquipmentSlot.HEAD).copy());
