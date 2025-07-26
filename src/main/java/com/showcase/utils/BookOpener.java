@@ -1,5 +1,6 @@
 package com.showcase.utils;
 
+import com.showcase.gui.ContainerGui;
 import eu.pb4.sgui.api.gui.BookGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -11,20 +12,6 @@ public final class BookOpener {
     private static final String BOOK_MARK = "isShowcaseBook";
     private final ItemStack book;
     private final BookGui gui;
-    public interface BookOpenerHandler {
-        void onClose();
-    }
-
-    public BookOpener(ServerPlayerEntity player, ItemStack book, BookOpenerHandler onClosedCallback) {
-        this.book = book;
-        this.gui = new BookGui(player, getNormalizeBook()) {
-            @Override
-            public void onClose() {
-                super.onClose();
-                onClosedCallback.onClose();
-            }
-        };
-    }
 
     public BookOpener(ServerPlayerEntity player, ItemStack book) {
         this.book = book;

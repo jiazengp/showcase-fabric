@@ -159,27 +159,14 @@ public class ContainerGui extends SimpleGui {
     }
 
     private void onBookClick(ItemStack stack, ServerPlayerEntity player) {
-        prepareToOpenNextGUI();
-
-        BookOpener bookOpener = new BookOpener(player, stack, () -> {});
-
-        this.player.getWorld().getServer().execute(() -> {
-            bookOpener.open();
-            isOpeningNestedContainer = false;
-        });
+        this.close();
+        BookOpener bookOpener = new BookOpener(player, stack);
+        bookOpener.open();
     }
 
     private void onMapClick(ItemStack stack, ServerPlayerEntity player) {
-        prepareToOpenNextGUI();
-
-        this.player.getWorld().getServer().execute(() -> {
-            MapViewer.viewMap(player, stack, (closedPlayer, mapItem) ->
-            {
-                if (!isOpeningNestedContainer) openPreviousGui();
-            });
-
-            isOpeningNestedContainer = false;
-        });
+        this.close();
+        MapViewer.viewMap(player, stack);
     }
 
     public void refreshItems(DefaultedList<ItemStack> items) {

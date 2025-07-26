@@ -20,14 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class MapViewer {
     private static final String MAP_MARK = "isShowcaseMap";
     private static final Map<UUID, ViewingSession> viewingSessions = new ConcurrentHashMap<>();
-    private static final Map<UUID, MapViewerHandler> closeCallbacks = new ConcurrentHashMap<>();
-
-    public interface MapViewerHandler {
-        void onClose(ServerPlayerEntity player, ItemStack mapItem);
-    }
 
     static {
-        // 每 Tick 检查是否需要自动关闭 GUI
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (viewingSessions.isEmpty()) return;
 
@@ -60,10 +54,6 @@ public final class MapViewer {
     }
 
     public static void open(ServerPlayerEntity player, ItemStack map, int displaySeconds) {
-        open(player, map, displaySeconds, null);
-    }
-
-    public static void open(ServerPlayerEntity player, ItemStack map, int displaySeconds, MapViewerHandler callback) {
         if (player == null || player.isSpectator() || !StackUtils.isMap(map)) return;
 
         UUID playerId = player.getUuid();
@@ -74,8 +64,6 @@ public final class MapViewer {
         NbtCompound nbt = customData.copyNbt();
         nbt.putBoolean(MAP_MARK, true);
         displayMap.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-
-        if (callback != null) closeCallbacks.put(playerId, callback);
 
         MapViewerGui gui = new MapViewerGui(new MapViewerContext(player, displayMap), 0) {
             @Override
@@ -92,23 +80,13 @@ public final class MapViewer {
     }
 
     public static void viewMap(ServerPlayerEntity player, ItemStack mapItem) {
-        open(player, mapItem, 10);
-    }
-
-    public static void viewMap(ServerPlayerEntity player, ItemStack mapItem, MapViewerHandler callback) {
         if (player != null && mapItem != null) {
-            open(player, mapItem, 10, callback);
+            open(player, mapItem, 10);
         }
     }
 
     private static void handleMapViewerClose(ServerPlayerEntity player, ItemStack mapItem) {
         UUID playerId = player.getUuid();
-        MapViewerHandler callback = closeCallbacks.remove(playerId);
-        if (callback != null) {
-            try {
-                callback.onClose(player, mapItem);
-            } catch (Exception ignored) {}
-        }
         viewingSessions.remove(playerId);
     }
 
@@ -139,7 +117,6 @@ public final class MapViewer {
             }
         }
         viewingSessions.clear();
-        closeCallbacks.clear();
     }
 
     public static int getViewingPlayersCount() {
@@ -163,16 +140,6 @@ public final class MapViewer {
 
         int currentTick = player.getWorld().getServer().getTicks();
         return Math.max(0, (session.autoRestoreTick - currentTick) / 20);
-    }
-
-    public static void setCloseCallback(ServerPlayerEntity player, MapViewerHandler callback) {
-        if (isPlayerViewingMap(player)) {
-            closeCallbacks.put(player.getUuid(), callback);
-        }
-    }
-
-    public static void removeCloseCallback(ServerPlayerEntity player) {
-        closeCallbacks.remove(player.getUuid());
     }
 
     private record ViewingSession(ItemStack displayMap, int autoRestoreTick) {}
