@@ -27,11 +27,11 @@ public final class MerchantContext {
     );
 
     public MerchantContext(VillagerEntity villager) {
-        this.offers = villager.getOffers();
+        this.offers = villager.getOffers() != null ? villager.getOffers() : new TradeOfferList();
         this.level = villager.getVillagerData().level();
         this.experience = villager.getExperience();
         this.isLeveled = true;
-        this.displayName = villager.getDisplayName();
+        this.displayName = villager.getDisplayName() != null ? villager.getDisplayName() : Text.empty();
     }
 
     public MerchantContext(TradeOfferList offers, int level, int experience, boolean isLeveled, Text displayName) {
