@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ReadOnlyInventory extends SimpleInventory {
-    public String name;
-    public Text textName;
+    public Text name;
     public ScreenHandlerType<?> type;
 
     public record SlotEntry(int slot, ItemStack stack) {}
@@ -29,13 +28,12 @@ public class ReadOnlyInventory extends SimpleInventory {
 
     public static final Codec<ReadOnlyInventory> READ_ONLY_INVENTORY_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.STRING.optionalFieldOf("name").forGetter(inv -> Optional.ofNullable(inv.name)),
-                    TextCodecs.CODEC.optionalFieldOf("textName").forGetter(inv -> Optional.ofNullable(inv.textName)),
+                    TextCodecs.CODEC.optionalFieldOf("name").forGetter(inv -> Optional.ofNullable(inv.name)),
                     Registries.SCREEN_HANDLER.getCodec().fieldOf("type").forGetter(inv -> inv.type),
                     Codec.INT.fieldOf("size").forGetter(ReadOnlyInventory::size),
                     Codec.list(SLOT_ENTRY_CODEC).fieldOf("items").forGetter(ReadOnlyInventory::encodeNonEmptyStacks)
-            ).apply(instance, (name, textName, type, size, slotEntries) -> {
-                ReadOnlyInventory inventory = new ReadOnlyInventory(size, textName.orElse(null), name.orElse(null), type);
+            ).apply(instance, (name, type, size, slotEntries) -> {
+                ReadOnlyInventory inventory = new ReadOnlyInventory(size, name.orElse(null), type);
                 for (SlotEntry entry : slotEntries) {
                     if (entry.slot >= 0 && entry.slot < size) {
                         inventory.setStack(entry.slot, entry.stack());
@@ -45,27 +43,14 @@ public class ReadOnlyInventory extends SimpleInventory {
             })
     );
 
-    public ReadOnlyInventory(int size, String name, ScreenHandlerType<?> type) {
-        super(size);
-        this.name = name;
-        this.type = type;
-    }
-
     public ReadOnlyInventory(int size, Text name, ScreenHandlerType<?> type) {
         super(size);
-        this.textName = name;
-        this.type = type;
-    }
-
-    public ReadOnlyInventory(int size, Text textName, String name, ScreenHandlerType<?> type) {
-        super(size);
-        this.textName = textName;
-        this.name = name;
+        this.name = name!= null ? name : TextUtils.UNKNOWN_ENTRY;
         this.type = type;
     }
 
     public Text getName() {
-        return textName != null ? textName : Text.literal(name);
+        return name;
     }
 
     public ScreenHandlerType<?> getType() {

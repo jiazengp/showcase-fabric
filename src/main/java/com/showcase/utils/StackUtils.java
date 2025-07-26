@@ -7,7 +7,6 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.Objects;
 import java.util.Set;

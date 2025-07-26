@@ -23,6 +23,8 @@ public abstract class MixinServerPlayerEntity {
             ServerPlayerEntity player = (ServerPlayerEntity)(Object) this;
             ScreenHandler screenHandler = player.currentScreenHandler;
 
+            if (screenHandler == null) return;
+
             if (screenHandler instanceof MerchantScreenHandler) {
                 ContainerOpenWatcher.onMerchantGuiOpened(player, factory);
                 return;

@@ -5,10 +5,8 @@ import net.minecraft.screen.ScreenHandlerType;
 
 public class HotbarSnapshotInventory extends ReadOnlyInventory {
     public HotbarSnapshotInventory(PlayerInventory playerInv) {
-        super(9, "container.inventory", ScreenHandlerType.GENERIC_9X1);
+        super(9, TextUtils.HOTBAR, ScreenHandlerType.GENERIC_9X1);
 
-        for (int i = 0; i < 9; i++) {
-            setStack(i, playerInv.getStack(i).copy());
-        }
+        for (int i = 0; i < 9; i++) setStack(i, playerInv.getStack(i).copy());
     }
 }
