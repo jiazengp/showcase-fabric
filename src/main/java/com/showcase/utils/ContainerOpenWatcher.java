@@ -125,7 +125,7 @@ public class ContainerOpenWatcher {
         }
 
         Text name = resolveContainerTitle(factory);
-        ScreenHandlerType<?> type = handler.getType();
+        ScreenHandlerType<?> type = handler.getType() == ScreenHandlerType.CRAFTER_3X3 ? ScreenHandlerType.CRAFTING : handler.getType();
         ReadOnlyInventory tempInv;
 
         if (handler instanceof GenericContainerScreenHandler containerHandler) {
