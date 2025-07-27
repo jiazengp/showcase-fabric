@@ -203,7 +203,7 @@ public class ShareCommandExecutor {
 
         if (ShowcaseManager.isOnCooldown(sender, CONTAINER)) return 0;
 
-        sender.sendMessage(Text.translatable("showcase.message.share_container_tip", ShowcaseMod.CONFIG.containerListeningDuration));
+        sender.sendMessage(Text.translatable("showcase.message.share_container_tip", ShowcaseMod.CONFIG.containerListeningDuration), true);
 
         ContainerOpenWatcher.awaitContainerOpened(sender, 10,
                 (player, inventory) -> {
@@ -211,7 +211,7 @@ public class ShareCommandExecutor {
                     ShareCommandUtils.sendShareMessage(sender, player, receivers, description, CONTAINER, inventory.getName(), duration, shareId);
                     ShowcaseManager.setCooldown(sender, CONTAINER);
                 },
-                () -> sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_container_expiry"))));
+                () -> sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_container_expiry")), true));
 
         return Command.SINGLE_SUCCESS;
     }
@@ -222,7 +222,7 @@ public class ShareCommandExecutor {
 
         if (ShowcaseManager.isOnCooldown(sender, MERCHANT)) return 0;
 
-        sender.sendMessage(Text.translatable("showcase.message.share_merchant_tip", ShowcaseMod.CONFIG.containerListeningDuration));
+        sender.sendMessage(Text.translatable("showcase.message.share_merchant_tip", ShowcaseMod.CONFIG.containerListeningDuration), true);
 
         ContainerOpenWatcher.awaitMerchantGuiOpened(sender, 10,
                 (player, merchantContext) -> {
@@ -230,7 +230,7 @@ public class ShareCommandExecutor {
                     ShareCommandUtils.sendShareMessage(sender, player, receivers, description, MERCHANT, merchantContext.getFullDisplayName(), duration, shareId);
                     ShowcaseManager.setCooldown(sender, MERCHANT);
                 },
-                () -> sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_merchant_expiry"))));
+                () -> sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_merchant_expiry")), true));
 
         return Command.SINGLE_SUCCESS;
     }

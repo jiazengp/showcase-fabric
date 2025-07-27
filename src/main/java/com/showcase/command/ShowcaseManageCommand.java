@@ -9,12 +9,22 @@ import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfig;
 import com.showcase.data.ShareEntry;
 import com.showcase.utils.ChatPaginator;
+import com.showcase.utils.ModMetadataHolder;
 import com.showcase.utils.TextUtils;
+import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static com.showcase.command.ShareCommandUtils.*;
 import static com.showcase.command.ShowcaseCommand.CANCEL_COMMAND;
@@ -28,12 +38,60 @@ public class ShowcaseManageCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
         dispatcher.register(
                 literal(command)
+                        .requires(src -> hasPermission(src, "manage", 4))
                         .then(createReloadCommand())
                         .then(createListCommand())
                         .then(createCancelCommand())
+                        .then(createAboutCommand())
         );
     }
 
+    private static LiteralArgumentBuilder<ServerCommandSource> createAboutCommand() {
+        return literal("about")
+                .requires(src -> hasPermission(src, "manage.about", 0))
+                .executes(ctx -> {
+                    ServerPlayerEntity player = getSenderPlayer(ctx);
+
+                    BiConsumer<String, String> sendInfoLine = getStringStringBiConsumer(player);
+
+                    player.sendMessage(Text.literal("=== Showcase Mod About ===").formatted(Formatting.GOLD), false);
+
+                    sendInfoLine.accept("Mod ID", ModMetadataHolder.MOD_ID);
+                    sendInfoLine.accept("Name", ModMetadataHolder.MOD_NAME);
+                    sendInfoLine.accept("Author", ModMetadataHolder.AUTHORS.stream()
+                            .map(Person::getName)
+                            .collect(Collectors.joining(", ")));
+                    sendInfoLine.accept("Version", ModMetadataHolder.VERSION);
+                    sendInfoLine.accept("Source Code", ModMetadataHolder.SOURCE);
+                    sendInfoLine.accept("Issues", ModMetadataHolder.ISSUES);
+                    sendInfoLine.accept("Homepage (CN)", ModMetadataHolder.HOMEPAGE);
+                    sendInfoLine.accept("License", ModMetadataHolder.LICENSE);
+
+                    player.sendMessage(Text.literal("===========================").formatted(Formatting.GOLD), false);
+
+                    return Command.SINGLE_SUCCESS;
+                });
+    }
+
+    private static @NotNull BiConsumer<String, String> getStringStringBiConsumer(ServerPlayerEntity player) {
+        return (name, value) -> {
+            MutableText line = Text.literal("")
+                    .append(Text.literal(name).formatted(Formatting.YELLOW))
+                    .append(Text.literal(": ").formatted(Formatting.GRAY));
+
+            if (value.startsWith("https://")) {
+                line.append(Text.literal(value.replaceAll("https://", "")).styled(style -> style
+                        .withClickEvent(new ClickEvent.OpenUrl(URI.create(value)))
+                        .withUnderline(true)
+                        .withColor(Formatting.AQUA)
+                ));
+            } else {
+                line.append(Text.literal(value).formatted(Formatting.WHITE));
+            }
+
+            player.sendMessage(line, false);
+        };
+    }
 
     private static LiteralArgumentBuilder<ServerCommandSource> createReloadCommand() {
         return literal("reload")

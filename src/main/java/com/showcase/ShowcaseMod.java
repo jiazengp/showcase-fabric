@@ -11,6 +11,7 @@ import com.showcase.listener.ChatMessageListener;
 import com.showcase.placeholders.Placeholders;
 import com.showcase.utils.ContainerOpenWatcher;
 import com.showcase.utils.MapViewer;
+import com.showcase.utils.ModMetadataHolder;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -35,6 +36,7 @@ public class ShowcaseMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		CONFIG = ModConfig.load();
+		ModMetadataHolder.load();
 
 		GlobalDataManager.register(PLAYER_SHARE_STORAGE_ID, PLAYER_SHARE_STORAGE);
 

@@ -8,8 +8,9 @@
 		"Hyouka233"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/project/showcase",
-		"sources": "https://github.com/jiazengp/showcase-fabric/"
+		"homepage": "https://www.mcmod.cn/class/20596.html",
+		"sources": "https://github.com/jiazengp/showcase-fabric/",
+		"issues": "https://github.com/jiazengp/showcase-fabric/issues/"
 	},
 	"license": "MIT",
 	"icon": "assets/showcase/icon.png",
