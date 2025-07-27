@@ -3,10 +3,12 @@ package com.showcase.placeholders;
 import com.showcase.ShowcaseMod;
 import com.showcase.command.ShareCommandUtils;
 import com.showcase.command.ShowcaseManager;
+import com.showcase.config.ModConfig;
 import com.showcase.utils.PermissionChecker;
 import com.showcase.utils.TextUtils;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
+import eu.pb4.placeholders.api.arguments.SimpleArguments;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
 import net.minecraft.entity.EquipmentSlot;
@@ -22,18 +24,27 @@ public class Placeholders {
     private static final Identifier ITEM = Identifier.of(ShowcaseMod.MOD_ID, "item");
     private static final Identifier ENDER_CHEST = Identifier.of(ShowcaseMod.MOD_ID, "ender_chest");
 
+    private static final String NO_PERMISSION = "You don't have permission to use this placeholder!";
+    private static final String ON_COOLDOWN = "You have reached the usage limit. Please try again later.";
+    private static final String INVALID_DURATION = "Invalid valid duration";
+    private static final String NO_PLAYER = "No valid player";
+
+    static ModConfig CONFIG = ShowcaseMod.CONFIG;
+
     public static void registerPlaceholders() {
         eu.pb4.placeholders.api.Placeholders.register(INVENTORY, (ctx, arg) -> {
-            if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            int duration = getDurationFromSimpleArguments(arg);
+
+            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
+            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
             if (!PermissionChecker.hasPermission(player, "chat.placeholder.inventory", 1))
-                return PlaceholderResult.invalid("No permission");
-
-
+                return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.INVENTORY))
-                return PlaceholderResult.invalid("Too fast");
+                return PlaceholderResult.invalid(ON_COOLDOWN);
 
-            String shareId = ShowcaseManager.createInventoryShare(player, null);
+
+            String shareId = ShowcaseManager.createInventoryShare(player, duration);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.INVENTORY);
 
             MutableText text = ShareCommandUtils.createClickableItemName(
@@ -46,16 +57,17 @@ public class Placeholders {
         });
 
         eu.pb4.placeholders.api.Placeholders.register(HOTBAR, (ctx, arg) -> {
-            if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            int duration = getDurationFromSimpleArguments(arg);
+
+            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
+            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
             if (!PermissionChecker.hasPermission(player, "chat.placeholder.hotbar", 1))
-                return PlaceholderResult.invalid("No permission");
-
-
+                return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.HOTBAR))
-                return PlaceholderResult.invalid("Too fast");
+                return PlaceholderResult.invalid(ON_COOLDOWN);
 
-            String shareId = ShowcaseManager.createHotbarShare(player, null);
+            String shareId = ShowcaseManager.createHotbarShare(player, duration);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.HOTBAR);
 
             MutableText text = ShareCommandUtils.createClickableItemName(
@@ -67,13 +79,15 @@ public class Placeholders {
         });
 
         eu.pb4.placeholders.api.Placeholders.register(ITEM, (ctx, arg) -> {
-            if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.item", 1))
-                return PlaceholderResult.invalid("No permission");
+            int duration = getDurationFromSimpleArguments(arg);
 
+            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
+            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.item", 1))
+                return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ITEM))
-                return PlaceholderResult.invalid("Too fast");
+                return PlaceholderResult.invalid(ON_COOLDOWN);
 
 
             ItemStack stack = player.getEquippedStack(EquipmentSlot.MAINHAND);
@@ -82,7 +96,7 @@ public class Placeholders {
                 return PlaceholderResult.invalid(Text.translatable("showcase.message.no_item").getString());
             }
 
-            String shareId = ShowcaseManager.createItemShare(player, stack, null);
+            String shareId = ShowcaseManager.createItemShare(player, stack, duration);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ITEM);
 
             MutableText text = ShareCommandUtils.createClickableItemName(
@@ -94,16 +108,16 @@ public class Placeholders {
         });
 
         eu.pb4.placeholders.api.Placeholders.register(ENDER_CHEST, (ctx, arg) -> {
-            if (!ctx.hasPlayer() || ctx.player() == null) return PlaceholderResult.invalid("No player");
             ServerPlayerEntity player = ctx.player();
+            int duration = getDurationFromSimpleArguments(arg);
+
+            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
+            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
             if (!PermissionChecker.hasPermission(player, "chat.placeholder.ender_chest", 1))
-                return PlaceholderResult.invalid("No permission");
-
-
+                return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST))
-                return PlaceholderResult.invalid("Too fast");
-
-            String shareId = ShowcaseManager.createEnderChestShare(player, null);
+                return PlaceholderResult.invalid(ON_COOLDOWN);
+            String shareId = ShowcaseManager.createEnderChestShare(player, duration);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST);
 
             MutableText text =  ShareCommandUtils.createClickableItemName(
@@ -148,5 +162,14 @@ public class Placeholders {
         }
 
         return true;
+    }
+
+    private static int getDurationFromSimpleArguments(String arg) {
+        int inputDuration = SimpleArguments.intNumber(arg, CONFIG.shareLinkExpiryTime);
+        if (inputDuration < CONFIG.shareLinkMinimumExpiryTime || inputDuration > CONFIG.shareLinkExpiryTime) {
+            return -1;
+        }
+
+        return inputDuration;
     }
 }
