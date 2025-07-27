@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URI;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static com.showcase.command.ShareCommandUtils.*;
@@ -81,7 +80,7 @@ public class ShowcaseManageCommand {
 
             if (value.startsWith("https://")) {
                 line.append(Text.literal(value.replaceAll("https://", "")).styled(style -> style
-                        .withClickEvent(new ClickEvent.OpenUrl(URI.create(value)))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, value))
                         .withUnderline(true)
                         .withColor(Formatting.AQUA)
                 ));

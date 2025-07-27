@@ -90,7 +90,6 @@ if (System.getenv("MODRINTH")) {
 		versionNumber = "" + version
 		versionType = "release"
 		changelog = System.getenv("CHANGELOG")
-		// On fabric, use 'remapJar' instead of 'jar'
 		uploadFile = remapJar
 		gameVersions = [((String) project.minecraft_version)]
 		loaders = ["fabric", "quilt"]
