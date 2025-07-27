@@ -18,6 +18,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import static com.showcase.utils.PermissionChecker.isOp;
+
 public class Placeholders {
     private static final Identifier INVENTORY = Identifier.of(ShowcaseMod.MOD_ID, "inventory");
     private static final Identifier HOTBAR = Identifier.of(ShowcaseMod.MOD_ID, "hotbar");
@@ -34,7 +36,7 @@ public class Placeholders {
     public static void registerPlaceholders() {
         eu.pb4.placeholders.api.Placeholders.register(INVENTORY, (ctx, arg) -> {
             ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg);
+            int duration = getDurationFromSimpleArguments(arg, player);
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
@@ -58,7 +60,7 @@ public class Placeholders {
 
         eu.pb4.placeholders.api.Placeholders.register(HOTBAR, (ctx, arg) -> {
             ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg);
+            int duration = getDurationFromSimpleArguments(arg, player);
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
@@ -80,7 +82,7 @@ public class Placeholders {
 
         eu.pb4.placeholders.api.Placeholders.register(ITEM, (ctx, arg) -> {
             ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg);
+            int duration = getDurationFromSimpleArguments(arg, player);
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
@@ -109,7 +111,7 @@ public class Placeholders {
 
         eu.pb4.placeholders.api.Placeholders.register(ENDER_CHEST, (ctx, arg) -> {
             ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg);
+            int duration = getDurationFromSimpleArguments(arg, player);
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
@@ -164,8 +166,12 @@ public class Placeholders {
         return true;
     }
 
-    private static int getDurationFromSimpleArguments(String arg) {
+    private static int getDurationFromSimpleArguments(String arg, ServerPlayerEntity player) {
         int inputDuration = SimpleArguments.intNumber(arg, CONFIG.shareLinkExpiryTime);
+
+        if (isOp(player) && inputDuration > 0) {
+            return inputDuration;
+        }
         if (inputDuration < CONFIG.shareLinkMinimumExpiryTime || inputDuration > CONFIG.shareLinkExpiryTime) {
             return -1;
         }
