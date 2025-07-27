@@ -1,6 +1,5 @@
 package com.showcase.utils;
 
-import com.showcase.gui.ContainerGui;
 import eu.pb4.sgui.api.gui.BookGui;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;

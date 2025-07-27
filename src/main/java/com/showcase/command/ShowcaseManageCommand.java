@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URI;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static com.showcase.command.ShareCommandUtils.*;
