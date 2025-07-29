@@ -288,28 +288,23 @@ public final class ShowcaseManager {
     }
 
 
-    private static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity p) {
+    private static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity player) {
         ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, ScreenHandlerType.GENERIC_9X6);
+        ItemStack playerHead = StackUtils.getPlayerHead(player);
 
-        // Armor & offhand (row 0‑5)
-        inv.setStack(0, p.getEquippedStack(EquipmentSlot.HEAD).copy());
-        inv.setStack(1, p.getEquippedStack(EquipmentSlot.CHEST).copy());
-        inv.setStack(2, p.getEquippedStack(EquipmentSlot.LEGS).copy());
-        inv.setStack(3, p.getEquippedStack(EquipmentSlot.FEET).copy());
-        inv.setStack(4, DIVIDER_ITEM.copy());
-        inv.setStack(5, p.getEquippedStack(EquipmentSlot.OFFHAND).copy());
+        inv.setStack(0, playerHead.copy());
+        inv.setStack(1, DIVIDER_ITEM.copy());
+        inv.setStack(2, player.getEquippedStack(EquipmentSlot.HEAD).copy());
+        inv.setStack(3, player.getEquippedStack(EquipmentSlot.CHEST).copy());
+        inv.setStack(4, player.getEquippedStack(EquipmentSlot.LEGS).copy());
+        inv.setStack(5, player.getEquippedStack(EquipmentSlot.FEET).copy());
+        inv.setStack(6, DIVIDER_ITEM.copy());
+        inv.setStack(7, player.getEquippedStack(EquipmentSlot.OFFHAND).copy());
 
-        // divider
-        for (int i = 6; i < 9; i++) inv.setStack(i, DIVIDER_ITEM.copy());
-
-        // hotbar (row 1)
-        for (int i = 0; i < 9; i++) inv.setStack(i + 9, p.getInventory().getStack(i).copy());
-
-        // divider
+        for (int i = 8; i < 9; i++) inv.setStack(i, DIVIDER_ITEM.copy());
+        for (int i = 0; i < 9; i++) inv.setStack(i + 9, player.getInventory().getStack(i).copy());
         for (int i = 18; i < 27; i++) inv.setStack(i, DIVIDER_ITEM.copy());
-
-        // main inventory (rows 3‑5)
-        for (int i = 9; i < 36; i++) inv.setStack(i + 18, p.getInventory().getStack(i).copy());
+        for (int i = 9; i < 36; i++) inv.setStack(i + 18, player.getInventory().getStack(i).copy());
 
         return inv;
     }

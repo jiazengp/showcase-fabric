@@ -1,10 +1,13 @@
 package com.showcase.utils;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.*;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
@@ -78,6 +81,11 @@ public class StackUtils {
         return base.append(isBook ? "》" : "]");
     }
 
+    public static ItemStack getPlayerHead(ServerPlayerEntity player) {
+        ItemStack head = new ItemStack(Items.PLAYER_HEAD);
+        head.set(DataComponentTypes.PROFILE, new ProfileComponent(player.getGameProfile()));
+        return head;
+    }
 
     public static boolean isValid(ItemStack stack) {
         return !(stack == null || stack.isEmpty() || stack.getCount() <= 0);
