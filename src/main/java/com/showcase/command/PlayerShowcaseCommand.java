@@ -1,6 +1,7 @@
 package com.showcase.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.showcase.config.ModConfigManager;
 import com.showcase.utils.PermissionChecker;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -13,25 +14,31 @@ public class PlayerShowcaseCommand {
                 .executes(ctx -> ShareCommandExecutor.shareItem(ctx, null, null, null));
 
         root.then(ShareCommandExecutor.createInventoryShareCommand(false)
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.inventory", 0)));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.inventory",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.INVENTORY).defaultPermission)));
 
         root.then(ShareCommandExecutor.createHotbarShareCommand(false)
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.hotbar", 0)));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.hotbar",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.HOTBAR).defaultPermission)));
 
         root.then(ShareCommandExecutor.createEnderChestShareCommand(false)
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.ender_chest", 0)));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.ender_chest",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ENDER_CHEST).defaultPermission)));
 
         root.then(ShareCommandExecutor.createItemShareCommand()
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.item", 0)));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.item",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ITEM).defaultPermission)));
 
         root.then(ShareCommandExecutor.createContainerShareCommand()
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.container", 0)));
-
-        root.then(ShareCommandExecutor.createCancelCommand()
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.cancel", 0)));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.container",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.CONTAINER).defaultPermission)));
 
         root.then(ShareCommandExecutor.shareMerchantShareCommand()
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.merchant", 0)));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.merchant",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.MERCHANT).defaultPermission)));
+
+        root.then(ShareCommandExecutor.createCancelCommand()
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.cancel",0)));
 
         dispatcher.register(root);
     }

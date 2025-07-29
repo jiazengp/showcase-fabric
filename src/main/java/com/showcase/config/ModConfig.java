@@ -1,58 +1,69 @@
 package com.showcase.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.showcase.command.ShowcaseManager;
+import de.exlll.configlib.Comment;
+import de.exlll.configlib.Configuration;
 
-import com.showcase.ShowcaseMod;
-import net.fabricmc.loader.api.FabricLoader;
+import java.util.*;
 
-import java.io.IOException;
-import java.nio.file.*;
-
+@Configuration
 public class ModConfig {
-    public int shareLinkExpiryTime = 300;
-    public int shareLinkMinimumExpiryTime = 60;
-    public int shareCommandCooldown = 10;
-    public int containerListeningDuration = 10;
+    @Comment("Per-share type settings.")
+    public Map<ShowcaseManager.ShareType, ShareSettings> shareSettings = defaultShareSettings();
 
-    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+    @Configuration
+    public static class ShareSettings {
+        @Comment("Cooldown time in seconds.")
+        public int cooldown;
 
-    private static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(ShowcaseMod.MOD_ID);
-    private static final Path CONFIG_FILE = CONFIG_DIR.resolve("config.json");
+        @Comment("Default permission level (0-4).")
+        public int defaultPermission;
 
-    public static ModConfig load() {
-        try {
-            // Load the main config
-            ModConfig config;
-            if (Files.exists(CONFIG_FILE)) {
-                config = GSON.fromJson(Files.readString(CONFIG_FILE), ModConfig.class);
-            } else {
-                config = new ModConfig();
-            }
+        @Comment("Trigger keywords for this share type.")
+        public List<String> keywords;
 
-            config.saveConfig();
+        @Comment("Listening duration in seconds (only for CONTAINER and MERCHANT). Set -1 if not applicable.")
+        public int listeningDuration;
 
-            return config;
-        } catch (IOException e) {
-            ShowcaseMod.LOGGER.error("Failed to load config", e);
-            ModConfig config = new ModConfig();
-            config.saveConfig();
-            return config;
+        public ShareSettings() {}
+
+        public ShareSettings(int cooldown, int defaultPermission, List<String> keywords, int listeningDuration) {
+            this.cooldown = cooldown;
+            this.defaultPermission = defaultPermission;
+            this.keywords = keywords;
+            this.listeningDuration = listeningDuration;
         }
     }
 
-    public void saveConfig() {
-        try {
-            JsonObject configJson = new JsonObject();
-            configJson.addProperty("shareLinkExpiryTime", shareLinkExpiryTime);
-            configJson.addProperty("shareCommandCooldown", shareCommandCooldown);
-            configJson.addProperty("shareLinkMinimumExpiryTime", shareLinkMinimumExpiryTime);
-            configJson.addProperty("containerListeningDuration", containerListeningDuration);
+    @Comment("Share link related configuration")
+    public ShareLinkSettings shareLink = new ShareLinkSettings();
 
-            Files.writeString(CONFIG_FILE, GSON.toJson(configJson));
-        } catch (IOException e) {
-            ShowcaseMod.LOGGER.error("Failed to save config", e);
-        }
+    @Configuration
+    public static class ShareLinkSettings {
+        @Comment("Minimum expiry time in seconds for share links")
+        public int minExpiryTime = 60;
+
+        @Comment("Default expiry time in seconds for share links")
+        public int defaultExpiryTime = 300;
+
+        public ShareLinkSettings() {}
+    }
+
+    private static Map<ShowcaseManager.ShareType, ShareSettings> defaultShareSettings() {
+        Map<ShowcaseManager.ShareType, ShareSettings> defaults = new EnumMap<>(ShowcaseManager.ShareType.class);
+
+        add(defaults, ShowcaseManager.ShareType.ITEM, 10, 0, Arrays.asList("item", "item"), -1);
+        add(defaults, ShowcaseManager.ShareType.INVENTORY, 10, 0, Arrays.asList("inventory", "inv"), -1);
+        add(defaults, ShowcaseManager.ShareType.HOTBAR, 10, 0, Arrays.asList("hotbar", "hb"), -1);
+        add(defaults, ShowcaseManager.ShareType.ENDER_CHEST, 10, 0, Arrays.asList("ender", "ec"), -1);
+        add(defaults, ShowcaseManager.ShareType.CONTAINER, 10, 0, Arrays.asList("container", "chest"), 10);
+        add(defaults, ShowcaseManager.ShareType.MERCHANT, 10, 0, Arrays.asList("merchant", "trade"), 10);
+
+        return defaults;
+    }
+
+    private static void add(Map<ShowcaseManager.ShareType, ShareSettings> map, ShowcaseManager.ShareType type,
+                            int cooldown, int perm, List<String> keywords, int listeningDuration) {
+        map.put(type, new ShareSettings(cooldown, perm, keywords, listeningDuration));
     }
 }

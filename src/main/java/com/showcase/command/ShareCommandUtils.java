@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfig;
+import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.gui.MerchantContext;
 import com.showcase.utils.StackUtils;
@@ -178,11 +179,10 @@ public class ShareCommandUtils {
 
     public static void sendShareMessage(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,  Collection<ServerPlayerEntity> receivers,
                                         String description, ShowcaseManager.ShareType type, Text itemName, Integer duration, String shareId) {
-        ModConfig config = ShowcaseMod.CONFIG;
         MutableText clickableItemName = createClickableItemName(type, itemName, shareId);
 
         MutableText message = buildShareMessage(sender, sourcePlayer, receivers, description, type, clickableItemName);
-        MutableText finalMessage = message.append("\n").append(TextUtils.info(Text.translatable("showcase.message.expiry_notice", (duration == null ? config.shareLinkExpiryTime : duration) / 60)));
+        MutableText finalMessage = message.append("\n").append(TextUtils.info(Text.translatable("showcase.message.expiry_notice", (duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration) / 60)));
 
         if (receivers != null) {
             for (ServerPlayerEntity receiver : receivers) {
@@ -361,7 +361,7 @@ public class ShareCommandUtils {
     }
 
     private static MutableText buildTimeSection(ShareEntry share) {
-        long expiryTime = share.getTimestamp() + ShowcaseMod.CONFIG.shareLinkExpiryTime * 1000L;
+        long expiryTime = share.getTimestamp() + ModConfigManager.getShareLinkDefaultExpiry() * 1000L;
 
         return Text.literal("")
                 .append(Text.literal("\n    "))

@@ -7,7 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.showcase.ShowcaseMod;
+import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.utils.ContainerOpenWatcher;
 import com.showcase.utils.StackUtils;
@@ -44,8 +44,8 @@ public class ShareCommandExecutor {
 
     public static IntegerArgumentType shareDurationArgument() {
         return IntegerArgumentType.integer(
-                ShowcaseMod.CONFIG.shareLinkMinimumExpiryTime,
-                ShowcaseMod.CONFIG.shareLinkExpiryTime
+                ModConfigManager.getShareLinkMinExpiry(),
+                ModConfigManager.getShareLinkDefaultExpiry()
         );
     }
 
@@ -203,7 +203,7 @@ public class ShareCommandExecutor {
 
         if (ShowcaseManager.isOnCooldown(sender, CONTAINER)) return 0;
 
-        sender.sendMessage(Text.translatable("showcase.message.share_container_tip", ShowcaseMod.CONFIG.containerListeningDuration), true);
+        sender.sendMessage(Text.translatable("showcase.message.share_container_tip", ModConfigManager.getShareSettings(CONTAINER).listeningDuration), true);
 
         ContainerOpenWatcher.awaitContainerOpened(sender, 10,
                 (player, inventory) -> {
@@ -222,7 +222,7 @@ public class ShareCommandExecutor {
 
         if (ShowcaseManager.isOnCooldown(sender, MERCHANT)) return 0;
 
-        sender.sendMessage(Text.translatable("showcase.message.share_merchant_tip", ShowcaseMod.CONFIG.containerListeningDuration), true);
+        sender.sendMessage(Text.translatable("showcase.message.share_merchant_tip", ModConfigManager.getShareSettings(MERCHANT).listeningDuration), true);
 
         ContainerOpenWatcher.awaitMerchantGuiOpened(sender, 10,
                 (player, merchantContext) -> {
@@ -261,8 +261,8 @@ public class ShareCommandExecutor {
 
     private static int getValidatedDuration(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         int requested = IntegerArgumentType.getInteger(ctx, DURATION_ARG);
-        int min = ShowcaseMod.CONFIG.shareLinkMinimumExpiryTime;
-        int max = ShowcaseMod.CONFIG.shareLinkExpiryTime;
+        int min = ModConfigManager.getShareLinkMinExpiry();
+        int max = ModConfigManager.getShareLinkDefaultExpiry();
 
         ServerPlayerEntity player = ctx.getSource().getPlayer();
 

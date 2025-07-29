@@ -2,8 +2,8 @@ package com.showcase.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.showcase.ShowcaseMod;
 import com.showcase.command.ShowcaseManager;
+import com.showcase.config.ModConfigManager;
 import com.showcase.gui.MerchantContext;
 import com.showcase.utils.ReadOnlyInventory;
 
@@ -60,11 +60,11 @@ public class ShareEntry {
     }
 
     public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, MerchantContext merchantContext, Integer duration) {
-        this(ownerUuid, type, null, merchantContext, Instant.now().toEpochMilli(), duration == null ? ShowcaseMod.CONFIG.shareLinkExpiryTime : duration, 0, false);
+        this(ownerUuid, type, null, merchantContext, Instant.now().toEpochMilli(), duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration, 0, false);
     }
 
     public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, ReadOnlyInventory inventory, Integer duration) {
-        this(ownerUuid, type, inventory, null, Instant.now().toEpochMilli(), duration == null ? ShowcaseMod.CONFIG.shareLinkExpiryTime : duration, 0, false);
+        this(ownerUuid, type, inventory, null, Instant.now().toEpochMilli(), duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration, 0, false);
     }
 
     public UUID getOwnerUuid() {

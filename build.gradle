@@ -43,6 +43,8 @@ dependencies {
 
 	include(modImplementation("me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"))
 	modImplementation "me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"
+
+	implementation("de.exlll:configlib-yaml:4.6.1")
 }
 
 processResources {

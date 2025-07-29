@@ -1,6 +1,7 @@
 package com.showcase.command;
 
 import com.showcase.ShowcaseMod;
+import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
@@ -137,15 +138,18 @@ public final class ShowcaseManager {
     }
 
     public static boolean isOnCooldown(ServerPlayerEntity player, ShareType type) {
-        if(FabricLoader.getInstance().isDevelopmentEnvironment()) return false;
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) return false;
+
         EnumMap<ShareType, Long> map = COOLDOWNS.get(player.getUuid());
         if (map == null) return false;
 
         long last = map.getOrDefault(type, 0L);
-        long remaining = last + ShowcaseMod.CONFIG.shareCommandCooldown * 1000L - Instant.now().toEpochMilli();
+        long cooldownMillis = ModConfigManager.getShareSettings(type).cooldown * 1000L;
+        long remaining = last + cooldownMillis - Instant.now().toEpochMilli();
         if (remaining <= 0) return false;
 
-        player.sendMessage(TextUtils.warning(Text.translatable("showcase.message.cooldown",  (int) Math.ceil(remaining / 1000.0))));
+        player.sendMessage(Text.translatable("showcase.message.cooldown", (int) Math.ceil(remaining / 1000.0))
+                .styled(style -> style.withColor(0xFF5555)));
         return true;
     }
 
@@ -286,7 +290,6 @@ public final class ShowcaseManager {
 
         return null;
     }
-
 
     private static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity player) {
         ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, ScreenHandlerType.GENERIC_9X6);

@@ -3,7 +3,7 @@ package com.showcase.placeholders;
 import com.showcase.ShowcaseMod;
 import com.showcase.command.ShareCommandUtils;
 import com.showcase.command.ShowcaseManager;
-import com.showcase.config.ModConfig;
+import com.showcase.config.ModConfigManager;
 import com.showcase.utils.PermissionChecker;
 import com.showcase.utils.TextUtils;
 import eu.pb4.placeholders.api.PlaceholderContext;
@@ -31,8 +31,6 @@ public class Placeholders {
     private static final String INVALID_DURATION = "Invalid valid duration";
     private static final String NO_PLAYER = "No valid player";
 
-    static ModConfig CONFIG = ShowcaseMod.CONFIG;
-
     public static void registerPlaceholders() {
         eu.pb4.placeholders.api.Placeholders.register(INVENTORY, (ctx, arg) -> {
             ServerPlayerEntity player = ctx.player();
@@ -40,7 +38,8 @@ public class Placeholders {
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.inventory", 1))
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.inventory",
+                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.INVENTORY).defaultPermission))
                 return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.INVENTORY))
                 return PlaceholderResult.invalid(ON_COOLDOWN);
@@ -64,7 +63,8 @@ public class Placeholders {
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.hotbar", 1))
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.hotbar",
+                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.HOTBAR).defaultPermission))
                 return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.HOTBAR))
                 return PlaceholderResult.invalid(ON_COOLDOWN);
@@ -86,7 +86,8 @@ public class Placeholders {
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.item", 1))
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.item",
+                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ITEM).defaultPermission))
                 return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ITEM))
                 return PlaceholderResult.invalid(ON_COOLDOWN);
@@ -115,7 +116,8 @@ public class Placeholders {
 
             if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
             if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.ender_chest", 1))
+            if (!PermissionChecker.hasPermission(player, "chat.placeholder.ender_chest",
+                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ENDER_CHEST).defaultPermission))
                 return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST))
                 return PlaceholderResult.invalid(ON_COOLDOWN);
@@ -167,12 +169,12 @@ public class Placeholders {
     }
 
     private static int getDurationFromSimpleArguments(String arg, ServerPlayerEntity player) {
-        int inputDuration = SimpleArguments.intNumber(arg, CONFIG.shareLinkExpiryTime);
+        int inputDuration = SimpleArguments.intNumber(arg, ModConfigManager.getShareLinkDefaultExpiry());
 
         if (isOp(player) && inputDuration > 0) {
             return inputDuration;
         }
-        if (inputDuration < CONFIG.shareLinkMinimumExpiryTime || inputDuration > CONFIG.shareLinkExpiryTime) {
+        if (inputDuration < ModConfigManager.getShareLinkMinExpiry() || inputDuration >ModConfigManager.getShareLinkDefaultExpiry()) {
             return -1;
         }
 

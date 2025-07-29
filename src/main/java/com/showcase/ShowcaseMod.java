@@ -3,7 +3,7 @@ package com.showcase;
 import com.mojang.serialization.Codec;
 import com.showcase.command.ShowcaseCommand;
 import com.showcase.command.ShowcaseManager;
-import com.showcase.config.ModConfig;
+import com.showcase.config.ModConfigManager;
 import com.showcase.data.GlobalDataManager;
 import com.showcase.data.JsonCodecDataStorage;
 import com.showcase.data.ShareEntry;
@@ -26,7 +26,6 @@ import static com.showcase.data.ShareEntry.SHARE_ENTRY_CODEC;
 public class ShowcaseMod implements ModInitializer {
 	public static final String MOD_ID = "showcase";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static ModConfig CONFIG;
 	public static final Identifier PLAYER_SHARE_STORAGE_ID = Identifier.of(MOD_ID, "showcase_storage");
 	public static final Codec<Map<String, ShareEntry>> PLAYER_SHARE_ENTRY_CODEC =
 			Codec.unboundedMap(Codec.STRING, SHARE_ENTRY_CODEC);
@@ -35,7 +34,7 @@ public class ShowcaseMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		CONFIG = ModConfig.load();
+		ModConfigManager.loadConfig();
 		ModMetadataHolder.load();
 
 		GlobalDataManager.register(PLAYER_SHARE_STORAGE_ID, PLAYER_SHARE_STORAGE);

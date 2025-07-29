@@ -6,7 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.showcase.ShowcaseMod;
-import com.showcase.config.ModConfig;
+import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.utils.ChatPaginator;
 import com.showcase.utils.ModMetadataHolder;
@@ -97,7 +97,7 @@ public class ShowcaseManageCommand {
                 .requires(src -> hasPermission(src, "manage.reload", 4))
                 .executes(ctx -> {
                     try {
-                        ShowcaseMod.CONFIG = ModConfig.load();
+                        ModConfigManager.reloadConfig();
                         ctx.getSource().sendMessage(TextUtils.success(Text.translatable("showcase.message.reload.success")));
                         return Command.SINGLE_SUCCESS;
                     } catch (Exception e) {
