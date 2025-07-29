@@ -2,8 +2,6 @@ package com.showcase.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.showcase.ShowcaseMod;
-import com.showcase.config.ModConfig;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.gui.MerchantContext;

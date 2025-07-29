@@ -1,6 +1,5 @@
 package com.showcase.utils;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.item.ItemStack;
