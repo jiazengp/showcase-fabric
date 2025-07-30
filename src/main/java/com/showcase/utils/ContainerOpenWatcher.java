@@ -1,28 +1,25 @@
 package com.showcase.utils;
 
 import com.showcase.gui.MerchantContext;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.village.TradeOfferList;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.showcase.utils.StackUtils.isValid;
 
 public class ContainerOpenWatcher {
     private static final Map<UUID, WatchContainer> watchContainerPending = new ConcurrentHashMap<>();
     private static final Map<UUID, WatchMerchant> watchMerchantPending = new ConcurrentHashMap<>();
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public interface ContainerCallback {
         void onOpened(ServerPlayerEntity player, ReadOnlyInventory inventory);
@@ -32,45 +29,42 @@ public class ContainerOpenWatcher {
         void onOpened(ServerPlayerEntity player, MerchantContext merchantContext);
     }
 
-    private record WatchContainer(ContainerCallback onSuccess, Runnable onTimeout) { }
-    private record WatchMerchant(MerchantGuiCallback onSuccess, Runnable onTimeout) { }
+    private static class WatchContainer {
+        ContainerCallback onSuccess;
+        Runnable onTimeout;
+        int ticksLeft;
 
+        WatchContainer(ContainerCallback onSuccess, Runnable onTimeout, int ticksLeft) {
+            this.onSuccess = onSuccess;
+            this.onTimeout = onTimeout;
+            this.ticksLeft = ticksLeft * 20;
+        }
+    }
 
-    public static void awaitMerchantGuiOpened(ServerPlayerEntity player, long durationSeconds,
+    private static class WatchMerchant {
+        MerchantGuiCallback onSuccess;
+        Runnable onTimeout;
+        int ticksLeft;
+
+        WatchMerchant(MerchantGuiCallback onSuccess, Runnable onTimeout, int ticksLeft) {
+            this.onSuccess = onSuccess;
+            this.onTimeout = onTimeout;
+            this.ticksLeft = ticksLeft * 20;
+        }
+    }
+
+    public static void awaitMerchantGuiOpened(ServerPlayerEntity player, int duration,
                                               MerchantGuiCallback onSuccess, Runnable onTimeout) {
         if (player == null) return;
 
-        UUID playerId = player.getUuid();
-        MinecraftServer server = player.getServer();
-
-        if (server == null) return;
-
-        watchMerchantPending.put(playerId, new WatchMerchant(onSuccess, onTimeout));
-
-        scheduler.schedule(() -> server.execute(() -> {
-            WatchMerchant removed = watchMerchantPending.remove(playerId);
-            if (removed != null && removed.onTimeout != null) {
-                removed.onTimeout.run();
-            }
-        }), durationSeconds, TimeUnit.SECONDS);
+        watchMerchantPending.put(player.getUuid(), new WatchMerchant(onSuccess, onTimeout, duration));
     }
 
-    public static void awaitContainerOpened(ServerPlayerEntity player, long durationSeconds,
+    public static void awaitContainerOpened(ServerPlayerEntity player, int duration,
                                             ContainerCallback onSuccess, Runnable onTimeout) {
         if (player == null) return;
 
-        UUID playerId = player.getUuid();
-        MinecraftServer server = player.getServer();
-        if (server == null) return;
-
-        watchContainerPending.put(playerId, new WatchContainer(onSuccess, onTimeout));
-
-        scheduler.schedule(() -> server.execute(() -> {
-            WatchContainer removed = watchContainerPending.remove(playerId);
-            if (removed != null && removed.onTimeout != null) {
-                removed.onTimeout.run();
-            }
-        }), durationSeconds, TimeUnit.SECONDS);
+        watchContainerPending.put(player.getUuid(), new WatchContainer(onSuccess, onTimeout, duration));
     }
 
     public static void onMerchantGuiOpened(ServerPlayerEntity player, NamedScreenHandlerFactory factory) {
@@ -84,7 +78,7 @@ public class ContainerOpenWatcher {
 
         MerchantContext merchantContext = getMerchantContext(handler, resolveContainerTitle(factory));
 
-        if (merchantContext == null){
+        if (merchantContext == null) {
             if (entry.onTimeout != null) entry.onTimeout.run();
             return;
         }
@@ -130,13 +124,12 @@ public class ContainerOpenWatcher {
 
         if (handler instanceof GenericContainerScreenHandler containerHandler) {
             tempInv = createGenericContainerInventory(containerHandler, name, type);
-        }
-        else {
+        } else {
             tempInv = createSlotBasedInventory(handler, player, name, type);
         }
 
         if (tempInv.isEmpty()) {
-            entry.onTimeout.run();
+            if (entry.onTimeout != null) entry.onTimeout.run();
             return;
         }
 
@@ -204,13 +197,37 @@ public class ContainerOpenWatcher {
         }
 
         return displayName;
+    }
 
+    public static void registerTickEvent() {
+        ServerTickEvents.START_SERVER_TICK.register(server -> {
+            Iterator<Map.Entry<UUID, WatchContainer>> containerIter = watchContainerPending.entrySet().iterator();
+            while (containerIter.hasNext()) {
+                Map.Entry<UUID, WatchContainer> entry = containerIter.next();
+                WatchContainer wc = entry.getValue();
+                wc.ticksLeft--;
+                if (wc.ticksLeft <= 0) {
+                    containerIter.remove();
+                    if (wc.onTimeout != null) wc.onTimeout.run();
+                }
+            }
+
+            Iterator<Map.Entry<UUID, WatchMerchant>> merchantIter = watchMerchantPending.entrySet().iterator();
+            while (merchantIter.hasNext()) {
+                Map.Entry<UUID, WatchMerchant> entry = merchantIter.next();
+                WatchMerchant wm = entry.getValue();
+                wm.ticksLeft--;
+                if (wm.ticksLeft <= 0) {
+                    merchantIter.remove();
+                    if (wm.onTimeout != null) wm.onTimeout.run();
+                }
+            }
+        });
     }
 
     public static void cleanup() {
         watchContainerPending.clear();
         watchMerchantPending.clear();
-        scheduler.shutdown();
     }
 
     public static int getPendingContainerCount() {
