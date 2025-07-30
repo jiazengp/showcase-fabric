@@ -11,6 +11,9 @@ public class ModConfig {
     @Comment("The duration of the map that player can view (seconds)")
     public int mapViewDuration = 10;
 
+    @Comment("The maximum number of placeholders that can be replaced in a single chat message.")
+    public int  maxPlaceholdersPerMessage = 2;
+
     @Comment("Per-share type settings.")
     public Map<ShowcaseManager.ShareType, ShareSettings> shareSettings = defaultShareSettings();
 
@@ -22,7 +25,7 @@ public class ModConfig {
         @Comment("Default permission level (0-4).")
         public int defaultPermission;
 
-        @Comment("Trigger keywords for this share type.")
+        @Comment("Trigger keywords for this share type (not available for CONTAINER and MERCHANT).")
         public List<String> keywords;
 
         @Comment("Listening duration in seconds (only for CONTAINER and MERCHANT). Set -1 if not applicable.")
@@ -55,12 +58,12 @@ public class ModConfig {
     private static Map<ShowcaseManager.ShareType, ShareSettings> defaultShareSettings() {
         Map<ShowcaseManager.ShareType, ShareSettings> defaults = new EnumMap<>(ShowcaseManager.ShareType.class);
 
-        add(defaults, ShowcaseManager.ShareType.ITEM, 10, 0, Arrays.asList("item", "item"), -1);
+        add(defaults, ShowcaseManager.ShareType.ITEM, 10, 0, Arrays.asList("item", "i"), -1);
         add(defaults, ShowcaseManager.ShareType.INVENTORY, 10, 0, Arrays.asList("inventory", "inv"), -1);
         add(defaults, ShowcaseManager.ShareType.HOTBAR, 10, 0, Arrays.asList("hotbar", "hb"), -1);
         add(defaults, ShowcaseManager.ShareType.ENDER_CHEST, 10, 0, Arrays.asList("ender", "ec"), -1);
-        add(defaults, ShowcaseManager.ShareType.CONTAINER, 10, 0, Arrays.asList("container", "chest"), 10);
-        add(defaults, ShowcaseManager.ShareType.MERCHANT, 10, 0, Arrays.asList("merchant", "trade"), 10);
+        add(defaults, ShowcaseManager.ShareType.CONTAINER, 10, 0, List.of(), 10);
+        add(defaults, ShowcaseManager.ShareType.MERCHANT, 10, 0, List.of(), 10);
 
         return defaults;
     }

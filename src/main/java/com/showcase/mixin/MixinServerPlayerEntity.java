@@ -1,7 +1,7 @@
 package com.showcase.mixin;
 
 import com.showcase.gui.BaseWorldGui;
-import com.showcase.utils.ContainerOpenWatcher;
+import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.utils.StackUtils;
 import eu.pb4.sgui.api.GuiHelpers;
 import net.minecraft.entity.damage.DamageSource;

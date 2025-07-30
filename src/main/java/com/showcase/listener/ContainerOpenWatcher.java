@@ -1,6 +1,8 @@
-package com.showcase.utils;
+package com.showcase.listener;
 
 import com.showcase.gui.MerchantContext;
+import com.showcase.utils.ReadOnlyInventory;
+import com.showcase.utils.TextUtils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;

@@ -8,6 +8,7 @@ import com.showcase.data.GlobalDataManager;
 import com.showcase.data.JsonCodecDataStorage;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ChatMessageListener;
+import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.placeholders.Placeholders;
 import com.showcase.utils.*;
 import net.fabricmc.api.ModInitializer;
@@ -34,6 +35,7 @@ public class ShowcaseMod implements ModInitializer {
 	public void onInitialize() {
 		ModConfigManager.loadConfig();
 		ModMetadataHolder.load();
+		ChatMessageListener.loadConfig();
 
 		GlobalDataManager.register(PLAYER_SHARE_STORAGE_ID, PLAYER_SHARE_STORAGE);
 

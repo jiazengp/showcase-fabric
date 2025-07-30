@@ -148,8 +148,7 @@ public final class ShowcaseManager {
         long remaining = last + cooldownMillis - Instant.now().toEpochMilli();
         if (remaining <= 0) return false;
 
-        player.sendMessage(Text.translatable("showcase.message.cooldown", (int) Math.ceil(remaining / 1000.0))
-                .styled(style -> style.withColor(0xFF5555)));
+        player.sendMessage(TextUtils.warning(Text.translatable("showcase.message.cooldown", (int) Math.ceil(remaining / 1000.0))));
         return true;
     }
 

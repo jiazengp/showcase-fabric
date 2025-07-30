@@ -9,6 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
+import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.utils.*;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.EquipmentSlot;

@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
+import com.showcase.listener.ChatMessageListener;
 import com.showcase.utils.ChatPaginator;
 import com.showcase.utils.ModMetadataHolder;
 import com.showcase.utils.TextUtils;
@@ -98,6 +99,7 @@ public class ShowcaseManageCommand {
                 .executes(ctx -> {
                     try {
                         ModConfigManager.reloadConfig();
+                        ChatMessageListener.loadConfig();
                         ctx.getSource().sendMessage(TextUtils.success(Text.translatable("showcase.message.reload.success")));
                         return Command.SINGLE_SUCCESS;
                     } catch (Exception e) {

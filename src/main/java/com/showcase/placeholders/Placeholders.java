@@ -5,6 +5,7 @@ import com.showcase.command.ShareCommandUtils;
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.PermissionChecker;
+import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
@@ -21,10 +22,10 @@ import net.minecraft.util.Identifier;
 import static com.showcase.utils.PermissionChecker.isOp;
 
 public class Placeholders {
-    private static final Identifier INVENTORY = Identifier.of(ShowcaseMod.MOD_ID, "inventory");
-    private static final Identifier HOTBAR = Identifier.of(ShowcaseMod.MOD_ID, "hotbar");
-    private static final Identifier ITEM = Identifier.of(ShowcaseMod.MOD_ID, "item");
-    private static final Identifier ENDER_CHEST = Identifier.of(ShowcaseMod.MOD_ID, "ender_chest");
+    public static final Identifier INVENTORY = Identifier.of(ShowcaseMod.MOD_ID, "inventory");
+    public static final Identifier HOTBAR = Identifier.of(ShowcaseMod.MOD_ID, "hotbar");
+    public static final Identifier ITEM = Identifier.of(ShowcaseMod.MOD_ID, "item");
+    public static final Identifier ENDER_CHEST = Identifier.of(ShowcaseMod.MOD_ID, "ender_chest");
 
     private static final String NO_PERMISSION = "You don't have permission to use this placeholder!";
     private static final String ON_COOLDOWN = "You have reached the usage limit. Please try again later.";
@@ -45,7 +46,7 @@ public class Placeholders {
                 return PlaceholderResult.invalid(ON_COOLDOWN);
 
 
-            String shareId = ShowcaseManager.createInventoryShare(player, duration);
+            String shareId = ShowcaseManager.createInventoryShare(player, duration, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.INVENTORY);
 
             MutableText text = ShareCommandUtils.createClickableItemName(
@@ -69,7 +70,7 @@ public class Placeholders {
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.HOTBAR))
                 return PlaceholderResult.invalid(ON_COOLDOWN);
 
-            String shareId = ShowcaseManager.createHotbarShare(player, duration);
+            String shareId = ShowcaseManager.createHotbarShare(player, duration, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.HOTBAR);
 
             MutableText text = ShareCommandUtils.createClickableItemName(
@@ -99,12 +100,12 @@ public class Placeholders {
                 return PlaceholderResult.invalid(Text.translatable("showcase.message.no_item").getString());
             }
 
-            String shareId = ShowcaseManager.createItemShare(player, stack, duration);
+            String shareId = ShowcaseManager.createItemShare(player, stack, duration, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ITEM);
 
             MutableText text = ShareCommandUtils.createClickableItemName(
                     ShowcaseManager.ShareType.ITEM,
-                    stack.getName(),
+                    StackUtils.getDisplayName(stack),
                     shareId
             );
             return PlaceholderResult.value(text);
@@ -121,7 +122,7 @@ public class Placeholders {
                 return PlaceholderResult.invalid(NO_PERMISSION);
             if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST))
                 return PlaceholderResult.invalid(ON_COOLDOWN);
-            String shareId = ShowcaseManager.createEnderChestShare(player, duration);
+            String shareId = ShowcaseManager.createEnderChestShare(player, duration, null);
             ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST);
 
             MutableText text =  ShareCommandUtils.createClickableItemName(
