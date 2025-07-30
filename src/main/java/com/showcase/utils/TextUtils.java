@@ -33,10 +33,4 @@ public class TextUtils {
     public static Text info(Text msg) {
         return Text.literal("").append(msg).formatted(Formatting.GRAY);
     }
-
-    public static MutableText getSafeDisplayName(ServerPlayerEntity player) {
-        if (player == null) return Text.translatable("argument.entity.notfound.player");
-        Text displayName = Text.translatable("chat.type.text", player.getDisplayName(), "");
-        return (MutableText) Objects.requireNonNullElseGet(displayName, player::getName);
-    }
 }
