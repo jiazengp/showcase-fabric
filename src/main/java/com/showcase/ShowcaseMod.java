@@ -9,16 +9,18 @@ import com.showcase.data.JsonCodecDataStorage;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ChatMessageListener;
 import com.showcase.placeholders.Placeholders;
-import com.showcase.utils.ContainerOpenWatcher;
-import com.showcase.utils.MapViewer;
-import com.showcase.utils.ModMetadataHolder;
+import com.showcase.utils.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.showcase.data.ShareEntry.SHARE_ENTRY_CODEC;
@@ -46,6 +48,8 @@ public class ShowcaseMod implements ModInitializer {
 
 		Placeholders.registerPlaceholders();
 		ChatMessageListener.registerChatHandler();
+		CountdownBossBarManager.registerTickEvent();
+		ContainerOpenWatcher.registerTickEvent();
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			try {
@@ -59,6 +63,7 @@ public class ShowcaseMod implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
 			MapViewer.restoreAll(server);
 			ContainerOpenWatcher.cleanup();
+			CountdownBossBarManager.cleanup();
 			try {
 				GlobalDataManager.setData(server, PLAYER_SHARE_STORAGE_ID, ShowcaseManager.getActiveShares());
 				GlobalDataManager.saveAll(server);

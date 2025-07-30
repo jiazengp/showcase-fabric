@@ -9,9 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
-import com.showcase.utils.ContainerOpenWatcher;
-import com.showcase.utils.StackUtils;
-import com.showcase.utils.TextUtils;
+import com.showcase.utils.*;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -145,7 +143,7 @@ public class ShareCommandExecutor {
 
     @FunctionalInterface
     private interface ShareCreator {
-        String create(ServerPlayerEntity player, Integer duration);
+        String create(ServerPlayerEntity player, Integer duration, Collection<ServerPlayerEntity> receivers);
     }
 
     private static int executeShare(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer,
@@ -157,7 +155,7 @@ public class ShareCommandExecutor {
         if (ShowcaseManager.isOnCooldown(sender, shareType)) return 0;
 
         ServerPlayerEntity source = sourcePlayer != null ? sourcePlayer : sender;
-        String shareId = shareCreator.create(source, duration);
+        String shareId = shareCreator.create(source, duration, receivers);
 
         ShareCommandUtils.sendShareMessage(sender, source, receivers, description, shareType, displayName, duration, shareId);
         ShowcaseManager.setCooldown(sender, shareType);
@@ -178,7 +176,7 @@ public class ShareCommandExecutor {
             return 0;
         }
 
-        String shareId = ShowcaseManager.createItemShare(sender, stack, duration);
+        String shareId = ShowcaseManager.createItemShare(sender, stack, duration, receivers);
         ShareCommandUtils.sendShareMessage(sender, sender, receivers, description, ITEM, StackUtils.getDisplayName(stack), duration, shareId);
         ShowcaseManager.setCooldown(sender, ITEM);
 
@@ -203,15 +201,25 @@ public class ShareCommandExecutor {
 
         if (ShowcaseManager.isOnCooldown(sender, CONTAINER)) return 0;
 
-        sender.sendMessage(Text.translatable("showcase.message.share_container_tip", ModConfigManager.getShareSettings(CONTAINER).listeningDuration), true);
+        int durationSeconds = ModConfigManager.getShareSettings(CONTAINER).listeningDuration;
+        Text message = Text.translatable("showcase.message.share_container_tip", durationSeconds);
 
-        ContainerOpenWatcher.awaitContainerOpened(sender, 10,
+        sender.sendMessage(message, true);
+        CountdownBossBar countdown = new CountdownBossBar(sender, message, durationSeconds);
+        countdown.start();
+        CountdownBossBarManager.add(countdown);
+
+        ContainerOpenWatcher.awaitContainerOpened(sender, durationSeconds,
                 (player, inventory) -> {
-                    String shareId = ShowcaseManager.createContainerShare(player, inventory, duration);
+                    String shareId = ShowcaseManager.createContainerShare(player, inventory, duration, receivers);
                     ShareCommandUtils.sendShareMessage(sender, player, receivers, description, CONTAINER, inventory.getName(), duration, shareId);
                     ShowcaseManager.setCooldown(sender, CONTAINER);
+                    CountdownBossBarManager.remove(countdown);
                 },
-                () -> sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_container_expiry")), true));
+                () -> {
+                    sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_container_expiry")), true);
+                    CountdownBossBarManager.remove(countdown);
+                });
 
         return Command.SINGLE_SUCCESS;
     }
@@ -222,15 +230,24 @@ public class ShareCommandExecutor {
 
         if (ShowcaseManager.isOnCooldown(sender, MERCHANT)) return 0;
 
-        sender.sendMessage(Text.translatable("showcase.message.share_merchant_tip", ModConfigManager.getShareSettings(MERCHANT).listeningDuration), true);
+        int durationSeconds = ModConfigManager.getShareSettings(MERCHANT).listeningDuration;
+        Text message = Text.translatable("showcase.message.share_merchant_tip", durationSeconds);
+        sender.sendMessage(message, true);
+        CountdownBossBar countdown = new CountdownBossBar(sender, message, durationSeconds);
+        countdown.start();
+        CountdownBossBarManager.add(countdown);
 
-        ContainerOpenWatcher.awaitMerchantGuiOpened(sender, 10,
+        ContainerOpenWatcher.awaitMerchantGuiOpened(sender, durationSeconds,
                 (player, merchantContext) -> {
-                    String shareId = ShowcaseManager.createMerchantShare(player, merchantContext, duration);
+                    String shareId = ShowcaseManager.createMerchantShare(player, merchantContext, duration, receivers);
                     ShareCommandUtils.sendShareMessage(sender, player, receivers, description, MERCHANT, merchantContext.getFullDisplayName(), duration, shareId);
                     ShowcaseManager.setCooldown(sender, MERCHANT);
+                    CountdownBossBarManager.remove(countdown);
                 },
-                () -> sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_merchant_expiry")), true));
+                () -> {
+                    sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_merchant_expiry")), true);
+                    CountdownBossBarManager.remove(countdown);
+                });
 
         return Command.SINGLE_SUCCESS;
     }
