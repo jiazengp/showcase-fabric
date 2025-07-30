@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.gui.MerchantContext;
+import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -35,6 +36,7 @@ public class ShareCommandUtils {
         try {
             Collection<ServerPlayerEntity> receivers = EntityArgumentType.getPlayers(ctx, RECEIVERS_ARG);
             if (receivers.isEmpty()) return null;
+            if (isAtAll(ctx, receivers)) return null;
             return receivers;
         } catch (Exception e) {
             return null;
@@ -89,6 +91,12 @@ public class ShareCommandUtils {
             out.append(Text.translatable("showcase.preview_text.more", counts.size() - maxLines)).append("\n");
         }
         return out;
+    }
+
+    private static boolean isAtAll(CommandContext<ServerCommandSource> ctx, Collection<ServerPlayerEntity> receivers) {
+        String input = ctx.getInput();
+        int online = ctx.getSource().getServer().getPlayerManager().getPlayerList().size();
+        return input.contains("@a") && receivers.size() == online;
     }
 
     private static MutableText getFinalPreviewText(Text itemName, ShowcaseManager.ShareType type, String shareId) {
@@ -213,7 +221,7 @@ public class ShareCommandUtils {
 
     public static MutableText buildPlayerDescriptionMessage(ServerPlayerEntity player, String description, MutableText clickableItemName) {
         return Text.translatable("showcase.message.player_description",
-                TextUtils.getSafeDisplayName(player), description, clickableItemName);
+                PlayerUtils.getSafeDisplayName(player), description, clickableItemName);
     }
 
     public static ClickEvent createShareClickEvent(String id) {
@@ -222,7 +230,7 @@ public class ShareCommandUtils {
 
     public static MutableText buildDefaultMessageForReceiver(ServerPlayerEntity sender,
                                                              ShowcaseManager.ShareType type, MutableText clickableItemName) {
-        MutableText senderPlayerDisplayName = TextUtils.getSafeDisplayName(sender);
+        MutableText senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
 
         return switch (type) {
             case ITEM -> Text.translatable("showcase.message.default.item", senderPlayerDisplayName, clickableItemName);
@@ -237,8 +245,8 @@ public class ShareCommandUtils {
     public static MutableText buildDefaultMessageForBroadcast(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,
                                                               ShowcaseManager.ShareType type, MutableText clickableItemName) {
         boolean isSelf = sender.getUuid().equals(sourcePlayer.getUuid());
-        MutableText senderPlayerDisplayName = TextUtils.getSafeDisplayName(sender);
-        MutableText sourcePlayerDisplayName = TextUtils.getSafeDisplayName(sourcePlayer);
+        MutableText senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
+        MutableText sourcePlayerDisplayName = PlayerUtils.getSafeDisplayName(sourcePlayer);
 
         return switch (type) {
             case ITEM -> Text.translatable("showcase.message.item_shared", senderPlayerDisplayName, clickableItemName);
@@ -305,8 +313,7 @@ public class ShareCommandUtils {
 
         if (server == null) return Text.literal("Server not available");
 
-        ServerPlayerEntity owner = server.getPlayerManager().getPlayer(share.getOwnerUuid());
-        Text ownerName = getOwnerDisplayName(owner);
+        Text ownerName =  PlayerUtils.getSafeDisplayName(server, share.getOwnerUuid());
         Text itemName = getShareItemName(share);
 
         return Text.literal("")
@@ -318,12 +325,6 @@ public class ShareCommandUtils {
                 .append(buildTimeSection(share))
                 .append(buildCancelSection(shareId))
                 .append(Text.literal("\n\n"));
-    }
-
-    private static Text getOwnerDisplayName(ServerPlayerEntity owner) {
-        return owner != null ?
-                (owner.getDisplayName() != null ? owner.getDisplayName() : Text.literal(owner.getName().getString())) :
-                TextUtils.UNKNOW_PLAYER;
     }
 
     private static MutableText buildIdSection(String shareId) {
@@ -359,7 +360,7 @@ public class ShareCommandUtils {
     }
 
     private static MutableText buildTimeSection(ShareEntry share) {
-        long expiryTime = share.getTimestamp() + ModConfigManager.getShareLinkDefaultExpiry() * 1000L;
+        long expiryTime = share.getTimestamp() + share.getDuration() * 1000L;
 
         return Text.literal("")
                 .append(Text.literal("\n    "))

@@ -5,11 +5,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
 import com.showcase.gui.MerchantContext;
+import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.ReadOnlyInventory;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.showcase.gui.MerchantContext.MERCHANT_CONTEXT_CODEC;
 import static com.showcase.utils.ReadOnlyInventory.READ_ONLY_INVENTORY_CODEC;
@@ -23,6 +25,7 @@ public class ShareEntry {
     private final int duration;
     private int viewCount;
     private boolean isInvalid;
+    private final Set<UUID> receiverUuids;
 
     public static final Codec<ShareEntry> SHARE_ENTRY_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -33,8 +36,11 @@ public class ShareEntry {
                     Codec.LONG.fieldOf("timestamp").forGetter(ShareEntry::getTimestamp),
                     Codec.INT.fieldOf("duration").forGetter(ShareEntry::getDuration),
                     Codec.INT.fieldOf("viewCount").forGetter(ShareEntry::getViewCount),
-                    Codec.BOOL.fieldOf("isInvalid").forGetter(ShareEntry::getIsInvalid)
-            ).apply(instance, (ownerUuid, type, inventoryOpt, merchantContextOpt, timestamp, duration, viewCount, isInvalid) ->
+                    Codec.BOOL.fieldOf("isInvalid").forGetter(ShareEntry::getIsInvalid),
+                    Codec.list(Codec.STRING.xmap(UUID::fromString, UUID::toString))
+                            .fieldOf("receivers")
+                            .forGetter(entry -> new ArrayList<>(entry.receiverUuids))
+            ).apply(instance, (ownerUuid, type, inventoryOpt, merchantContextOpt, timestamp, duration, viewCount, isInvalid, receiverList) ->
                     new ShareEntry(
                             ownerUuid,
                             type,
@@ -43,12 +49,16 @@ public class ShareEntry {
                             timestamp,
                             duration,
                             viewCount,
-                            isInvalid
+                            isInvalid,
+                            new HashSet<>(receiverList)
                     )
             )
     );
 
-    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, ReadOnlyInventory inventory, MerchantContext merchantContext, long timestamp, int duration, int viewCount, boolean isInvalid) {
+    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type,
+                      ReadOnlyInventory inventory, MerchantContext merchantContext,
+                      long timestamp, int duration, int viewCount, boolean isInvalid,
+                      Set<UUID> receiverUuids) {
         this.ownerUuid = ownerUuid;
         this.type = type;
         this.inventory = inventory;
@@ -57,47 +67,54 @@ public class ShareEntry {
         this.duration = duration;
         this.viewCount = viewCount;
         this.isInvalid = isInvalid;
+        this.receiverUuids = receiverUuids != null ? receiverUuids : new HashSet<>();
     }
 
-    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, MerchantContext merchantContext, Integer duration) {
-        this(ownerUuid, type, null, merchantContext, Instant.now().toEpochMilli(), duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration, 0, false);
+    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, MerchantContext merchantContext, Integer duration, Collection<ServerPlayerEntity> receivers) {
+        this(ownerUuid, type, null, merchantContext,
+                Instant.now().toEpochMilli(),
+                duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration,
+                0, false, PlayerUtils.getReceiverUuids(receivers));
     }
 
-    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, ReadOnlyInventory inventory, Integer duration) {
-        this(ownerUuid, type, inventory, null, Instant.now().toEpochMilli(), duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration, 0, false);
+    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, ReadOnlyInventory inventory, Integer duration, Collection<ServerPlayerEntity> receivers) {
+        this(ownerUuid, type, inventory, null,
+                Instant.now().toEpochMilli(),
+                duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration,
+                0, false, PlayerUtils.getReceiverUuids(receivers));
     }
 
-    public UUID getOwnerUuid() {
-        return ownerUuid;
-    }
-
-    public ShowcaseManager.ShareType getType() {
-        return type;
-    }
-
-    public ReadOnlyInventory getInventory() {
-        return inventory;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public int getViewCount() {
-        return viewCount;
-    }
-
-    public boolean getIsInvalid() { return isInvalid; }
-
-    public void incrementViewCount() {
-        this.viewCount++;
-    }
-
-    public void invalidShare() {
-        this.isInvalid = true;
-    }
-
-    public MerchantContext getMerchantContext() { return this.merchantContext; }
-
+    // Getters
+    public UUID getOwnerUuid() { return ownerUuid; }
+    public ShowcaseManager.ShareType getType() { return type; }
+    public ReadOnlyInventory getInventory() { return inventory; }
+    public MerchantContext getMerchantContext() { return merchantContext; }
+    public long getTimestamp() { return timestamp; }
     public int getDuration() { return duration; }
+    public int getViewCount() { return viewCount; }
+    public boolean getIsInvalid() { return isInvalid; }
+    public Set<UUID> getReceiverUuids() { return receiverUuids; }
+
+    // Logic
+    public void incrementViewCount() { this.viewCount++; }
+    public void invalidShare() { this.isInvalid = true; }
+
+    public void addReceiver(ServerPlayerEntity player) {
+        receiverUuids.add(player.getUuid());
+    }
+
+    public void removeReceiver(ServerPlayerEntity player) {
+        receiverUuids.remove(player.getUuid());
+    }
+
+    public Collection<ServerPlayerEntity> getReceiver(net.minecraft.server.MinecraftServer server) {
+        return receiverUuids.stream()
+                .map(server.getPlayerManager()::getPlayer)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public Set<UUID> getUuidOfReceiverPlayers() {
+        return receiverUuids;
+    }
 }

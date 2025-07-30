@@ -50,7 +50,7 @@
   "showcase.message.reload.fail": "§r重新载入配置失败！",
 
   "showcase.message.manage.empty": "§r没有任何有效的展示",
-
+  "showcase.message.manage.noPermission": "§r抱歉，您无权限查看该内容",
   "showcase.message.manage.cancel.success_id": "§r成功取消展示 %s",
   "showcase.message.manage.cancel.tip": "§r点击取消该展示",
   "showcase.message.manage.cancel.success_player": "§r已取消 %s 个来自 %s 的展示",

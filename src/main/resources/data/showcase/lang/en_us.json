@@ -43,6 +43,7 @@
   "showcase.message.reload.success": "§rSuccessfully reloaded configuration!",
   "showcase.message.reload.fail": "§rFailed to reload configuration!",
   "showcase.message.manage.empty": "§rNo active showcases found",
+  "showcase.message.manage.noPermission": "§rSorry, you don't have permission to view this.",
   "showcase.message.manage.cancel.success_id": "§rSuccessfully canceled showcase %s",
   "showcase.message.manage.cancel.tip": "§rClick to cancel this showcase",
   "showcase.message.manage.cancel.success_player": "§rCanceled %s showcases from %s",

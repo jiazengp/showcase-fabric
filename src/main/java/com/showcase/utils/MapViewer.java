@@ -1,5 +1,6 @@
 package com.showcase.utils;
 
+import com.showcase.config.ModConfigManager;
 import com.showcase.gui.MapViewerContext;
 import com.showcase.gui.MapViewerGui;
 import eu.pb4.sgui.api.GuiHelpers;
@@ -42,7 +43,6 @@ public final class MapViewer {
             toRemove.forEach(viewingSessions::remove);
         });
 
-        // 阻止玩家在查看地图时进行交互
         UseItemCallback.EVENT.register((player, world, hand) -> getCheckResult(player));
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> getCheckResult(player));
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> getCheckResult(player));
@@ -81,7 +81,7 @@ public final class MapViewer {
 
     public static void viewMap(ServerPlayerEntity player, ItemStack mapItem) {
         if (player != null && mapItem != null) {
-            open(player, mapItem, 10);
+            open(player, mapItem, ModConfigManager.getConfig().mapViewDuration);
         }
     }
 

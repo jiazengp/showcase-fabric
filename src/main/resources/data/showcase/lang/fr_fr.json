@@ -46,7 +46,7 @@
   "showcase.message.manage.cancel.success_player": "§r%s a annulé %s partages de %s.",
   "showcase.message.manage.cancel.empty": "§rAucun partage valide trouvé pour %s.",
   "showcase.message.manage.cancel.not_found": "§rID de partage ou nom de joueur introuvable.",
-
+  "showcase.message.manage.noPermission": "§rDésolé, vous n’avez pas la permission de voir ceci.",
   "showcase.preview_text.more_trades": "§rEt §l%d§r autres échanges.",
   "showcase.preview_text.more": "§r%s éléments non affichés…",
   "showcase.message.invalid_duration_exception": "§rLa durée valide doit être comprise entre §l%d§r et §l%d§r secondes.",

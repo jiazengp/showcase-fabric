@@ -38,6 +38,7 @@
   "showcase.preview_text.more_trades": "§r以及 §l%d §r個其他交易內容",
   "showcase.preview_text.more": "§r還有%s項未顯示…",
   "showcase.message.invalid_duration_exception": "§r有效時長必須在 §l%d §r到 §l%d §r秒之間",
+  "showcase.message.manage.noPermission": "§r抱歉，您沒有權限查看此內容。",
   "showcase.message.about.version": "§r版本： %s",
   "showcase.message.about.contributors": "§r貢獻者",
   "showcase.message.reload.success": "§r成功重新載入配置！",

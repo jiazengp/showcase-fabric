@@ -46,7 +46,7 @@
   "showcase.message.manage.cancel.success_player": "§r成功取消咗 %s 嘅 %s 个展示。",
   "showcase.message.manage.cancel.empty": "§r未搵到 %s 嘅任何有效展示。",
   "showcase.message.manage.cancel.not_found": "§r搵唔到对应嘅展示ID或者玩家名。",
-
+  "showcase.message.manage.noPermission": "§r對唔住，你冇權限睇呢個。",
   "showcase.preview_text.more_trades": "§r仲有 §l%d§r 个其他交易内容。",
   "showcase.preview_text.more": "§r仲有 %s 项未显示…",
   "showcase.message.invalid_duration_exception": "§r有效时间必须係 §l%d§r 到 §l%d§r 秒之间。",

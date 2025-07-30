@@ -47,5 +47,6 @@
   "showcase.message.manage.cancel.tip": "§rこの共有をキャンセルするにはクリックしてください。",
   "showcase.message.manage.cancel.success_player": "§r%s の共有 %s 件をキャンセルしました。",
   "showcase.message.manage.cancel.empty": "§r%s による共有はありません。",
-  "showcase.message.manage.cancel.not_found": "§r一致する共有 ID またはプレイヤーが見つかりません。"
+  "showcase.message.manage.cancel.not_found": "§r一致する共有 ID またはプレイヤーが見つかりません。",
+  "showcase.message.manage.noPermission": "§r申し訳ありませんが、これを見る権限がありません。"
 }

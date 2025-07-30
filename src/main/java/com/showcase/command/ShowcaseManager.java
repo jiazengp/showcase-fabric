@@ -15,6 +15,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -61,51 +62,51 @@ public final class ShowcaseManager {
         return UUID.randomUUID().toString().substring(0, 8);
     }
 
-    public static String createItemShare(ServerPlayerEntity owner, ItemStack stack, Integer duration) {
+    public static String createItemShare(ServerPlayerEntity owner, ItemStack stack, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
 
         ReadOnlyInventory inv = new ReadOnlyInventory(9, StackUtils.getDisplayName(stack), ScreenHandlerType.GENERIC_9X1);
         inv.addStack(stack.copy());
         for (int i = 1; i < 9; i++) inv.setStack(i, DIVIDER_ITEM);
 
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ITEM, inv, duration));
+        SHARES.put(id, new ShareEntry(owner.getUuid(), ITEM, inv, duration, receivers));
         return id;
     }
 
-    public static String createInventoryShare(ServerPlayerEntity owner, Integer duration) {
+    public static String createInventoryShare(ServerPlayerEntity owner, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         ReadOnlyInventory inv = snapshotFullInventory(owner);
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.INVENTORY, inv, duration));
+        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.INVENTORY, inv, duration, receivers));
         return id;
     }
 
-    public static String createHotbarShare(ServerPlayerEntity owner, Integer duration) {
+    public static String createHotbarShare(ServerPlayerEntity owner, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         ReadOnlyInventory inv = new HotbarSnapshotInventory(owner.getInventory());
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.HOTBAR, inv, duration));
+        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.HOTBAR, inv, duration, receivers));
         return id;
     }
 
-    public static String createEnderChestShare(ServerPlayerEntity owner, Integer duration) {
+    public static String createEnderChestShare(ServerPlayerEntity owner, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         int size = owner.getEnderChestInventory().size();
         ReadOnlyInventory inv = new ReadOnlyInventory(size, TextUtils.ENDER_CHEST, handlerTypeForRows(size / 9));
         for (int i = 0; i < size; i++) {
             inv.setStack(i, owner.getEnderChestInventory().getStack(i).copy());
         }
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.ENDER_CHEST, inv, duration));
+        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.ENDER_CHEST, inv, duration, receivers));
         return id;
     }
 
-    public static String createContainerShare(ServerPlayerEntity owner, ReadOnlyInventory container, Integer duration) {
+    public static String createContainerShare(ServerPlayerEntity owner, ReadOnlyInventory container, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.CONTAINER, container, duration));
+        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.CONTAINER, container, duration, receivers));
         return id;
     }
 
-    public static String createMerchantShare(ServerPlayerEntity owner, MerchantContext merchantContext, Integer duration) {
+    public static String createMerchantShare(ServerPlayerEntity owner, MerchantContext merchantContext, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.MERCHANT, merchantContext, duration));
+        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.MERCHANT, merchantContext, duration, receivers));
         return id;
     }
 
@@ -118,17 +119,16 @@ public final class ShowcaseManager {
             return false;
         }
 
-        ServerPlayerEntity owner = Objects.requireNonNull(viewer.getServer()).getPlayerManager().getPlayer(entry.getOwnerUuid());
 
-        if (owner == null) {
-            SHARES.remove(id);
+        if (!canViewShare(entry, viewer) && !viewer.getUuid().equals(entry.getOwnerUuid()) && !PermissionChecker.isOp(viewer)) {
+            viewer.sendMessage(TextUtils.warning(Text.translatable("showcase.message.manage.noPermission")));
             return false;
         }
 
         entry.incrementViewCount();
 
         try {
-            var gui = factory(owner, viewer, entry);
+            var gui = factory(viewer, entry);
             if (gui != null) gui.open();
             return true;
         } catch (Exception e) {
@@ -151,6 +151,11 @@ public final class ShowcaseManager {
         player.sendMessage(Text.translatable("showcase.message.cooldown", (int) Math.ceil(remaining / 1000.0))
                 .styled(style -> style.withColor(0xFF5555)));
         return true;
+    }
+
+    public static boolean canViewShare(ShareEntry entry, ServerPlayerEntity viewer) {
+        if (entry.getReceiverUuids().isEmpty() || entry.getReceiverUuids() == null) return true;
+        return entry.getReceiverUuids().contains(viewer.getUuid());
     }
 
     public static void setCooldown(ServerPlayerEntity player, ShareType type) {
@@ -217,8 +222,14 @@ public final class ShowcaseManager {
         return new ArrayList<>(getUnmodifiableActiveShares().keySet());
     }
 
-    private static ContainerGui factory(ServerPlayerEntity owner, ServerPlayerEntity viewer, ShareEntry entry) {
+    private static ContainerGui factory(ServerPlayerEntity viewer, ShareEntry entry) {
         ReadOnlyInventory inv = entry.getInventory();
+        MinecraftServer server = viewer.getServer();
+
+        if (server == null) return null;
+
+        Text ownerName =  PlayerUtils.getSafeDisplayName(server, entry.getOwnerUuid());
+
         return switch (entry.getType()) {
             case ITEM -> {
                 ItemStack itemStack = inv.getStack(0);
@@ -236,7 +247,7 @@ public final class ShowcaseManager {
                 ReadOnlyInventory unpackInv = unpackFromItemStack(itemStack);
                 ReadOnlyInventory finalInv = unpackInv != null ? unpackInv : inv;
                 ScreenHandlerType<?> type = finalInv.getType();
-                Text name = Text.translatable("showcase.screen.item_title", TextUtils.getSafeDisplayName(owner), finalInv.getName());
+                Text name = Text.translatable("showcase.screen.item_title", ownerName, finalInv.getName());
 
                 yield new ContainerGui(type, viewer, name, finalInv);
             }
@@ -247,15 +258,13 @@ public final class ShowcaseManager {
             }
 
             case INVENTORY -> new ContainerGui(inv.getType(), viewer,
-                    Text.translatable("showcase.screen.inventory_title", TextUtils.getSafeDisplayName(owner)), inv);
+                    Text.translatable("showcase.screen.inventory_title", ownerName), inv);
             case HOTBAR -> new ContainerGui(inv.getType(),viewer,
-                    Text.translatable("showcase.screen.hotbar_title", TextUtils.getSafeDisplayName(owner),
-                            TextUtils.HOTBAR), inv);
+                    Text.translatable("showcase.screen.hotbar_title", ownerName, TextUtils.HOTBAR), inv);
             case ENDER_CHEST -> new ContainerGui(inv.getType(), viewer,
-                    Text.translatable("showcase.screen.ender_chest_title", TextUtils.getSafeDisplayName(owner),
-                            TextUtils.ENDER_CHEST), inv);
+                    Text.translatable("showcase.screen.ender_chest_title", ownerName, TextUtils.ENDER_CHEST), inv);
             case CONTAINER ->  new ContainerGui(inv.getType(), viewer,
-                    Text.translatable("showcase.screen.container_title", TextUtils.getSafeDisplayName(owner), inv.getName()), inv);
+                    Text.translatable("showcase.screen.container_title", ownerName, inv.getName()), inv);
         };
     }
 
@@ -313,6 +322,7 @@ public final class ShowcaseManager {
     }
 
     private static boolean isExpired(ShareEntry e) {
+        if (e == null) return true;
         return e.getIsInvalid() || Instant.now().toEpochMilli() - e.getTimestamp() > e.getDuration() * 1000L;
     }
 

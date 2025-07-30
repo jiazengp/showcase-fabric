@@ -8,6 +8,9 @@ import java.util.*;
 
 @Configuration
 public class ModConfig {
+    @Comment("The duration of the map that player can view (seconds)")
+    public int mapViewDuration = 10;
+
     @Comment("Per-share type settings.")
     public Map<ShowcaseManager.ShareType, ShareSettings> shareSettings = defaultShareSettings();
 
