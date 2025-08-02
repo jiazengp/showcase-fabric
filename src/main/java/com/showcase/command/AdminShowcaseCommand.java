@@ -10,10 +10,12 @@ public class AdminShowcaseCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
         dispatcher.register(literal(command)
                 .requires(PermissionChecker::isOp)
-                .executes(ctx -> ShareCommandExecutor.shareItem(ctx, null, null, null))
+                .executes(ctx -> ShareCommandExecutor.shareItem(ctx, ShareCommandUtils.getSenderPlayer(ctx), null, null, null))
                 .then(ShareCommandExecutor.createInventoryShareCommand(true))
                 .then(ShareCommandExecutor.createHotbarShareCommand(true))
                 .then(ShareCommandExecutor.createEnderChestShareCommand(true))
+                .then(ShareCommandExecutor.createStatsShareCommand(true))
+                .then(ShareCommandExecutor.createItemShareCommand(true))
         );
     }
 }

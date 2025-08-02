@@ -11,15 +11,20 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.utils.*;
+import com.showcase.utils.countdown.CountdownBossBar;
+import com.showcase.utils.countdown.CountdownBossBarManager;
+import com.showcase.utils.stats.StatUtils;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
@@ -48,8 +53,12 @@ public class ShareCommandExecutor {
         );
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createItemShareCommand() {
-        return createSimpleShareCommand("item", ShareCommandExecutor::shareItem);
+    public static LiteralArgumentBuilder<ServerCommandSource> createItemShareCommand(boolean withSource) {
+        return createShareCommand("item", withSource, ShareCommandExecutor::shareItem);
+    }
+
+    public static LiteralArgumentBuilder<ServerCommandSource> createStatsShareCommand(boolean withSource) {
+        return createShareCommand("stats", withSource, ShareCommandExecutor::shareStats);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createInventoryShareCommand(boolean withSource) {
@@ -142,58 +151,110 @@ public class ShareCommandExecutor {
         return command;
     }
 
-    @FunctionalInterface
-    private interface ShareCreator {
-        String create(ServerPlayerEntity player, Integer duration, Collection<ServerPlayerEntity> receivers);
-    }
+    private static int executeShare(
+            CommandContext<ServerCommandSource> ctx,
+            ShowcaseManager.ShareType type,
+            @Nullable Function<ServerPlayerEntity, ItemStack> stackSupplier,
+            @Nullable String emptyMessageKey,
+            QuadFunction<ServerPlayerEntity, @Nullable ItemStack, Integer, Collection<ServerPlayerEntity>, String> shareCreator,
+            Text defaultDisplayName,
+            String description,
+            Collection<ServerPlayerEntity> receivers,
+            Integer duration
+    ) {
+        try {
+            ServerPlayerEntity sender = getSenderPlayer(ctx);
+            if (sender == null) return 0;
+            if (ShowcaseManager.isOnCooldown(sender, type)) return 0;
 
-    private static int executeShare(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer,
-                                    ShowcaseManager.ShareType shareType, ShareCreator shareCreator,
-                                    Text displayName, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        ServerPlayerEntity sender = getSenderPlayer(ctx);
-        if (sender == null) return 0;
+            ServerPlayerEntity source = getSourceOrSender(ctx);
+            ItemStack stack = ItemStack.EMPTY;
 
-        if (ShowcaseManager.isOnCooldown(sender, shareType)) return 0;
+            if (stackSupplier != null) {
+                stack = stackSupplier.apply(source).copy();
+                if (stack.isEmpty()) {
+                    sender.sendMessage(TextUtils.error(Text.translatable(emptyMessageKey)));
+                    return 0;
+                }
+            }
 
-        ServerPlayerEntity source = sourcePlayer != null ? sourcePlayer : sender;
-        String shareId = shareCreator.create(source, duration, receivers);
+            String shareId = shareCreator.apply(source, stackSupplier != null ? stack : null, duration, receivers);
+            Text displayName = (stackSupplier != null ? StackUtils.getDisplayName(stack) : defaultDisplayName);
 
-        ShareCommandUtils.sendShareMessage(sender, source, receivers, description, shareType, displayName, duration, shareId);
-        ShowcaseManager.setCooldown(sender, shareType);
+            ShareCommandUtils.sendShareMessage(sender, source, receivers, description, type, displayName, duration, shareId);
+            ShowcaseManager.setCooldown(sender, type);
 
-        return Command.SINGLE_SUCCESS;
-    }
-
-    public static int shareItem(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        ServerPlayerEntity sender = getSenderPlayer(ctx);
-
-        if (sender == null) return 0;
-        if (ShowcaseManager.isOnCooldown(sender, ITEM)) return 0;
-
-        ItemStack stack = sender.getEquippedStack(EquipmentSlot.MAINHAND).copy();
-
-        if (stack.isEmpty()) {
-            sender.sendMessage(TextUtils.error(Text.translatable("showcase.message.no_item")));
-            return 0;
+            return Command.SINGLE_SUCCESS;
+        } catch (RuntimeException e) {
+            handleError(ctx, e);
+            return -1;
         }
-
-        String shareId = ShowcaseManager.createItemShare(sender, stack, duration, receivers);
-        ShareCommandUtils.sendShareMessage(sender, sender, receivers, description, ITEM, StackUtils.getDisplayName(stack), duration, shareId);
-        ShowcaseManager.setCooldown(sender, ITEM);
-
-        return Command.SINGLE_SUCCESS;
     }
 
-    public static int shareInventory(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        return executeShare(ctx, sourcePlayer, INVENTORY, ShowcaseManager::createInventoryShare, TextUtils.INVENTORY, description, receivers, duration);
+    public static int shareItem(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
+        return executeShare(
+                ctx,
+                ITEM,
+                player -> player.getEquippedStack(EquipmentSlot.MAINHAND),
+                "showcase.message.no_item",
+                ShowcaseManager::createItemShare,
+                Text.empty(),
+                description, receivers, duration
+        );
     }
 
-    public static int shareHotbar(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        return executeShare(ctx, sourcePlayer, HOTBAR, ShowcaseManager::createHotbarShare, TextUtils.HOTBAR, description, receivers, duration);
+    public static int shareStats(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
+        return executeShare(
+                ctx,
+                STATS,
+                StatUtils::createStatsBook,
+                "showcase.message.no_stats",
+                ShowcaseManager::createStatsShare,
+                Text.empty(),
+                description, receivers, duration
+        );
     }
 
-    public static int shareEnderChest(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        return executeShare(ctx, sourcePlayer, ENDER_CHEST, ShowcaseManager::createEnderChestShare, TextUtils.ENDER_CHEST, description, receivers, duration);
+    public static int shareInventory(CommandContext<ServerCommandSource> ctx,
+                                     ServerPlayerEntity sourcePlayer, String description,
+                                     Collection<ServerPlayerEntity> receivers, Integer duration) {
+        return executeShare(
+                ctx,
+                INVENTORY,
+                null, // 不需要 stackSupplier
+                null, // 不需要 emptyMessageKey
+                (player, unused, dur, recv) -> ShowcaseManager.createInventoryShare(player, dur, recv),
+                TextUtils.INVENTORY,
+                description, receivers, duration
+        );
+    }
+
+    public static int shareHotbar(CommandContext<ServerCommandSource> ctx,
+                                  ServerPlayerEntity sourcePlayer, String description,
+                                  Collection<ServerPlayerEntity> receivers, Integer duration) {
+        return executeShare(
+                ctx,
+                HOTBAR,
+                null,
+                null,
+                (player, unused, dur, recv) -> ShowcaseManager.createHotbarShare(player, dur, recv),
+                TextUtils.HOTBAR,
+                description, receivers, duration
+        );
+    }
+
+    public static int shareEnderChest(CommandContext<ServerCommandSource> ctx,
+                                      ServerPlayerEntity sourcePlayer, String description,
+                                      Collection<ServerPlayerEntity> receivers, Integer duration) {
+        return executeShare(
+                ctx,
+                ENDER_CHEST,
+                null,
+                null,
+                (player, unused, dur, recv) -> ShowcaseManager.createEnderChestShare(player, dur, recv),
+                TextUtils.ENDER_CHEST,
+                description, receivers, duration
+        );
     }
 
     public static int shareContainer(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
@@ -295,5 +356,9 @@ public class ShareCommandExecutor {
         }
 
         return requested;
+    }
+
+    private interface QuadFunction<A, B, C, D, R> {
+        R apply(A a, B b, C c, D d);
     }
 }

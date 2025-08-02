@@ -3,6 +3,7 @@ package com.showcase.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.PermissionChecker;
+import com.showcase.utils.PlayerUtils;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static net.minecraft.server.command.CommandManager.literal;
@@ -10,8 +11,8 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class PlayerShowcaseCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
         var root = literal(command)
-                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands", 0)) // 主命令权限
-                .executes(ctx -> ShareCommandExecutor.shareItem(ctx, null, null, null));
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands", 0))
+                .executes(ctx -> ShareCommandExecutor.shareItem(ctx, ShareCommandUtils.getSenderPlayer(ctx), null, null, null));
 
         root.then(ShareCommandExecutor.createInventoryShareCommand(false)
                 .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.inventory",
@@ -25,7 +26,11 @@ public class PlayerShowcaseCommand {
                 .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.ender_chest",
                         ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ENDER_CHEST).defaultPermission)));
 
-        root.then(ShareCommandExecutor.createItemShareCommand()
+        root.then(ShareCommandExecutor.createStatsShareCommand(false)
+                .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.stats",
+                        ModConfigManager.getShareSettings(ShowcaseManager.ShareType.STATS).defaultPermission)));
+
+        root.then(ShareCommandExecutor.createItemShareCommand(false)
                 .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.item",
                         ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ITEM).defaultPermission)));
 
