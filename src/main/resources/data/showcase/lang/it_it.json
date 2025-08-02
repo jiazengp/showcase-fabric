@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rHai condiviso troppo velocemente. Attendi §l%d§r secondi prima di riprovare",
+  "showcase.message.no_item": "§rPer favore tieni un oggetto da mostrare",
+  "showcase.message.item_shared": "§r%s ha mostrato il suo %s",
+  "showcase.message.stats_shared": "§r%s ha mostrato le sue %s",
+  "showcase.message.inventory_shared": "§r%s ha mostrato il suo %s",
+  "showcase.message.other_inventory_shared": "§r%s ha mostrato l'%s di %s",
+  "showcase.message.ender_chest_shared": "§r%s ha mostrato il suo %s",
+  "showcase.message.other_ender_chest_shared": "§r%s ha mostrato l'%s di %s",
+  "showcase.message.hotbar_shared": "§r%s ha mostrato la sua %s",
+  "showcase.message.other_hotbar_shared": "§r%s ha mostrato la %s di %s",
+  "showcase.message.other_item_shared": "§r%s ha mostrato l'%s di %s",
+  "showcase.message.other_stats_shared": "§r%s ha mostrato le %s di %s",
+  "showcase.message.other_container_shared": "§r%s ha mostrato il %s di %s",
+  "showcase.message.other_merchant_shared": "§r%s ha mostrato l'%s di %s",
+  "showcase.message.container_shared": "§r%s ha mostrato il suo %s",
+  "showcase.message.merchant_shared": "§r%s ha mostrato l'interfaccia commerciale di %s",
+  "showcase.message.private_share_tip": "§rHai condiviso l'%s di %s con %s",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rApri il contenitore che vuoi mostrare entro §l%d§r secondi",
+  "showcase.message.share_container_expiry": "§rNessun contenitore valido rilevato, visualizzazione fallita",
+  "showcase.message.share_merchant_tip": "§rApri l'interfaccia commerciale che vuoi mostrare entro §l%d§r secondi",
+  "showcase.message.share_merchant_expiry": "§rNessuna interfaccia commerciale valida rilevata, visualizzazione fallita",
+  "showcase.message.expiry_notice": "§r(Questo link scadrà tra §l%d§r minuti)",
+  "showcase.message.click_to_view": "§rClicca per visualizzare",
+  "showcase.message.invalid_or_expired": "§rQuesto link di condivisione non è valido o è scaduto",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s di %s",
+  "showcase.screen.hotbar_title": "§r%s di %s",
+  "showcase.screen.item_title": "§r%s di %s",
+  "showcase.screen.container_title": "§r%s mostrato da %s",
+  "showcase.screen.merchant_title": "§rCommercio di %s mostrato da %s",
+
+  "showcase.message.default.inventory": "§r%s ha mostrato il suo %s",
+  "showcase.message.default.ender_chest": "§r%s ha mostrato il suo %s",
+  "showcase.message.default.hotbar": "§r%s ha mostrato la sua %s",
+  "showcase.message.default.item": "§r%s ha mostrato il suo %s",
+  "showcase.message.default.stats": "§r%s ha mostrato le sue %s",
+  "showcase.message.default.container": "§r%s ha mostrato un %s",
+  "showcase.message.default.merchant": "§r%s ha mostrato il commercio di %s",
+
+  "showcase.message.invalid_id": "§rID visualizzazione non valido",
+  "showcase.message.cancel_not_owner": "§rPuoi cancellare solo le tue visualizzazioni",
+  "showcase.message.cancel_success": "§rVisualizzazione cancellata con successo",
+  "showcase.message.cancel_failed": "§rErrore nella cancellazione della visualizzazione",
+
+  "showcase.preview_text.more_trades": "§rE altri §l%d§r scambi",
+  "showcase.preview_text.more": "§r%s oggetti in più non mostrati…",
+  "showcase.message.invalid_duration_exception": "§rLa durata deve essere tra §l%d§r e §l%d§r secondi",
+
+  "showcase.message.about.version": "§rVersione: %s",
+  "showcase.message.about.contributors": "§rContributori",
+
+  "showcase.message.reload.success": "§rConfigurazione ricaricata con successo!",
+  "showcase.message.reload.fail": "§rErrore nel ricaricamento della configurazione!",
+
+  "showcase.message.manage.empty": "§rNessuna visualizzazione attiva trovata",
+  "showcase.message.manage.noPermission": "§rSpiacente, non hai il permesso di vedere questo",
+  "showcase.message.manage.cancel.success_id": "§rVisualizzazione %s cancellata con successo",
+  "showcase.message.manage.cancel.tip": "§rClicca per cancellare questa visualizzazione",
+  "showcase.message.manage.cancel.success_player": "§rCancellate %s visualizzazioni di %s",
+  "showcase.message.manage.cancel.empty": "§rNessuna visualizzazione attiva trovata per %s",
+  "showcase.message.manage.cancel.not_found": "§rNessun ID visualizzazione o nome giocatore corrispondente trovato",
+
+  "showcase.stats.category.time": "Statistiche Tempo",
+  "showcase.stats.category.movement": "Statistiche Movimento", 
+  "showcase.stats.category.combat": "Statistiche Combattimento",
+  "showcase.stats.category.interaction": "Statistiche Interazione",
+  "showcase.stats.category.misc": "Statistiche Varie",
+  "showcase.stats.category.blocks": "Statistiche Blocchi",
+  "showcase.stats.category.items": "Statistiche Oggetti",
+  "showcase.stats.category.entities": "Statistiche Entità",
+
+  "showcase.stats.blocks.total_placed": "Totale Blocchi Piazzati",
+  "showcase.stats.blocks.total_broken": "Totale Blocchi Rotti",
+  
+  "showcase.stats.block.building_blocks": "Blocchi da Costruzione",
+  "showcase.stats.block.building_blocks.placed": "Blocchi da Costruzione Piazzati",
+  "showcase.stats.block.building_blocks.broken": "Blocchi da Costruzione Rotti",
+  
+  "showcase.stats.block.colored_blocks": "Blocchi Colorati",
+  "showcase.stats.block.colored_blocks.placed": "Blocchi Colorati Piazzati", 
+  "showcase.stats.block.colored_blocks.broken": "Blocchi Colorati Rotti",
+  
+  "showcase.stats.block.natural_blocks": "Blocchi Naturali",
+  "showcase.stats.block.natural_blocks.placed": "Blocchi Naturali Piazzati",
+  "showcase.stats.block.natural_blocks.broken": "Blocchi Naturali Rotti",
+  
+  "showcase.stats.block.functional_blocks": "Blocchi Funzionali", 
+  "showcase.stats.block.functional_blocks.placed": "Blocchi Funzionali Piazzati",
+  "showcase.stats.block.functional_blocks.broken": "Blocchi Funzionali Rotti",
+  
+  "showcase.stats.block.redstone_blocks": "Blocchi Redstone",
+  "showcase.stats.block.redstone_blocks.placed": "Blocchi Redstone Piazzati",
+  "showcase.stats.block.redstone_blocks.broken": "Blocchi Redstone Rotti",
+  
+  "showcase.stats.block.combat": "Blocchi da Combattimento",
+  "showcase.stats.block.combat.placed": "Blocchi da Combattimento Piazzati",
+  "showcase.stats.block.combat.broken": "Blocchi da Combattimento Rotti",
+  
+  "showcase.stats.block.ingredients": "Blocchi Materiali",
+  "showcase.stats.block.ingredients.placed": "Blocchi Materiali Piazzati",
+  "showcase.stats.block.ingredients.broken": "Blocchi Materiali Rotti",
+  
+  "showcase.stats.block.unknown": "Blocchi Sconosciuti",
+  
+  "showcase.stats.message.create_date": "Data di Creazione",
+  "showcase.stats.message.total_pages": "Pagine Totali"
+}

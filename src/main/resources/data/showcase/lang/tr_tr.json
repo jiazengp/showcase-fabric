@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rÇok hızlı paylaştınız. Tekrar denemeden önce §l%d§r saniye bekleyin",
+  "showcase.message.no_item": "§rLütfen gösterilecek bir eşya tutun",
+  "showcase.message.item_shared": "§r%s %s eşyasını gösterdi",
+  "showcase.message.stats_shared": "§r%s %s istatistiklerini gösterdi",
+  "showcase.message.inventory_shared": "§r%s %s envanterini gösterdi",
+  "showcase.message.other_inventory_shared": "§r%s, %s oyuncusunun %s envanterini gösterdi",
+  "showcase.message.ender_chest_shared": "§r%s %s ender sandığını gösterdi",
+  "showcase.message.other_ender_chest_shared": "§r%s, %s oyuncusunun %s ender sandığını gösterdi",
+  "showcase.message.hotbar_shared": "§r%s %s hızlı çubuğunu gösterdi",
+  "showcase.message.other_hotbar_shared": "§r%s, %s oyuncusunun %s hızlı çubuğunu gösterdi",
+  "showcase.message.other_item_shared": "§r%s, %s oyuncusunun %s eşyasını gösterdi",
+  "showcase.message.other_stats_shared": "§r%s, %s oyuncusunun %s istatistiklerini gösterdi",
+  "showcase.message.other_container_shared": "§r%s, %s oyuncusunun %s konteynerini gösterdi",
+  "showcase.message.other_merchant_shared": "§r%s, %s oyuncusunun %s ticaret arayüzünü gösterdi",
+  "showcase.message.container_shared": "§r%s %s konteynerini gösterdi",
+  "showcase.message.merchant_shared": "§r%s, %s ticaret arayüzünü gösterdi",
+  "showcase.message.private_share_tip": "§r%s oyuncusunun %s eşyasını %s ile paylaştınız",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rGöstermek istediğiniz konteyneri §l%d§r saniye içinde açın",
+  "showcase.message.share_container_expiry": "§rGeçerli bir konteyner algılanmadı, gösterim başarısız",
+  "showcase.message.share_merchant_tip": "§rGöstermek istediğiniz ticaret arayüzünü §l%d§r saniye içinde açın",
+  "showcase.message.share_merchant_expiry": "§rGeçerli bir ticaret arayüzü algılanmadı, gösterim başarısız",
+  "showcase.message.expiry_notice": "§r(Bu bağlantı §l%d§r dakika sonra sona erecek)",
+  "showcase.message.click_to_view": "§rGörmek için tıklayın",
+  "showcase.message.invalid_or_expired": "§rBu paylaşım bağlantısı geçersiz veya süresi dolmuş",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s oyuncusunun %s",
+  "showcase.screen.hotbar_title": "§r%s oyuncusunun %s",
+  "showcase.screen.item_title": "§r%s oyuncusunun %s",
+  "showcase.screen.container_title": "§r%s tarafından gösterilen %s",
+  "showcase.screen.merchant_title": "§r%s tarafından gösterilen %s ticareti",
+
+  "showcase.message.default.inventory": "§r%s %s envanterini gösterdi",
+  "showcase.message.default.ender_chest": "§r%s %s ender sandığını gösterdi",
+  "showcase.message.default.hotbar": "§r%s %s hızlı çubuğunu gösterdi",
+  "showcase.message.default.item": "§r%s %s eşyasını gösterdi",
+  "showcase.message.default.stats": "§r%s %s istatistiklerini gösterdi",
+  "showcase.message.default.container": "§r%s bir %s gösterdi",
+  "showcase.message.default.merchant": "§r%s, %s ticaretini gösterdi",
+
+  "showcase.message.invalid_id": "§rGeçersiz gösterim ID'si",
+  "showcase.message.cancel_not_owner": "§rSadece kendi gösterimlerinizi iptal edebilirsiniz",
+  "showcase.message.cancel_success": "§rGösterim başarıyla iptal edildi",
+  "showcase.message.cancel_failed": "§rGösterim iptal edilemedi",
+
+  "showcase.preview_text.more_trades": "§rVe §l%d§r daha fazla ticaret",
+  "showcase.preview_text.more": "§r%s daha fazla eşya gösterilmedi…",
+  "showcase.message.invalid_duration_exception": "§rSüre §l%d§r ile §l%d§r saniye arasında olmalıdır",
+
+  "showcase.message.about.version": "§rSürüm: %s",
+  "showcase.message.about.contributors": "§rKatkıda Bulunanlar",
+
+  "showcase.message.reload.success": "§rYapılandırma başarıyla yeniden yüklendi!",
+  "showcase.message.reload.fail": "§rYapılandırma yeniden yüklenemedi!",
+
+  "showcase.message.manage.empty": "§rAktif gösterim bulunamadı",
+  "showcase.message.manage.noPermission": "§rÜzgünüm, bunu görme izniniz yok",
+  "showcase.message.manage.cancel.success_id": "§rGösterim %s başarıyla iptal edildi",
+  "showcase.message.manage.cancel.tip": "§rBu gösterimi iptal etmek için tıklayın",
+  "showcase.message.manage.cancel.success_player": "§r%s oyuncusunun %s gösterimi iptal edildi",
+  "showcase.message.manage.cancel.empty": "§r%s oyuncusundan aktif gösterim bulunamadı",
+  "showcase.message.manage.cancel.not_found": "§rEşleşen gösterim ID'si veya oyuncu adı bulunamadı",
+
+  "showcase.stats.category.time": "Zaman İstatistikleri",
+  "showcase.stats.category.movement": "Hareket İstatistikleri", 
+  "showcase.stats.category.combat": "Savaş İstatistikleri",
+  "showcase.stats.category.interaction": "Etkileşim İstatistikleri",
+  "showcase.stats.category.misc": "Çeşitli İstatistikler",
+  "showcase.stats.category.blocks": "Blok İstatistikleri",
+  "showcase.stats.category.items": "Eşya İstatistikleri",
+  "showcase.stats.category.entities": "Varlık İstatistikleri",
+
+  "showcase.stats.blocks.total_placed": "Toplam Yerleştirilen Blok",
+  "showcase.stats.blocks.total_broken": "Toplam Kırılan Blok",
+  
+  "showcase.stats.block.building_blocks": "Yapı Blokları",
+  "showcase.stats.block.building_blocks.placed": "Yerleştirilen Yapı Blokları",
+  "showcase.stats.block.building_blocks.broken": "Kırılan Yapı Blokları",
+  
+  "showcase.stats.block.colored_blocks": "Renkli Bloklar",
+  "showcase.stats.block.colored_blocks.placed": "Yerleştirilen Renkli Bloklar", 
+  "showcase.stats.block.colored_blocks.broken": "Kırılan Renkli Bloklar",
+  
+  "showcase.stats.block.natural_blocks": "Doğal Bloklar",
+  "showcase.stats.block.natural_blocks.placed": "Yerleştirilen Doğal Bloklar",
+  "showcase.stats.block.natural_blocks.broken": "Kırılan Doğal Bloklar",
+  
+  "showcase.stats.block.functional_blocks": "İşlevsel Bloklar", 
+  "showcase.stats.block.functional_blocks.placed": "Yerleştirilen İşlevsel Bloklar",
+  "showcase.stats.block.functional_blocks.broken": "Kırılan İşlevsel Bloklar",
+  
+  "showcase.stats.block.redstone_blocks": "Redstone Blokları",
+  "showcase.stats.block.redstone_blocks.placed": "Yerleştirilen Redstone Blokları",
+  "showcase.stats.block.redstone_blocks.broken": "Kırılan Redstone Blokları",
+  
+  "showcase.stats.block.combat": "Savaş Blokları",
+  "showcase.stats.block.combat.placed": "Yerleştirilen Savaş Blokları",
+  "showcase.stats.block.combat.broken": "Kırılan Savaş Blokları",
+  
+  "showcase.stats.block.ingredients": "Malzeme Blokları",
+  "showcase.stats.block.ingredients.placed": "Yerleştirilen Malzeme Blokları",
+  "showcase.stats.block.ingredients.broken": "Kırılan Malzeme Blokları",
+  
+  "showcase.stats.block.unknown": "Bilinmeyen Bloklar",
+  
+  "showcase.stats.message.create_date": "Oluşturma Tarihi",
+  "showcase.stats.message.total_pages": "Toplam Sayfa"
+}

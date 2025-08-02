@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rDu har delt for hurtigt. Vent §l%d§r sekunder før du prøver igen",
+  "showcase.message.no_item": "§rVenligst hold en genstand at vise",
+  "showcase.message.item_shared": "§r%s viste sin %s",
+  "showcase.message.stats_shared": "§r%s viste sine %s",
+  "showcase.message.inventory_shared": "§r%s viste sit %s",
+  "showcase.message.other_inventory_shared": "§r%s viste %ss %s",
+  "showcase.message.ender_chest_shared": "§r%s viste sin %s",
+  "showcase.message.other_ender_chest_shared": "§r%s viste %ss %s",
+  "showcase.message.hotbar_shared": "§r%s viste sit %s",
+  "showcase.message.other_hotbar_shared": "§r%s viste %ss %s",
+  "showcase.message.other_item_shared": "§r%s viste %ss %s",
+  "showcase.message.other_stats_shared": "§r%s viste %ss %s",
+  "showcase.message.other_container_shared": "§r%s viste %ss %s",
+  "showcase.message.other_merchant_shared": "§r%s viste %ss %s",
+  "showcase.message.container_shared": "§r%s viste sin %s",
+  "showcase.message.merchant_shared": "§r%s viste %ss handelsgrænseflade",
+  "showcase.message.private_share_tip": "§rDu har delt %ss %s med %s",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rÅbn beholderen du vil vise inden for §l%d§r sekunder",
+  "showcase.message.share_container_expiry": "§rIngen gyldig beholder fundet, visning fejlede",
+  "showcase.message.share_merchant_tip": "§rÅbn handelsgrænsefladen du vil vise inden for §l%d§r sekunder",
+  "showcase.message.share_merchant_expiry": "§rIngen gyldig handelsgrænseflade fundet, visning fejlede",
+  "showcase.message.expiry_notice": "§r(Dette link udløber om §l%d§r minutter)",
+  "showcase.message.click_to_view": "§rKlik for at se",
+  "showcase.message.invalid_or_expired": "§rDette delingslink er ugyldigt eller udløbet",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%ss %s",
+  "showcase.screen.hotbar_title": "§r%ss %s",
+  "showcase.screen.item_title": "§r%ss %s",
+  "showcase.screen.container_title": "§r%s vist af %s",
+  "showcase.screen.merchant_title": "§r%ss handel vist af %s",
+
+  "showcase.message.default.inventory": "§r%s viste sit %s",
+  "showcase.message.default.ender_chest": "§r%s viste sin %s",
+  "showcase.message.default.hotbar": "§r%s viste sit %s",
+  "showcase.message.default.item": "§r%s viste sin %s",
+  "showcase.message.default.stats": "§r%s viste sine %s",
+  "showcase.message.default.container": "§r%s viste en %s",
+  "showcase.message.default.merchant": "§r%s viste %ss handel",
+
+  "showcase.message.invalid_id": "§rUgyldigt visnings-ID",
+  "showcase.message.cancel_not_owner": "§rDu kan kun annullere dine egne visninger",
+  "showcase.message.cancel_success": "§rVisning annulleret succesfuldt",
+  "showcase.message.cancel_failed": "§rMislykkedes med at annullere visning",
+
+  "showcase.preview_text.more_trades": "§rOg §l%d§r flere handler",
+  "showcase.preview_text.more": "§r%s flere genstande ikke vist…",
+  "showcase.message.invalid_duration_exception": "§rVarighed skal være mellem §l%d§r og §l%d§r sekunder",
+
+  "showcase.message.about.version": "§rVersion: %s",
+  "showcase.message.about.contributors": "§rBidragydere",
+
+  "showcase.message.reload.success": "§rKonfiguration genindlæst succesfuldt!",
+  "showcase.message.reload.fail": "§rMislykkedes med at genindlæse konfiguration!",
+
+  "showcase.message.manage.empty": "§rIngen aktive visninger fundet",
+  "showcase.message.manage.noPermission": "§rBeklager, du har ikke tilladelse til at se dette",
+  "showcase.message.manage.cancel.success_id": "§rVisning %s annulleret succesfuldt",
+  "showcase.message.manage.cancel.tip": "§rKlik for at annullere denne visning",
+  "showcase.message.manage.cancel.success_player": "§rAnnullerede %s visninger fra %s",
+  "showcase.message.manage.cancel.empty": "§rIngen aktive visninger fundet fra %s",
+  "showcase.message.manage.cancel.not_found": "§rIngen matchende visnings-ID eller spillernavn fundet",
+
+  "showcase.stats.category.time": "Tidsstatistik",
+  "showcase.stats.category.movement": "Bevægelsesstatistik", 
+  "showcase.stats.category.combat": "Kampstatistik",
+  "showcase.stats.category.interaction": "Interaktionsstatistik",
+  "showcase.stats.category.misc": "Diverse Statistik",
+  "showcase.stats.category.blocks": "Blokstatistik",
+  "showcase.stats.category.items": "Genstandsstatistik",
+  "showcase.stats.category.entities": "Entitetsstatistik",
+
+  "showcase.stats.blocks.total_placed": "Total Placerede Blokke",
+  "showcase.stats.blocks.total_broken": "Total Ødelagte Blokke",
+  
+  "showcase.stats.block.building_blocks": "Byggeblokke",
+  "showcase.stats.block.building_blocks.placed": "Placerede Byggeblokke",
+  "showcase.stats.block.building_blocks.broken": "Ødelagte Byggeblokke",
+  
+  "showcase.stats.block.colored_blocks": "Farvede Blokke",
+  "showcase.stats.block.colored_blocks.placed": "Placerede Farvede Blokke", 
+  "showcase.stats.block.colored_blocks.broken": "Ødelagte Farvede Blokke",
+  
+  "showcase.stats.block.natural_blocks": "Naturlige Blokke",
+  "showcase.stats.block.natural_blocks.placed": "Placerede Naturlige Blokke",
+  "showcase.stats.block.natural_blocks.broken": "Ødelagte Naturlige Blokke",
+  
+  "showcase.stats.block.functional_blocks": "Funktionelle Blokke", 
+  "showcase.stats.block.functional_blocks.placed": "Placerede Funktionelle Blokke",
+  "showcase.stats.block.functional_blocks.broken": "Ødelagte Funktionelle Blokke",
+  
+  "showcase.stats.block.redstone_blocks": "Redstone Blokke",
+  "showcase.stats.block.redstone_blocks.placed": "Placerede Redstone Blokke",
+  "showcase.stats.block.redstone_blocks.broken": "Ødelagte Redstone Blokke",
+  
+  "showcase.stats.block.combat": "Kampblokke",
+  "showcase.stats.block.combat.placed": "Placerede Kampblokke",
+  "showcase.stats.block.combat.broken": "Ødelagte Kampblokke",
+  
+  "showcase.stats.block.ingredients": "Materialeblokke",
+  "showcase.stats.block.ingredients.placed": "Placerede Materialeblokke",
+  "showcase.stats.block.ingredients.broken": "Ødelagte Materialeblokke",
+  
+  "showcase.stats.block.unknown": "Ukendte Blokke",
+  
+  "showcase.stats.message.create_date": "Oprettelsesdato",
+  "showcase.stats.message.total_pages": "Samlede Sider"
+}

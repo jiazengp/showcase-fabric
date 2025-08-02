@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rUdostępniałeś zbyt szybko. Poczekaj §l%d§r sekund przed ponowną próbą",
+  "showcase.message.no_item": "§rProszę trzymaj przedmiot do pokazania",
+  "showcase.message.item_shared": "§r%s pokazał swój %s",
+  "showcase.message.stats_shared": "§r%s pokazał swoje %s",
+  "showcase.message.inventory_shared": "§r%s pokazał swój %s",
+  "showcase.message.other_inventory_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.ender_chest_shared": "§r%s pokazał swoją %s",
+  "showcase.message.other_ender_chest_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.hotbar_shared": "§r%s pokazał swój %s",
+  "showcase.message.other_hotbar_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.other_item_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.other_stats_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.other_container_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.other_merchant_shared": "§r%s pokazał %s gracza %s",
+  "showcase.message.container_shared": "§r%s pokazał swój %s",
+  "showcase.message.merchant_shared": "§r%s pokazał interfejs handlowy %s",
+  "showcase.message.private_share_tip": "§rUdostępniłeś %s gracza %s graczowi %s",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rOtwórz kontener, który chcesz pokazać w ciągu §l%d§r sekund",
+  "showcase.message.share_container_expiry": "§rNie wykryto prawidłowego kontenera, pokazywanie nie powiodło się",
+  "showcase.message.share_merchant_tip": "§rOtwórz interfejs handlowy, który chcesz pokazać w ciągu §l%d§r sekund",
+  "showcase.message.share_merchant_expiry": "§rNie wykryto prawidłowego interfejsu handlowego, pokazywanie nie powiodło się",
+  "showcase.message.expiry_notice": "§r(Ten link wygaśnie za §l%d§r minut)",
+  "showcase.message.click_to_view": "§rKliknij aby zobaczyć",
+  "showcase.message.invalid_or_expired": "§rTen link udostępniania jest nieprawidłowy lub wygasł",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s gracza %s",
+  "showcase.screen.hotbar_title": "§r%s gracza %s",
+  "showcase.screen.item_title": "§r%s gracza %s",
+  "showcase.screen.container_title": "§r%s pokazany przez %s",
+  "showcase.screen.merchant_title": "§rHandel %s pokazany przez %s",
+
+  "showcase.message.default.inventory": "§r%s pokazał swój %s",
+  "showcase.message.default.ender_chest": "§r%s pokazał swoją %s",
+  "showcase.message.default.hotbar": "§r%s pokazał swój %s",
+  "showcase.message.default.item": "§r%s pokazał swój %s",
+  "showcase.message.default.stats": "§r%s pokazał swoje %s",
+  "showcase.message.default.container": "§r%s pokazał %s",
+  "showcase.message.default.merchant": "§r%s pokazał handel %s",
+
+  "showcase.message.invalid_id": "§rNieprawidłowe ID pokazu",
+  "showcase.message.cancel_not_owner": "§rMożesz anulować tylko swoje własne pokazy",
+  "showcase.message.cancel_success": "§rPokaz pomyślnie anulowany",
+  "showcase.message.cancel_failed": "§rNie udało się anulować pokazu",
+
+  "showcase.preview_text.more_trades": "§rI §l%d§r więcej wymiany",
+  "showcase.preview_text.more": "§r%s więcej przedmiotów nie pokazano…",
+  "showcase.message.invalid_duration_exception": "§rCzas trwania musi być między §l%d§r a §l%d§r sekund",
+
+  "showcase.message.about.version": "§rWersja: %s",
+  "showcase.message.about.contributors": "§rWspółautorzy",
+
+  "showcase.message.reload.success": "§rKonfiguracja pomyślnie przeładowana!",
+  "showcase.message.reload.fail": "§rNie udało się przeładować konfiguracji!",
+
+  "showcase.message.manage.empty": "§rNie znaleziono aktywnych pokazów",
+  "showcase.message.manage.noPermission": "§rPrzepraszam, nie masz uprawnień do oglądania tego",
+  "showcase.message.manage.cancel.success_id": "§rPokaz %s pomyślnie anulowany",
+  "showcase.message.manage.cancel.tip": "§rKliknij aby anulować ten pokaz",
+  "showcase.message.manage.cancel.success_player": "§rAnulowano %s pokazów gracza %s",
+  "showcase.message.manage.cancel.empty": "§rNie znaleziono aktywnych pokazów gracza %s",
+  "showcase.message.manage.cancel.not_found": "§rNie znaleziono pasującego ID pokazu lub nazwy gracza",
+
+  "showcase.stats.category.time": "Statystyki Czasu",
+  "showcase.stats.category.movement": "Statystyki Ruchu", 
+  "showcase.stats.category.combat": "Statystyki Walki",
+  "showcase.stats.category.interaction": "Statystyki Interakcji",
+  "showcase.stats.category.misc": "Różne Statystyki",
+  "showcase.stats.category.blocks": "Statystyki Bloków",
+  "showcase.stats.category.items": "Statystyki Przedmiotów",
+  "showcase.stats.category.entities": "Statystyki Istot",
+
+  "showcase.stats.blocks.total_placed": "Łącznie Postawionych Bloków",
+  "showcase.stats.blocks.total_broken": "Łącznie Zniszczonych Bloków",
+  
+  "showcase.stats.block.building_blocks": "Bloki Budowlane",
+  "showcase.stats.block.building_blocks.placed": "Postawione Bloki Budowlane",
+  "showcase.stats.block.building_blocks.broken": "Zniszczone Bloki Budowlane",
+  
+  "showcase.stats.block.colored_blocks": "Kolorowe Bloki",
+  "showcase.stats.block.colored_blocks.placed": "Postawione Kolorowe Bloki", 
+  "showcase.stats.block.colored_blocks.broken": "Zniszczone Kolorowe Bloki",
+  
+  "showcase.stats.block.natural_blocks": "Naturalne Bloki",
+  "showcase.stats.block.natural_blocks.placed": "Postawione Naturalne Bloki",
+  "showcase.stats.block.natural_blocks.broken": "Zniszczone Naturalne Bloki",
+  
+  "showcase.stats.block.functional_blocks": "Bloki Funkcjonalne", 
+  "showcase.stats.block.functional_blocks.placed": "Postawione Bloki Funkcjonalne",
+  "showcase.stats.block.functional_blocks.broken": "Zniszczone Bloki Funkcjonalne",
+  
+  "showcase.stats.block.redstone_blocks": "Bloki Redstone",
+  "showcase.stats.block.redstone_blocks.placed": "Postawione Bloki Redstone",
+  "showcase.stats.block.redstone_blocks.broken": "Zniszczone Bloki Redstone",
+  
+  "showcase.stats.block.combat": "Bloki Bojowe",
+  "showcase.stats.block.combat.placed": "Postawione Bloki Bojowe",
+  "showcase.stats.block.combat.broken": "Zniszczone Bloki Bojowe",
+  
+  "showcase.stats.block.ingredients": "Bloki Materiałowe",
+  "showcase.stats.block.ingredients.placed": "Postawione Bloki Materiałowe",
+  "showcase.stats.block.ingredients.broken": "Zniszczone Bloki Materiałowe",
+  
+  "showcase.stats.block.unknown": "Nieznane Bloki",
+  
+  "showcase.stats.message.create_date": "Data Utworzenia",
+  "showcase.stats.message.total_pages": "Łączna Liczba Stron"
+}

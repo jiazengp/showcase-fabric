@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rDu har delat för snabbt. Vänta §l%d§r sekunder innan du försöker igen",
+  "showcase.message.no_item": "§rVänligen håll ett föremål att visa",
+  "showcase.message.item_shared": "§r%s visade sin %s",
+  "showcase.message.stats_shared": "§r%s visade sin %s",
+  "showcase.message.inventory_shared": "§r%s visade sitt %s",
+  "showcase.message.other_inventory_shared": "§r%s visade %ss %s",
+  "showcase.message.ender_chest_shared": "§r%s visade sin %s",
+  "showcase.message.other_ender_chest_shared": "§r%s visade %ss %s",
+  "showcase.message.hotbar_shared": "§r%s visade sitt %s",
+  "showcase.message.other_hotbar_shared": "§r%s visade %ss %s",
+  "showcase.message.other_item_shared": "§r%s visade %ss %s",
+  "showcase.message.other_stats_shared": "§r%s visade %ss %s",
+  "showcase.message.other_container_shared": "§r%s visade %ss %s",
+  "showcase.message.other_merchant_shared": "§r%s visade %ss %s",
+  "showcase.message.container_shared": "§r%s visade sin %s",
+  "showcase.message.merchant_shared": "§r%s visade %ss handelsgränssnitt",
+  "showcase.message.private_share_tip": "§rDu har delat %ss %s med %s",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rÖppna behållaren du vill visa inom §l%d§r sekunder",
+  "showcase.message.share_container_expiry": "§rIngen giltig behållare upptäckt, visning misslyckades",
+  "showcase.message.share_merchant_tip": "§rÖppna handelsgränssnittet du vill visa inom §l%d§r sekunder",
+  "showcase.message.share_merchant_expiry": "§rInget giltigt handelsgränssnitt upptäckt, visning misslyckades",
+  "showcase.message.expiry_notice": "§r(Denna länk går ut om §l%d§r minuter)",
+  "showcase.message.click_to_view": "§rKlicka för att visa",
+  "showcase.message.invalid_or_expired": "§rDenna delningslänk är ogiltig eller har gått ut",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%ss %s",
+  "showcase.screen.hotbar_title": "§r%ss %s",
+  "showcase.screen.item_title": "§r%ss %s",
+  "showcase.screen.container_title": "§r%s visad av %s",
+  "showcase.screen.merchant_title": "§r%ss handel visad av %s",
+
+  "showcase.message.default.inventory": "§r%s visade sitt %s",
+  "showcase.message.default.ender_chest": "§r%s visade sin %s",
+  "showcase.message.default.hotbar": "§r%s visade sitt %s",
+  "showcase.message.default.item": "§r%s visade sin %s",
+  "showcase.message.default.stats": "§r%s visade sin %s",
+  "showcase.message.default.container": "§r%s visade en %s",
+  "showcase.message.default.merchant": "§r%s visade %ss handel",
+
+  "showcase.message.invalid_id": "§rOgiltigt visnings-ID",
+  "showcase.message.cancel_not_owner": "§rDu kan bara avbryta dina egna visningar",
+  "showcase.message.cancel_success": "§rVisning avbruten framgångsrikt",
+  "showcase.message.cancel_failed": "§rMisslyckades avbryta visning",
+
+  "showcase.preview_text.more_trades": "§rOch §l%d§r fler affärer",
+  "showcase.preview_text.more": "§r%s fler föremål visas inte…",
+  "showcase.message.invalid_duration_exception": "§rVaraktighet måste vara mellan §l%d§r och §l%d§r sekunder",
+
+  "showcase.message.about.version": "§rVersion: %s",
+  "showcase.message.about.contributors": "§rBidragsgivare",
+
+  "showcase.message.reload.success": "§rKonfiguration omladdad framgångsrikt!",
+  "showcase.message.reload.fail": "§rMisslyckades ladda om konfiguration!",
+
+  "showcase.message.manage.empty": "§rInga aktiva visningar hittade",
+  "showcase.message.manage.noPermission": "§rTyvärr, du har inte behörighet att se detta",
+  "showcase.message.manage.cancel.success_id": "§rVisning %s avbruten framgångsrikt",
+  "showcase.message.manage.cancel.tip": "§rKlicka för att avbryta denna visning",
+  "showcase.message.manage.cancel.success_player": "§rAvbröt %s visningar från %s",
+  "showcase.message.manage.cancel.empty": "§rInga aktiva visningar hittade från %s",
+  "showcase.message.manage.cancel.not_found": "§rInget matchande visnings-ID eller spelarnamn hittat",
+
+  "showcase.stats.category.time": "Tidsstatistik",
+  "showcase.stats.category.movement": "Rörelsestatistik", 
+  "showcase.stats.category.combat": "Stridsstatistik",
+  "showcase.stats.category.interaction": "Interaktionsstatistik",
+  "showcase.stats.category.misc": "Diverse Statistik",
+  "showcase.stats.category.blocks": "Blockstatistik",
+  "showcase.stats.category.items": "Föremålsstatistik",
+  "showcase.stats.category.entities": "Entitetsstatistik",
+
+  "showcase.stats.blocks.total_placed": "Totalt Placerade Block",
+  "showcase.stats.blocks.total_broken": "Totalt Trasiga Block",
+  
+  "showcase.stats.block.building_blocks": "Byggblock",
+  "showcase.stats.block.building_blocks.placed": "Placerade Byggblock",
+  "showcase.stats.block.building_blocks.broken": "Trasiga Byggblock",
+  
+  "showcase.stats.block.colored_blocks": "Färgade Block",
+  "showcase.stats.block.colored_blocks.placed": "Placerade Färgade Block", 
+  "showcase.stats.block.colored_blocks.broken": "Trasiga Färgade Block",
+  
+  "showcase.stats.block.natural_blocks": "Naturliga Block",
+  "showcase.stats.block.natural_blocks.placed": "Placerade Naturliga Block",
+  "showcase.stats.block.natural_blocks.broken": "Trasiga Naturliga Block",
+  
+  "showcase.stats.block.functional_blocks": "Funktionella Block", 
+  "showcase.stats.block.functional_blocks.placed": "Placerade Funktionella Block",
+  "showcase.stats.block.functional_blocks.broken": "Trasiga Funktionella Block",
+  
+  "showcase.stats.block.redstone_blocks": "Redstone Block",
+  "showcase.stats.block.redstone_blocks.placed": "Placerade Redstone Block",
+  "showcase.stats.block.redstone_blocks.broken": "Trasiga Redstone Block",
+  
+  "showcase.stats.block.combat": "Stridsblock",
+  "showcase.stats.block.combat.placed": "Placerade Stridsblock",
+  "showcase.stats.block.combat.broken": "Trasiga Stridsblock",
+  
+  "showcase.stats.block.ingredients": "Materialblock",
+  "showcase.stats.block.ingredients.placed": "Placerade Materialblock",
+  "showcase.stats.block.ingredients.broken": "Trasiga Materialblock",
+  
+  "showcase.stats.block.unknown": "Okända Block",
+  
+  "showcase.stats.message.create_date": "Skapelsedatum",
+  "showcase.stats.message.total_pages": "Totalt Sidor"
+}

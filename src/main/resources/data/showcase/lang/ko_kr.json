@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§r너무 빠르게 공유했습니다. §l%d§r초 후에 다시 시도해주세요",
+  "showcase.message.no_item": "§r보여줄 아이템을 들어주세요",
+  "showcase.message.item_shared": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.stats_shared": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.inventory_shared": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.other_inventory_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.ender_chest_shared": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.other_ender_chest_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.hotbar_shared": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.other_hotbar_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.other_item_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.other_stats_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.other_container_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.other_merchant_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.container_shared": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.merchant_shared": "§r%s님이 %s의 거래 인터페이스를 보여주었습니다",
+  "showcase.message.private_share_tip": "§r%s의 %s을(를) %s님과 공유했습니다",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§r§l%d§r초 내에 보여줄 컨테이너를 열어주세요",
+  "showcase.message.share_container_expiry": "§r유효한 컨테이너가 감지되지 않았습니다. 보여주기 실패",
+  "showcase.message.share_merchant_tip": "§r§l%d§r초 내에 보여줄 거래 인터페이스를 열어주세요",
+  "showcase.message.share_merchant_expiry": "§r유효한 거래 인터페이스가 감지되지 않았습니다. 보여주기 실패",
+  "showcase.message.expiry_notice": "§r(이 링크는 §l%d§r분 후에 만료됩니다)",
+  "showcase.message.click_to_view": "§r클릭하여 보기",
+  "showcase.message.invalid_or_expired": "§r이 공유 링크는 유효하지 않거나 만료되었습니다",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s의 %s",
+  "showcase.screen.hotbar_title": "§r%s의 %s",
+  "showcase.screen.item_title": "§r%s의 %s",
+  "showcase.screen.container_title": "§r%s가 보여준 %s",
+  "showcase.screen.merchant_title": "§r%s가 보여준 %s의 거래",
+
+  "showcase.message.default.inventory": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.default.ender_chest": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.default.hotbar": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.default.item": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.default.stats": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.default.container": "§r%s님이 %s을(를) 보여주었습니다",
+  "showcase.message.default.merchant": "§r%s님이 %s의 거래를 보여주었습니다",
+
+  "showcase.message.invalid_id": "§r유효하지 않은 보여주기 ID",
+  "showcase.message.cancel_not_owner": "§r자신의 보여주기만 취소할 수 있습니다",
+  "showcase.message.cancel_success": "§r보여주기가 성공적으로 취소되었습니다",
+  "showcase.message.cancel_failed": "§r보여주기 취소에 실패했습니다",
+
+  "showcase.preview_text.more_trades": "§r그리고 §l%d§r개의 추가 거래",
+  "showcase.preview_text.more": "§r%s개의 아이템이 더 표시되지 않음…",
+  "showcase.message.invalid_duration_exception": "§r지속 시간은 §l%d§r초에서 §l%d§r초 사이여야 합니다",
+
+  "showcase.message.about.version": "§r버전: %s",
+  "showcase.message.about.contributors": "§r기여자",
+
+  "showcase.message.reload.success": "§r설정이 성공적으로 다시 로드되었습니다!",
+  "showcase.message.reload.fail": "§r설정 다시 로드에 실패했습니다!",
+
+  "showcase.message.manage.empty": "§r활성 보여주기를 찾을 수 없습니다",
+  "showcase.message.manage.noPermission": "§r죄송합니다. 이것을 볼 권한이 없습니다",
+  "showcase.message.manage.cancel.success_id": "§r보여주기 %s이(가) 성공적으로 취소되었습니다",
+  "showcase.message.manage.cancel.tip": "§r클릭하여 이 보여주기를 취소하세요",
+  "showcase.message.manage.cancel.success_player": "§r%s의 보여주기 %s개를 취소했습니다",
+  "showcase.message.manage.cancel.empty": "§r%s의 활성 보여주기를 찾을 수 없습니다",
+  "showcase.message.manage.cancel.not_found": "§r일치하는 보여주기 ID 또는 플레이어 이름을 찾을 수 없습니다",
+
+  "showcase.stats.category.time": "시간 통계",
+  "showcase.stats.category.movement": "이동 통계", 
+  "showcase.stats.category.combat": "전투 통계",
+  "showcase.stats.category.interaction": "상호작용 통계",
+  "showcase.stats.category.misc": "기타 통계",
+  "showcase.stats.category.blocks": "블록 통계",
+  "showcase.stats.category.items": "아이템 통계",
+  "showcase.stats.category.entities": "엔티티 통계",
+
+  "showcase.stats.blocks.total_placed": "총 설치한 블록 수",
+  "showcase.stats.blocks.total_broken": "총 파괴한 블록 수",
+  
+  "showcase.stats.block.building_blocks": "건축 블록",
+  "showcase.stats.block.building_blocks.placed": "설치한 건축 블록",
+  "showcase.stats.block.building_blocks.broken": "파괴한 건축 블록",
+  
+  "showcase.stats.block.colored_blocks": "색상 블록",
+  "showcase.stats.block.colored_blocks.placed": "설치한 색상 블록", 
+  "showcase.stats.block.colored_blocks.broken": "파괴한 색상 블록",
+  
+  "showcase.stats.block.natural_blocks": "자연 블록",
+  "showcase.stats.block.natural_blocks.placed": "설치한 자연 블록",
+  "showcase.stats.block.natural_blocks.broken": "파괴한 자연 블록",
+  
+  "showcase.stats.block.functional_blocks": "기능 블록", 
+  "showcase.stats.block.functional_blocks.placed": "설치한 기능 블록",
+  "showcase.stats.block.functional_blocks.broken": "파괴한 기능 블록",
+  
+  "showcase.stats.block.redstone_blocks": "레드스톤 블록",
+  "showcase.stats.block.redstone_blocks.placed": "설치한 레드스톤 블록",
+  "showcase.stats.block.redstone_blocks.broken": "파괴한 레드스톤 블록",
+  
+  "showcase.stats.block.combat": "전투 블록",
+  "showcase.stats.block.combat.placed": "설치한 전투 블록",
+  "showcase.stats.block.combat.broken": "파괴한 전투 블록",
+  
+  "showcase.stats.block.ingredients": "재료 블록",
+  "showcase.stats.block.ingredients.placed": "설치한 재료 블록",
+  "showcase.stats.block.ingredients.broken": "파괴한 재료 블록",
+  
+  "showcase.stats.block.unknown": "알 수 없는 블록",
+  
+  "showcase.stats.message.create_date": "생성 날짜",
+  "showcase.stats.message.total_pages": "총 페이지"
+}

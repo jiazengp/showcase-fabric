@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rВы слишком быстро делились. Подождите §l%d§r секунд перед повторной попыткой",
+  "showcase.message.no_item": "§rПожалуйста, держите предмет для показа",
+  "showcase.message.item_shared": "§r%s показал свой %s",
+  "showcase.message.stats_shared": "§r%s показал свою %s",
+  "showcase.message.inventory_shared": "§r%s показал свой %s",
+  "showcase.message.other_inventory_shared": "§r%s показал %s игрока %s",
+  "showcase.message.ender_chest_shared": "§r%s показал свой %s",
+  "showcase.message.other_ender_chest_shared": "§r%s показал %s игрока %s",
+  "showcase.message.hotbar_shared": "§r%s показал свою %s",
+  "showcase.message.other_hotbar_shared": "§r%s показал %s игрока %s",
+  "showcase.message.other_item_shared": "§r%s показал %s игрока %s",
+  "showcase.message.other_stats_shared": "§r%s показал %s игрока %s",
+  "showcase.message.other_container_shared": "§r%s показал %s игрока %s",
+  "showcase.message.other_merchant_shared": "§r%s показал %s игрока %s",
+  "showcase.message.container_shared": "§r%s показал свой %s",
+  "showcase.message.merchant_shared": "§r%s показал торговый интерфейс %s",
+  "showcase.message.private_share_tip": "§rВы поделились %s игрока %s с %s",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rОткройте контейнер, который хотите показать, в течение §l%d§r секунд",
+  "showcase.message.share_container_expiry": "§rДействительный контейнер не обнаружен, показ не удался",
+  "showcase.message.share_merchant_tip": "§rОткройте торговый интерфейс, который хотите показать, в течение §l%d§r секунд",
+  "showcase.message.share_merchant_expiry": "§rДействительный торговый интерфейс не обнаружен, показ не удался",
+  "showcase.message.expiry_notice": "§r(Эта ссылка истечет через §l%d§r минут)",
+  "showcase.message.click_to_view": "§rНажмите для просмотра",
+  "showcase.message.invalid_or_expired": "§rЭта ссылка недействительна или истекла",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s игрока %s",
+  "showcase.screen.hotbar_title": "§r%s игрока %s",
+  "showcase.screen.item_title": "§r%s игрока %s",
+  "showcase.screen.container_title": "§r%s показан игроком %s",
+  "showcase.screen.merchant_title": "§rТорговля %s показана игроком %s",
+
+  "showcase.message.default.inventory": "§r%s показал свой %s",
+  "showcase.message.default.ender_chest": "§r%s показал свой %s",
+  "showcase.message.default.hotbar": "§r%s показал свою %s",
+  "showcase.message.default.item": "§r%s показал свой %s",
+  "showcase.message.default.stats": "§r%s показал свою %s",
+  "showcase.message.default.container": "§r%s показал %s",
+  "showcase.message.default.merchant": "§r%s показал торговлю %s",
+
+  "showcase.message.invalid_id": "§rНедействительный ID показа",
+  "showcase.message.cancel_not_owner": "§rВы можете отменить только свои собственные показы",
+  "showcase.message.cancel_success": "§rПоказ успешно отменен",
+  "showcase.message.cancel_failed": "§rНе удалось отменить показ",
+
+  "showcase.preview_text.more_trades": "§rИ еще §l%d§r торговых предложений",
+  "showcase.preview_text.more": "§r%s предметов больше не показано…",
+  "showcase.message.invalid_duration_exception": "§rПродолжительность должна быть от §l%d§r до §l%d§r секунд",
+
+  "showcase.message.about.version": "§rВерсия: %s",
+  "showcase.message.about.contributors": "§rВкладчики",
+
+  "showcase.message.reload.success": "§rКонфигурация успешно перезагружена!",
+  "showcase.message.reload.fail": "§rНе удалось перезагрузить конфигурацию!",
+
+  "showcase.message.manage.empty": "§rАктивные показы не найдены",
+  "showcase.message.manage.noPermission": "§rИзвините, у вас нет разрешения на просмотр этого",
+  "showcase.message.manage.cancel.success_id": "§rПоказ %s успешно отменен",
+  "showcase.message.manage.cancel.tip": "§rНажмите, чтобы отменить этот показ",
+  "showcase.message.manage.cancel.success_player": "§rОтменено %s показов игрока %s",
+  "showcase.message.manage.cancel.empty": "§rАктивные показы игрока %s не найдены",
+  "showcase.message.manage.cancel.not_found": "§rСоответствующий ID показа или имя игрока не найдены",
+
+  "showcase.stats.category.time": "Статистика времени",
+  "showcase.stats.category.movement": "Статистика движения", 
+  "showcase.stats.category.combat": "Боевая статистика",
+  "showcase.stats.category.interaction": "Статистика взаимодействий",
+  "showcase.stats.category.misc": "Разная статистика",
+  "showcase.stats.category.blocks": "Статистика блоков",
+  "showcase.stats.category.items": "Статистика предметов",
+  "showcase.stats.category.entities": "Статистика сущностей",
+
+  "showcase.stats.blocks.total_placed": "Всего размещено блоков",
+  "showcase.stats.blocks.total_broken": "Всего сломано блоков",
+  
+  "showcase.stats.block.building_blocks": "Строительные блоки",
+  "showcase.stats.block.building_blocks.placed": "Размещено строительных блоков",
+  "showcase.stats.block.building_blocks.broken": "Сломано строительных блоков",
+  
+  "showcase.stats.block.colored_blocks": "Цветные блоки",
+  "showcase.stats.block.colored_blocks.placed": "Размещено цветных блоков", 
+  "showcase.stats.block.colored_blocks.broken": "Сломано цветных блоков",
+  
+  "showcase.stats.block.natural_blocks": "Природные блоки",
+  "showcase.stats.block.natural_blocks.placed": "Размещено природных блоков",
+  "showcase.stats.block.natural_blocks.broken": "Сломано природных блоков",
+  
+  "showcase.stats.block.functional_blocks": "Функциональные блоки", 
+  "showcase.stats.block.functional_blocks.placed": "Размещено функциональных блоков",
+  "showcase.stats.block.functional_blocks.broken": "Сломано функциональных блоков",
+  
+  "showcase.stats.block.redstone_blocks": "Редстоун блоки",
+  "showcase.stats.block.redstone_blocks.placed": "Размещено редстоун блоков",
+  "showcase.stats.block.redstone_blocks.broken": "Сломано редстоун блоков",
+  
+  "showcase.stats.block.combat": "Боевые блоки",
+  "showcase.stats.block.combat.placed": "Размещено боевых блоков",
+  "showcase.stats.block.combat.broken": "Сломано боевых блоков",
+  
+  "showcase.stats.block.ingredients": "Материальные блоки",
+  "showcase.stats.block.ingredients.placed": "Размещено материальных блоков",
+  "showcase.stats.block.ingredients.broken": "Сломано материальных блоков",
+  
+  "showcase.stats.block.unknown": "Неизвестные блоки",
+  
+  "showcase.stats.message.create_date": "Дата создания",
+  "showcase.stats.message.total_pages": "Всего страниц"
+}

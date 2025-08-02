@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rDu hast zu schnell geteilt. Warte §l%d§r Sekunden bevor du es erneut versuchst",
+  "showcase.message.no_item": "§rBitte halte einen Gegenstand zum Zeigen",
+  "showcase.message.item_shared": "§r%s zeigte seinen %s",
+  "showcase.message.stats_shared": "§r%s zeigte seine %s",
+  "showcase.message.inventory_shared": "§r%s zeigte sein %s",
+  "showcase.message.other_inventory_shared": "§r%s zeigte %ss %s",
+  "showcase.message.ender_chest_shared": "§r%s zeigte seine %s",
+  "showcase.message.other_ender_chest_shared": "§r%s zeigte %ss %s",
+  "showcase.message.hotbar_shared": "§r%s zeigte seine %s",
+  "showcase.message.other_hotbar_shared": "§r%s zeigte %ss %s",
+  "showcase.message.other_item_shared": "§r%s zeigte %ss %s",
+  "showcase.message.other_stats_shared": "§r%s zeigte %ss %s",
+  "showcase.message.other_container_shared": "§r%s zeigte %ss %s",
+  "showcase.message.other_merchant_shared": "§r%s zeigte %ss %s",
+  "showcase.message.container_shared": "§r%s zeigte seinen %s",
+  "showcase.message.merchant_shared": "§r%s zeigte %ss Handelsschnittstelle",
+  "showcase.message.private_share_tip": "§rDu hast %ss %s mit %s geteilt",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rÖffne den Behälter, den du zeigen möchtest, in §l%d§r Sekunden",
+  "showcase.message.share_container_expiry": "§rKein gültiger Behälter erkannt, Anzeige fehlgeschlagen",
+  "showcase.message.share_merchant_tip": "§rÖffne die Handelsschnittstelle, die du zeigen möchtest, in §l%d§r Sekunden",
+  "showcase.message.share_merchant_expiry": "§rKeine gültige Handelsschnittstelle erkannt, Anzeige fehlgeschlagen",
+  "showcase.message.expiry_notice": "§r(Dieser Link läuft in §l%d§r Minuten ab)",
+  "showcase.message.click_to_view": "§rKlicken zum Anzeigen",
+  "showcase.message.invalid_or_expired": "§rDieser Freigabelink ist ungültig oder abgelaufen",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%ss %s",
+  "showcase.screen.hotbar_title": "§r%ss %s",
+  "showcase.screen.item_title": "§r%ss %s",
+  "showcase.screen.container_title": "§r%s gezeigt von %s",
+  "showcase.screen.merchant_title": "§r%ss Handel gezeigt von %s",
+
+  "showcase.message.default.inventory": "§r%s zeigte sein %s",
+  "showcase.message.default.ender_chest": "§r%s zeigte seine %s",
+  "showcase.message.default.hotbar": "§r%s zeigte seine %s",
+  "showcase.message.default.item": "§r%s zeigte seinen %s",
+  "showcase.message.default.stats": "§r%s zeigte seine %s",
+  "showcase.message.default.container": "§r%s zeigte einen %s",
+  "showcase.message.default.merchant": "§r%s zeigte %ss Handel",
+
+  "showcase.message.invalid_id": "§rUngültige Anzeige-ID",
+  "showcase.message.cancel_not_owner": "§rDu kannst nur deine eigenen Anzeigen abbrechen",
+  "showcase.message.cancel_success": "§rAnzeige erfolgreich abgebrochen",
+  "showcase.message.cancel_failed": "§rFehler beim Abbrechen der Anzeige",
+
+  "showcase.preview_text.more_trades": "§rUnd §l%d§r weitere Geschäfte",
+  "showcase.preview_text.more": "§r%s weitere Gegenstände nicht angezeigt…",
+  "showcase.message.invalid_duration_exception": "§rDie Dauer muss zwischen §l%d§r und §l%d§r Sekunden liegen",
+
+  "showcase.message.about.version": "§rVersion: %s",
+  "showcase.message.about.contributors": "§rMitwirkende",
+
+  "showcase.message.reload.success": "§rKonfiguration erfolgreich neu geladen!",
+  "showcase.message.reload.fail": "§rFehler beim Neu laden der Konfiguration!",
+
+  "showcase.message.manage.empty": "§rKeine aktiven Anzeigen gefunden",
+  "showcase.message.manage.noPermission": "§rEntschuldigung, du hast keine Berechtigung dies zu sehen",
+  "showcase.message.manage.cancel.success_id": "§rAnzeige %s erfolgreich abgebrochen",
+  "showcase.message.manage.cancel.tip": "§rKlicken um diese Anzeige abzubrechen",
+  "showcase.message.manage.cancel.success_player": "§r%s Anzeigen von %s abgebrochen",
+  "showcase.message.manage.cancel.empty": "§rKeine aktiven Anzeigen von %s gefunden",
+  "showcase.message.manage.cancel.not_found": "§rKeine passende Anzeige-ID oder Spielername gefunden",
+
+  "showcase.stats.category.time": "Zeit-Statistiken",
+  "showcase.stats.category.movement": "Bewegungs-Statistiken", 
+  "showcase.stats.category.combat": "Kampf-Statistiken",
+  "showcase.stats.category.interaction": "Interaktions-Statistiken",
+  "showcase.stats.category.misc": "Verschiedene Statistiken",
+  "showcase.stats.category.blocks": "Block-Statistiken",
+  "showcase.stats.category.items": "Gegenstands-Statistiken",
+  "showcase.stats.category.entities": "Entitäts-Statistiken",
+
+  "showcase.stats.blocks.total_placed": "Gesamtzahl platzierter Blöcke",
+  "showcase.stats.blocks.total_broken": "Gesamtzahl zerstörter Blöcke",
+  
+  "showcase.stats.block.building_blocks": "Baublöcke",
+  "showcase.stats.block.building_blocks.placed": "Platzierte Baublöcke",
+  "showcase.stats.block.building_blocks.broken": "Zerstörte Baublöcke",
+  
+  "showcase.stats.block.colored_blocks": "Farbige Blöcke",
+  "showcase.stats.block.colored_blocks.placed": "Platzierte farbige Blöcke", 
+  "showcase.stats.block.colored_blocks.broken": "Zerstörte farbige Blöcke",
+  
+  "showcase.stats.block.natural_blocks": "Natürliche Blöcke",
+  "showcase.stats.block.natural_blocks.placed": "Platzierte natürliche Blöcke",
+  "showcase.stats.block.natural_blocks.broken": "Zerstörte natürliche Blöcke",
+  
+  "showcase.stats.block.functional_blocks": "Funktionsblöcke", 
+  "showcase.stats.block.functional_blocks.placed": "Platzierte Funktionsblöcke",
+  "showcase.stats.block.functional_blocks.broken": "Zerstörte Funktionsblöcke",
+  
+  "showcase.stats.block.redstone_blocks": "Redstone-Blöcke",
+  "showcase.stats.block.redstone_blocks.placed": "Platzierte Redstone-Blöcke",
+  "showcase.stats.block.redstone_blocks.broken": "Zerstörte Redstone-Blöcke",
+  
+  "showcase.stats.block.combat": "Kampfblöcke",
+  "showcase.stats.block.combat.placed": "Platzierte Kampfblöcke",
+  "showcase.stats.block.combat.broken": "Zerstörte Kampfblöcke",
+  
+  "showcase.stats.block.ingredients": "Materialblöcke",
+  "showcase.stats.block.ingredients.placed": "Platzierte Materialblöcke",
+  "showcase.stats.block.ingredients.broken": "Zerstörte Materialblöcke",
+  
+  "showcase.stats.block.unknown": "Unbekannte Blöcke",
+  
+  "showcase.stats.message.create_date": "Erstellungsdatum",
+  "showcase.stats.message.total_pages": "Gesamtseiten"
+}

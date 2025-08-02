@@ -1,0 +1,110 @@
+{
+  "showcase.message.cooldown": "§rJe hebt te snel gedeeld. Wacht §l%d§r seconden voordat je het opnieuw probeert",
+  "showcase.message.no_item": "§rHoud alsjeblieft een voorwerp vast om te tonen",
+  "showcase.message.item_shared": "§r%s toonde zijn %s",
+  "showcase.message.stats_shared": "§r%s toonde zijn %s",
+  "showcase.message.inventory_shared": "§r%s toonde zijn %s",
+  "showcase.message.other_inventory_shared": "§r%s toonde %s's %s",
+  "showcase.message.ender_chest_shared": "§r%s toonde zijn %s",
+  "showcase.message.other_ender_chest_shared": "§r%s toonde %s's %s",
+  "showcase.message.hotbar_shared": "§r%s toonde zijn %s",
+  "showcase.message.other_hotbar_shared": "§r%s toonde %s's %s",
+  "showcase.message.other_item_shared": "§r%s toonde %s's %s",
+  "showcase.message.other_stats_shared": "§r%s toonde %s's %s",
+  "showcase.message.other_container_shared": "§r%s toonde %s's %s",
+  "showcase.message.other_merchant_shared": "§r%s toonde %s's %s",
+  "showcase.message.container_shared": "§r%s toonde zijn %s",
+  "showcase.message.merchant_shared": "§r%s toonde %s's handelsinterface",
+  "showcase.message.private_share_tip": "§rJe hebt %s's %s gedeeld met %s",
+  "showcase.message.player_description": "§r%s %s %s",
+  "showcase.message.share_container_tip": "§rOpen de container die je wilt tonen binnen §l%d§r seconden",
+  "showcase.message.share_container_expiry": "§rGeen geldige container gedetecteerd, tonen mislukt",
+  "showcase.message.share_merchant_tip": "§rOpen de handelsinterface die je wilt tonen binnen §l%d§r seconden",
+  "showcase.message.share_merchant_expiry": "§rGeen geldige handelsinterface gedetecteerd, tonen mislukt",
+  "showcase.message.expiry_notice": "§r(Deze link verloopt over §l%d§r minuten)",
+  "showcase.message.click_to_view": "§rKlik om te bekijken",
+  "showcase.message.invalid_or_expired": "§rDeze deel-link is ongeldig of verlopen",
+
+  "showcase.screen.inventory_title": "§r%s",
+  "showcase.screen.ender_chest_title": "§r%s's %s",
+  "showcase.screen.hotbar_title": "§r%s's %s",
+  "showcase.screen.item_title": "§r%s's %s",
+  "showcase.screen.container_title": "§r%s getoond door %s",
+  "showcase.screen.merchant_title": "§r%s's handel getoond door %s",
+
+  "showcase.message.default.inventory": "§r%s toonde zijn %s",
+  "showcase.message.default.ender_chest": "§r%s toonde zijn %s",
+  "showcase.message.default.hotbar": "§r%s toonde zijn %s",
+  "showcase.message.default.item": "§r%s toonde zijn %s",
+  "showcase.message.default.stats": "§r%s toonde zijn %s",
+  "showcase.message.default.container": "§r%s toonde een %s",
+  "showcase.message.default.merchant": "§r%s toonde %s's handel",
+
+  "showcase.message.invalid_id": "§rOngeldig toon-ID",
+  "showcase.message.cancel_not_owner": "§rJe kunt alleen je eigen toonacties annuleren",
+  "showcase.message.cancel_success": "§rToonactie succesvol geannuleerd",
+  "showcase.message.cancel_failed": "§rMislukt om toonactie te annuleren",
+
+  "showcase.preview_text.more_trades": "§rEn §l%d§r meer handelingen",
+  "showcase.preview_text.more": "§r%s meer voorwerpen niet getoond…",
+  "showcase.message.invalid_duration_exception": "§rDuur moet tussen §l%d§r en §l%d§r seconden zijn",
+
+  "showcase.message.about.version": "§rVersie: %s",
+  "showcase.message.about.contributors": "§rBijdragers",
+
+  "showcase.message.reload.success": "§rConfiguratie succesvol herladen!",
+  "showcase.message.reload.fail": "§rMislukt om configuratie te herladen!",
+
+  "showcase.message.manage.empty": "§rGeen actieve toonacties gevonden",
+  "showcase.message.manage.noPermission": "§rSorry, je hebt geen toestemming om dit te bekijken",
+  "showcase.message.manage.cancel.success_id": "§rToonactie %s succesvol geannuleerd",
+  "showcase.message.manage.cancel.tip": "§rKlik om deze toonactie te annuleren",
+  "showcase.message.manage.cancel.success_player": "§r%s toonacties van %s geannuleerd",
+  "showcase.message.manage.cancel.empty": "§rGeen actieve toonacties gevonden van %s",
+  "showcase.message.manage.cancel.not_found": "§rGeen overeenkomend toon-ID of spelersnaam gevonden",
+
+  "showcase.stats.category.time": "Tijd Statistieken",
+  "showcase.stats.category.movement": "Beweging Statistieken", 
+  "showcase.stats.category.combat": "Gevecht Statistieken",
+  "showcase.stats.category.interaction": "Interactie Statistieken",
+  "showcase.stats.category.misc": "Diverse Statistieken",
+  "showcase.stats.category.blocks": "Blok Statistieken",
+  "showcase.stats.category.items": "Voorwerp Statistieken",
+  "showcase.stats.category.entities": "Entiteit Statistieken",
+
+  "showcase.stats.blocks.total_placed": "Totaal Geplaatste Blokken",
+  "showcase.stats.blocks.total_broken": "Totaal Gebroken Blokken",
+  
+  "showcase.stats.block.building_blocks": "Bouwblokken",
+  "showcase.stats.block.building_blocks.placed": "Geplaatste Bouwblokken",
+  "showcase.stats.block.building_blocks.broken": "Gebroken Bouwblokken",
+  
+  "showcase.stats.block.colored_blocks": "Gekleurde Blokken",
+  "showcase.stats.block.colored_blocks.placed": "Geplaatste Gekleurde Blokken", 
+  "showcase.stats.block.colored_blocks.broken": "Gebroken Gekleurde Blokken",
+  
+  "showcase.stats.block.natural_blocks": "Natuurlijke Blokken",
+  "showcase.stats.block.natural_blocks.placed": "Geplaatste Natuurlijke Blokken",
+  "showcase.stats.block.natural_blocks.broken": "Gebroken Natuurlijke Blokken",
+  
+  "showcase.stats.block.functional_blocks": "Functionele Blokken", 
+  "showcase.stats.block.functional_blocks.placed": "Geplaatste Functionele Blokken",
+  "showcase.stats.block.functional_blocks.broken": "Gebroken Functionele Blokken",
+  
+  "showcase.stats.block.redstone_blocks": "Redstone Blokken",
+  "showcase.stats.block.redstone_blocks.placed": "Geplaatste Redstone Blokken",
+  "showcase.stats.block.redstone_blocks.broken": "Gebroken Redstone Blokken",
+  
+  "showcase.stats.block.combat": "Gevecht Blokken",
+  "showcase.stats.block.combat.placed": "Geplaatste Gevecht Blokken",
+  "showcase.stats.block.combat.broken": "Gebroken Gevecht Blokken",
+  
+  "showcase.stats.block.ingredients": "Materiaal Blokken",
+  "showcase.stats.block.ingredients.placed": "Geplaatste Materiaal Blokken",
+  "showcase.stats.block.ingredients.broken": "Gebroken Materiaal Blokken",
+  
+  "showcase.stats.block.unknown": "Onbekende Blokken",
+  
+  "showcase.stats.message.create_date": "Aanmaakdatum",
+  "showcase.stats.message.total_pages": "Totaal Pagina's"
+}
