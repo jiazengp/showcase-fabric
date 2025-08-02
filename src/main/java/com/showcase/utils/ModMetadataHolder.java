@@ -17,7 +17,7 @@ public class ModMetadataHolder {
     public static String HOMEPAGE = "";
     public static String SOURCE = "";
     public static String ISSUES = "";
-//    public static String LATEST_COMMIT = GitInfo.LATEST_COMMIT;
+
     public static void load() {
         Optional<ModContainer> containerOpt = FabricLoader.getInstance().getModContainer("showcase");
         if (containerOpt.isEmpty()) {

@@ -1,7 +1,11 @@
 package com.showcase.utils;
 
+import com.showcase.ShowcaseMod;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BundleContentsComponent;
+import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.ItemTags;
@@ -11,10 +15,22 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.showcase.utils.ScreenHandlerUtils.handlerTypeForRows;
+
 public class StackUtils {
+    public static final ItemStack DIVIDER_ITEM;
+
+    static {
+        ItemStack temp = new ItemStack(Items.GRAY_STAINED_GLASS_PANE);
+        temp.set(DataComponentTypes.CUSTOM_NAME, Text.literal("⬛").formatted(Formatting.DARK_GRAY));
+        DIVIDER_ITEM = temp;
+    }
+
     public static Boolean isMap(ItemStack itemStack) {
         return (itemStack.isOf(Items.MAP) || itemStack.isOf(Items.FILLED_MAP));
     }
@@ -79,6 +95,59 @@ public class StackUtils {
         }
 
         return base.append(isBook ? "》" : "]");
+    }
+
+    public static ReadOnlyInventory unpackFromItemStack(ItemStack stack) {
+        List<ItemStack> tmp = new ArrayList<>();
+        Text itemName = StackUtils.getDisplayName(stack);
+
+        if (StackUtils.isBundle(stack)) {
+            BundleContentsComponent bundle = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
+            if (bundle != null) bundle.iterateCopy().forEach(tmp::add);
+            int rows = Math.min(6, Math.max(1, (tmp.size() + 8) / 9));
+            int size = rows * 9;
+            ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, handlerTypeForRows(rows));
+
+            for (int i = 0; i < tmp.size() && i < size; i++) inv.setStack(i, tmp.get(i));
+            return inv;
+        }
+
+        if (StackUtils.isShulkerBox(stack)) {
+            try {
+                ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
+                if (container != null) tmp.addAll(container.stream().toList());
+                int size = 27;
+                ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, ScreenHandlerType.SHULKER_BOX);
+                for (int i = 0; i < tmp.size() && i < size; i++) inv.setStack(i, tmp.get(i));
+                return inv;
+            } catch (RuntimeException e) {
+                ShowcaseMod.LOGGER.error(e.toString());
+                throw new RuntimeException(e);
+            }
+        }
+
+        return null;
+    }
+
+    public static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity player) {
+        ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, ScreenHandlerType.GENERIC_9X6);
+        ItemStack playerHead = StackUtils.getPlayerHead(player);
+
+        inv.setStack(0, playerHead.copy());
+        inv.setStack(1, DIVIDER_ITEM.copy());
+        inv.setStack(2, player.getEquippedStack(EquipmentSlot.HEAD).copy());
+        inv.setStack(3, player.getEquippedStack(EquipmentSlot.CHEST).copy());
+        inv.setStack(4, player.getEquippedStack(EquipmentSlot.LEGS).copy());
+        inv.setStack(5, player.getEquippedStack(EquipmentSlot.FEET).copy());
+        inv.setStack(6, DIVIDER_ITEM.copy());
+        inv.setStack(7, player.getEquippedStack(EquipmentSlot.OFFHAND).copy());
+
+        for (int i = 8; i < 9; i++) inv.setStack(i, DIVIDER_ITEM.copy());
+        for (int i = 0; i < 9; i++) inv.setStack(i + 9, player.getInventory().getStack(i).copy());
+        for (int i = 18; i < 27; i++) inv.setStack(i, DIVIDER_ITEM.copy());
+        for (int i = 9; i < 36; i++) inv.setStack(i + 18, player.getInventory().getStack(i).copy());
+
+        return inv;
     }
 
     public static ItemStack getPlayerHead(ServerPlayerEntity player) {
