@@ -28,7 +28,8 @@ public class ChatKeywordHandler {
             ShowcaseManager.ShareType.ITEM, Placeholders.ITEM,
             ShowcaseManager.ShareType.INVENTORY, Placeholders.INVENTORY,
             ShowcaseManager.ShareType.HOTBAR, Placeholders.HOTBAR,
-            ShowcaseManager.ShareType.ENDER_CHEST, Placeholders.ENDER_CHEST
+            ShowcaseManager.ShareType.ENDER_CHEST, Placeholders.ENDER_CHEST,
+            ShowcaseManager.ShareType.STATS, Placeholders.STATS
     );
 
     static {

@@ -55,6 +55,101 @@ public class ModConfig {
         public ShareLinkSettings() {}
     }
 
+    @Comment("Settings related to how player statistics are displayed")
+    public StatsDisplaySettings statsDisplay = new StatsDisplaySettings();
+
+    @Configuration
+    public static class StatsDisplaySettings {
+        @Comment("Whether to show time-related statistics (play time, death time, rest time, etc.)")
+        public boolean showTimeStats = true;
+
+        @Comment("Whether to show movement-related statistics (walking, running, swimming, etc.)")
+        public boolean showMovementStats = true;
+
+        @Comment("Whether to show combat-related statistics (damage dealt/taken, kills, deaths, etc.)")
+        public boolean showCombatStats = true;
+
+        @Comment("Whether to show interaction statistics (trading, breeding, container interactions, etc.)")
+        public boolean showInteractionStats = true;
+
+        @Comment("Whether to show miscellaneous statistics (drops, cauldron usage, note blocks, etc.)")
+        public boolean showMiscStats = true;
+
+        @Comment("Maximum number of statistics to display per category in the book")
+        public int maxStatsPerCategory = 15;
+
+        @Comment("Whether to sort statistics by value (highest first) within each category")
+        public boolean sortStatsByValue = true;
+
+        @Comment("Whether to hide statistics with zero values")
+        public boolean hideZeroStats = true;
+
+        @Comment("Whether to show only the top statistics in each category")
+        public boolean showOnlyTopStats = false;
+
+        @Comment("Number of top statistics to show when showOnlyTopStats is enabled")
+        public int topStatsCount = 10;
+
+        @Comment("Custom formatting settings for time display")
+        public TimeFormatSettings timeFormat = new TimeFormatSettings();
+
+        @Comment("Custom formatting settings for distance display")
+        public DistanceFormatSettings distanceFormat = new DistanceFormatSettings();
+
+        @Comment("Custom formatting settings for damage display")
+        public DamageFormatSettings damageFormat = new DamageFormatSettings();
+
+        public StatsDisplaySettings() {}
+    }
+
+    @Configuration
+    public static class TimeFormatSettings {
+        @Comment("Whether to use compact time format (e.g., '1h 30m' instead of '1 hour 30 minutes')")
+        public boolean useCompactFormat = true;
+
+        @Comment("Whether to show seconds when displaying time under 1 minute")
+        public boolean showSecondsUnderMinute = true;
+
+        @Comment("Whether to hide zero components (e.g., show '1h 5s' instead of '1h 0m 5s')")
+        public boolean hideZeroComponents = true;
+
+        public TimeFormatSettings() {}
+    }
+
+    @Configuration
+    public static class DistanceFormatSettings {
+        @Comment("Whether to automatically convert centimeters to meters/kilometers")
+        public boolean autoConvert = true;
+
+        @Comment("Threshold in centimeters above which to convert to meters (default: 100cm = 1m)")
+        public int meterThreshold = 100;
+
+        @Comment("Threshold in centimeters above which to convert to kilometers (default: 100000cm = 1km)")
+        public int kilometerThreshold = 100000;
+
+        @Comment("Number of decimal places for meter display")
+        public int meterDecimalPlaces = 1;
+
+        @Comment("Number of decimal places for kilometer display")
+        public int kilometerDecimalPlaces = 2;
+
+        public DistanceFormatSettings() {}
+    }
+
+    @Configuration
+    public static class DamageFormatSettings {
+        @Comment("Whether to show damage as hearts (♥) instead of raw damage points")
+        public boolean showAsHearts = true;
+
+        @Comment("Number of decimal places for heart display")
+        public int heartDecimalPlaces = 1;
+
+        @Comment("Whether to show both hearts and raw damage (e.g., '5.0♥ (50)')")
+        public boolean showBothFormats = false;
+
+        public DamageFormatSettings() {}
+    }
+
     private static Map<ShowcaseManager.ShareType, ShareSettings> defaultShareSettings() {
         Map<ShowcaseManager.ShareType, ShareSettings> defaults = new EnumMap<>(ShowcaseManager.ShareType.class);
 
@@ -62,6 +157,7 @@ public class ModConfig {
         add(defaults, ShowcaseManager.ShareType.INVENTORY, 10, 0, Arrays.asList("inventory", "inv"), -1);
         add(defaults, ShowcaseManager.ShareType.HOTBAR, 10, 0, Arrays.asList("hotbar", "hb"), -1);
         add(defaults, ShowcaseManager.ShareType.ENDER_CHEST, 10, 0, Arrays.asList("ender", "ec"), -1);
+        add(defaults, ShowcaseManager.ShareType.STATS, 10, 0, List.of("stats", "statistical", "stat"), -1);
         add(defaults, ShowcaseManager.ShareType.CONTAINER, 10, 0, List.of(), 10);
         add(defaults, ShowcaseManager.ShareType.MERCHANT, 10, 0, List.of(), 10);
 

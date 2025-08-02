@@ -7,6 +7,7 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.utils.PermissionChecker;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
+import com.showcase.utils.stats.StatUtils;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.arguments.SimpleArguments;
@@ -19,6 +20,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.function.Function;
+
 import static com.showcase.utils.PermissionChecker.isOp;
 
 public class Placeholders {
@@ -26,114 +29,100 @@ public class Placeholders {
     public static final Identifier HOTBAR = Identifier.of(ShowcaseMod.MOD_ID, "hotbar");
     public static final Identifier ITEM = Identifier.of(ShowcaseMod.MOD_ID, "item");
     public static final Identifier ENDER_CHEST = Identifier.of(ShowcaseMod.MOD_ID, "ender_chest");
+    public static final Identifier STATS = Identifier.of(ShowcaseMod.MOD_ID, "stats");
 
     private static final String NO_PERMISSION = "You don't have permission to use this placeholder!";
     private static final String ON_COOLDOWN = "You have reached the usage limit. Please try again later.";
     private static final String INVALID_DURATION = "Invalid valid duration";
     private static final String NO_PLAYER = "No valid player";
 
-    public static void registerPlaceholders() {
-        eu.pb4.placeholders.api.Placeholders.register(INVENTORY, (ctx, arg) -> {
-            ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg, player);
+    private record ShareData(ServerPlayerEntity player, int duration) {}
 
-            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
-            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.inventory",
-                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.INVENTORY).defaultPermission))
-                return PlaceholderResult.invalid(NO_PERMISSION);
-            if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.INVENTORY))
-                return PlaceholderResult.invalid(ON_COOLDOWN);
+    private static void registerPlaceholder(Identifier identifier, ShowcaseManager.ShareType shareType, 
+                                          String permission, Function<ShareData, MutableText> shareCreator) {
+        eu.pb4.placeholders.api.Placeholders.register(identifier, (ctx, arg) -> {
+            try {
+                PlaceholderResult validation = validatePlaceholderRequest(ctx, arg, shareType, permission);
+                if (validation != null) return validation;
 
-
-            String shareId = ShowcaseManager.createInventoryShare(player, duration, null);
-            ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.INVENTORY);
-
-            MutableText text = ShareCommandUtils.createClickableItemName(
-                    ShowcaseManager.ShareType.INVENTORY,
-                    TextUtils.INVENTORY,
-                    shareId
-            );
-
-            return PlaceholderResult.value(text);
-        });
-
-        eu.pb4.placeholders.api.Placeholders.register(HOTBAR, (ctx, arg) -> {
-            ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg, player);
-
-            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
-            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.hotbar",
-                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.HOTBAR).defaultPermission))
-                return PlaceholderResult.invalid(NO_PERMISSION);
-            if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.HOTBAR))
-                return PlaceholderResult.invalid(ON_COOLDOWN);
-
-            String shareId = ShowcaseManager.createHotbarShare(player, duration, null);
-            ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.HOTBAR);
-
-            MutableText text = ShareCommandUtils.createClickableItemName(
-                    ShowcaseManager.ShareType.HOTBAR,
-                    TextUtils.HOTBAR,
-                    shareId
-            );
-            return PlaceholderResult.value(text);
-        });
-
-        eu.pb4.placeholders.api.Placeholders.register(ITEM, (ctx, arg) -> {
-            ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg, player);
-
-            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
-            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.item",
-                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ITEM).defaultPermission))
-                return PlaceholderResult.invalid(NO_PERMISSION);
-            if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ITEM))
-                return PlaceholderResult.invalid(ON_COOLDOWN);
-
-
-            ItemStack stack = player.getEquippedStack(EquipmentSlot.MAINHAND);
-
-            if (stack.isEmpty()) {
-                return PlaceholderResult.invalid(Text.translatable("showcase.message.no_item").getString());
+                ServerPlayerEntity player = ctx.player();
+                int duration = getDurationFromSimpleArguments(arg, player);
+                
+                MutableText result = shareCreator.apply(new ShareData(player, duration));
+                ShowcaseManager.setCooldown(player, shareType);
+                
+                return PlaceholderResult.value(result);
+            } catch (Exception e) {
+                return PlaceholderResult.invalid(e.getMessage());
             }
-
-            String shareId = ShowcaseManager.createItemShare(player, stack, duration, null);
-            ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ITEM);
-
-            MutableText text = ShareCommandUtils.createClickableItemName(
-                    ShowcaseManager.ShareType.ITEM,
-                    StackUtils.getDisplayName(stack),
-                    shareId
-            );
-            return PlaceholderResult.value(text);
         });
+    }
 
-        eu.pb4.placeholders.api.Placeholders.register(ENDER_CHEST, (ctx, arg) -> {
-            ServerPlayerEntity player = ctx.player();
-            int duration = getDurationFromSimpleArguments(arg, player);
+    private static PlaceholderResult validatePlaceholderRequest(PlaceholderContext ctx, String arg, 
+                                                              ShowcaseManager.ShareType shareType, String permission) {
+        ServerPlayerEntity player = ctx.player();
+        if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
+        
+        int duration = getDurationFromSimpleArguments(arg, player);
+        if (duration == -1) return PlaceholderResult.invalid(INVALID_DURATION);
+        
+        if (!PermissionChecker.hasPermission(player, permission,
+                ModConfigManager.getShareSettings(shareType).defaultPermission))
+            return PlaceholderResult.invalid(NO_PERMISSION);
+        
+        if (ShowcaseManager.isOnCooldown(player, shareType))
+            return PlaceholderResult.invalid(ON_COOLDOWN);
+        
+        return null;
+    }
 
-            if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
-            if (duration == -1) return  PlaceholderResult.invalid(INVALID_DURATION);
-            if (!PermissionChecker.hasPermission(player, "chat.placeholder.ender_chest",
-                    ModConfigManager.getShareSettings(ShowcaseManager.ShareType.ENDER_CHEST).defaultPermission))
-                return PlaceholderResult.invalid(NO_PERMISSION);
-            if (ShowcaseManager.isOnCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST))
-                return PlaceholderResult.invalid(ON_COOLDOWN);
-            String shareId = ShowcaseManager.createEnderChestShare(player, duration, null);
-            ShowcaseManager.setCooldown(player, ShowcaseManager.ShareType.ENDER_CHEST);
+    public static void registerPlaceholders() {
+        registerPlaceholder(INVENTORY, ShowcaseManager.ShareType.INVENTORY, "chat.placeholder.inventory",
+                (shareData) -> ShareCommandUtils.createClickableItemName(
+                        ShowcaseManager.ShareType.INVENTORY,
+                        TextUtils.INVENTORY,
+                        ShowcaseManager.createInventoryShare(shareData.player, shareData.duration, null)
+                ));
 
-            MutableText text =  ShareCommandUtils.createClickableItemName(
-                    ShowcaseManager.ShareType.ENDER_CHEST,
-                    TextUtils.ENDER_CHEST,
-                    shareId
-            );
-            return PlaceholderResult.value(text);
-        });
+        registerPlaceholder(HOTBAR, ShowcaseManager.ShareType.HOTBAR, "chat.placeholder.hotbar",
+                (shareData) -> ShareCommandUtils.createClickableItemName(
+                        ShowcaseManager.ShareType.HOTBAR,
+                        TextUtils.HOTBAR,
+                        ShowcaseManager.createHotbarShare(shareData.player, shareData.duration, null)
+                ));
 
+        registerPlaceholder(ENDER_CHEST, ShowcaseManager.ShareType.ENDER_CHEST, "chat.placeholder.ender_chest",
+                (shareData) -> ShareCommandUtils.createClickableItemName(
+                        ShowcaseManager.ShareType.ENDER_CHEST,
+                        TextUtils.ENDER_CHEST,
+                        ShowcaseManager.createEnderChestShare(shareData.player, shareData.duration, null)
+                ));
 
+        registerPlaceholder(STATS, ShowcaseManager.ShareType.STATS, "chat.placeholder.stat",
+                (shareData) -> {
+                    ItemStack stack = StatUtils.createStatsBook(shareData.player);
+                    if (stack.isEmpty()) {
+                        throw new RuntimeException("Statistics reading failed");
+                    }
+                    return ShareCommandUtils.createClickableItemName(
+                            ShowcaseManager.ShareType.STATS,
+                            StackUtils.getDisplayName(stack),
+                            ShowcaseManager.createStatsShare(shareData.player, stack, shareData.duration, null)
+                    );
+                });
+
+        registerPlaceholder(ITEM, ShowcaseManager.ShareType.ITEM, "chat.placeholder.item",
+                (shareData) -> {
+                    ItemStack stack = shareData.player.getEquippedStack(EquipmentSlot.MAINHAND);
+                    if (stack.isEmpty()) {
+                        throw new RuntimeException(Text.translatable("showcase.message.no_item").getString());
+                    }
+                    return ShareCommandUtils.createClickableItemName(
+                            ShowcaseManager.ShareType.ITEM,
+                            StackUtils.getDisplayName(stack),
+                            ShowcaseManager.createItemShare(shareData.player, stack, shareData.duration, null)
+                    );
+                });
     }
 
     public static boolean containsPlaceholders(String text) {
