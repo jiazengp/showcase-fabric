@@ -2,8 +2,10 @@ package com.showcase.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.showcase.api.ShowcaseAPI;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
+import com.showcase.event.ShowcaseEvent;
 import com.showcase.gui.MerchantContext;
 import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.StackUtils;
@@ -19,15 +21,16 @@ import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.showcase.command.ShowcaseCommand.*;
-import static com.showcase.command.ShowcaseManager.ShareType.ITEM;
-import static com.showcase.command.ShowcaseManager.ShareType.MERCHANT;
+import static com.showcase.command.ShowcaseManager.ShareType.*;
 import static com.showcase.command.ShowcaseManager.getItemStackWithID;
+import static net.minecraft.text.Text.translatable;
 
 public class ShareCommandUtils {
     private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("MM/dd HH:mm:ss");
@@ -55,6 +58,12 @@ public class ShareCommandUtils {
         }
     }
 
+    public static ServerPlayerEntity getSourceOrSender(CommandContext<ServerCommandSource> ctx) {
+        ServerPlayerEntity sourcePlayer = getSourcePlayer(ctx);
+        if (sourcePlayer != null) return sourcePlayer;
+        return getSenderPlayer(ctx);
+    }
+
     public static String getDescription(CommandContext<ServerCommandSource> ctx) {
         try {
             return StringArgumentType.getString(ctx, DESCRIPTION_ARG);
@@ -77,7 +86,7 @@ public class ShareCommandUtils {
         }
 
         if (counts.isEmpty()) {
-            return Text.translatable("item.minecraft.bundle.empty");
+            return translatable("item.minecraft.bundle.empty");
         }
 
         int maxLines = 5;
@@ -88,7 +97,7 @@ public class ShareCommandUtils {
                 .forEach(e -> out.append(e.getKey()).append("×" + e.getValue() + "\n"));
 
         if (counts.size() > maxLines) {
-            out.append(Text.translatable("showcase.preview_text.more", counts.size() - maxLines)).append("\n");
+            out.append(translatable("showcase.preview_text.more", counts.size() - maxLines)).append("\n");
         }
         return out;
     }
@@ -111,10 +120,9 @@ public class ShareCommandUtils {
 
         if (sharePreview != null) {
             preview.append(sharePreview)
-                    .append("\n")
+                    .append(translatable("showcase.message.click_to_view"))
+                    .append("\n\n")
                     .append(TextUtils.BADGE)
-                    .append("\n")
-                    .append(Text.translatable("showcase.message.click_to_view"))
                     .formatted(Formatting.GRAY);
         } else {
             preview.append(TextUtils.EMPTY);
@@ -154,7 +162,7 @@ public class ShareCommandUtils {
 
             if (offers.size() > maxPreview) {
                 preview.append("\n")
-                        .append(Text.translatable("showcase.preview_text.more_trades", offers.size() - maxPreview))
+                        .append(translatable("showcase.preview_text.more_trades", offers.size() - maxPreview))
                         .formatted(Formatting.GRAY)
                         .append("\n");
             }
@@ -166,7 +174,7 @@ public class ShareCommandUtils {
     public static MutableText createClickableItemName(ShowcaseManager.ShareType type, Text itemName, String shareId) {
         MutableText hoverableName = createClickableTag(itemName, type, shareId);
 
-        if (type == ITEM) {
+        if (type == ITEM || type == STATS) {
             ItemStack stack = ShowcaseManager.getItemStackWithID(shareId);
 
             if (stack != null && !stack.isEmpty()) {
@@ -185,10 +193,20 @@ public class ShareCommandUtils {
 
     public static void sendShareMessage(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,  Collection<ServerPlayerEntity> receivers,
                                         String description, ShowcaseManager.ShareType type, Text itemName, Integer duration, String shareId) {
+        // Get the share entry for the event
+        ShareEntry shareEntry = ShowcaseManager.getShareEntry(shareId);
+        if (shareEntry != null) {
+            // Fire the ShowcaseEvent
+            ShowcaseEvent event = new ShowcaseEvent(
+                sender, sourcePlayer, receivers, type, shareEntry, shareId, description, duration
+            );
+            ShowcaseAPI.fireShowcaseEvent(event);
+        }
+
         MutableText clickableItemName = createClickableItemName(type, itemName, shareId);
 
         MutableText message = buildShareMessage(sender, sourcePlayer, receivers, description, type, clickableItemName);
-        MutableText finalMessage = message.append("\n").append(TextUtils.info(Text.translatable("showcase.message.expiry_notice", (duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration) / 60)));
+        MutableText finalMessage = message.append("\n").append(TextUtils.info(translatable("showcase.message.expiry_notice", (duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration) / 60)));
 
         if (receivers != null) {
             for (ServerPlayerEntity receiver : receivers) {
@@ -196,7 +214,7 @@ public class ShareCommandUtils {
             }
 
             String receiverList = receivers.stream().map(ServerPlayerEntity::getDisplayName).filter(Objects::nonNull).map(Text::getString).collect(Collectors.joining(", "));
-            sender.sendMessage(Text.translatable("showcase.message.private_share_tip", sourcePlayer.getDisplayName(), clickableItemName, Text.literal(receiverList)));
+            sender.sendMessage(translatable("showcase.message.private_share_tip", sourcePlayer.getDisplayName(), clickableItemName, Text.literal(receiverList)));
         } else {
             MinecraftServer server = sender.getServer();
             if (server != null) {
@@ -220,7 +238,7 @@ public class ShareCommandUtils {
     }
 
     public static MutableText buildPlayerDescriptionMessage(ServerPlayerEntity player, String description, MutableText clickableItemName) {
-        return Text.translatable("showcase.message.player_description",
+        return translatable("showcase.message.player_description",
                 PlayerUtils.getSafeDisplayName(player), description, clickableItemName);
     }
 
@@ -233,12 +251,13 @@ public class ShareCommandUtils {
         MutableText senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
 
         return switch (type) {
-            case ITEM -> Text.translatable("showcase.message.default.item", senderPlayerDisplayName, clickableItemName);
-            case INVENTORY -> Text.translatable("showcase.message.default.inventory", senderPlayerDisplayName, clickableItemName);
-            case ENDER_CHEST -> Text.translatable("showcase.message.default.ender_chest", senderPlayerDisplayName, clickableItemName);
-            case HOTBAR -> Text.translatable("showcase.message.default.hotbar", senderPlayerDisplayName, clickableItemName);
-            case CONTAINER -> Text.translatable("showcase.message.default.container", senderPlayerDisplayName, clickableItemName);
-            case MERCHANT -> Text.translatable("showcase.message.default.merchant", senderPlayerDisplayName, clickableItemName);
+            case ITEM -> translatable("showcase.message.default.item", senderPlayerDisplayName, clickableItemName);
+            case STATS -> translatable("showcase.message.default.stats", senderPlayerDisplayName, clickableItemName);
+            case INVENTORY -> translatable("showcase.message.default.inventory", senderPlayerDisplayName, clickableItemName);
+            case ENDER_CHEST -> translatable("showcase.message.default.ender_chest", senderPlayerDisplayName, clickableItemName);
+            case HOTBAR -> translatable("showcase.message.default.hotbar", senderPlayerDisplayName, clickableItemName);
+            case CONTAINER -> translatable("showcase.message.default.container", senderPlayerDisplayName, clickableItemName);
+            case MERCHANT -> translatable("showcase.message.default.merchant", senderPlayerDisplayName, clickableItemName);
         };
     }
 
@@ -249,18 +268,27 @@ public class ShareCommandUtils {
         MutableText sourcePlayerDisplayName = PlayerUtils.getSafeDisplayName(sourcePlayer);
 
         return switch (type) {
-            case ITEM -> Text.translatable("showcase.message.item_shared", senderPlayerDisplayName, clickableItemName);
-            case CONTAINER -> Text.translatable("showcase.message.container_shared", senderPlayerDisplayName, clickableItemName);
-            case MERCHANT -> Text.translatable("showcase.message.default.merchant", senderPlayerDisplayName, clickableItemName);
+            case ITEM -> isSelf ?
+                    translatable("showcase.message.item_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_item_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
+            case STATS -> isSelf ?
+                    translatable("showcase.message.stats_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_stats_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
+            case CONTAINER -> isSelf ?
+                    translatable("showcase.message.container_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_container_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
+            case MERCHANT -> isSelf ?
+                    translatable("showcase.message.merchant_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_merchant_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
             case INVENTORY -> isSelf ?
-                    Text.translatable("showcase.message.inventory_shared", senderPlayerDisplayName, clickableItemName) :
-                    Text.translatable("showcase.message.other_inventory_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
+                    translatable("showcase.message.inventory_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_inventory_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
             case ENDER_CHEST -> isSelf ?
-                    Text.translatable("showcase.message.ender_chest_shared", senderPlayerDisplayName, clickableItemName) :
-                    Text.translatable("showcase.message.other_ender_chest_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
+                    translatable("showcase.message.ender_chest_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_ender_chest_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
             case HOTBAR -> isSelf ?
-                    Text.translatable("showcase.message.hotbar_shared", senderPlayerDisplayName, clickableItemName) :
-                    Text.translatable("showcase.message.other_hotbar_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
+                    translatable("showcase.message.hotbar_shared", senderPlayerDisplayName, clickableItemName) :
+                    translatable("showcase.message.other_hotbar_shared", senderPlayerDisplayName, sourcePlayerDisplayName, clickableItemName);
         };
     }
 
@@ -280,6 +308,7 @@ public class ShareCommandUtils {
 
         return switch (type) {
             case ITEM -> Formatting.BLUE;
+            case STATS -> Formatting.DARK_AQUA;
             case INVENTORY -> Formatting.GREEN;
             case ENDER_CHEST -> Formatting.DARK_PURPLE;
             case HOTBAR -> Formatting.YELLOW;
@@ -298,7 +327,7 @@ public class ShareCommandUtils {
     public static MutableText createClickableTag(Text name, ShowcaseManager.ShareType type, String id) {
         ItemStack stack = getItemStackWithID(id);
         Formatting color = getFormattingColorForType(type, type == ITEM ? stack : null);
-        Text displayName = type == ITEM ? name : Text.literal("[").append(name).append("]");
+        Text displayName = (type == ITEM  || type == STATS) ? name : Text.literal("[").append(name).append("]");
 
         return Text.literal("")
                 .append(displayName)
@@ -376,13 +405,13 @@ public class ShareCommandUtils {
                         .styled(style -> style
                                 .withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent.RunCommand("/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.translatable("showcase.message.manage.cancel.tip")))))
+                                .withHoverEvent(new HoverEvent.ShowText(translatable("showcase.message.manage.cancel.tip")))))
                 .append(Text.literal("  "));
     }
 
     private static Text getShareItemName(ShareEntry share) {
         return switch (share.getType()) {
-            case ITEM -> share.getInventory().getName();
+            case ITEM, STATS -> share.getInventory().getName();
             case INVENTORY -> TextUtils.INVENTORY;
             case HOTBAR -> TextUtils.HOTBAR;
             case ENDER_CHEST -> TextUtils.ENDER_CHEST;
@@ -412,5 +441,17 @@ public class ShareCommandUtils {
         }
 
         return names;
+    }
+
+    public static @ApiStatus.Internal void handleError(CommandContext<ServerCommandSource> context, Throwable e)
+    {
+        //handle errors
+        if(e instanceof Error)
+            throw new Error("Unable to handle errors.", e);
+
+        //handle command syntax errors
+        context.getSource().sendError(
+                translatable("command.failed")
+                        .append(":\n    " + e.getMessage()));
     }
 }

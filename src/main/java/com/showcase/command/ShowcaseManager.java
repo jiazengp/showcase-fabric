@@ -1,24 +1,19 @@
 package com.showcase.command;
 
 import com.showcase.ShowcaseMod;
-import com.showcase.config.ModConfigManager;
+import com.showcase.api.ShowcaseAPI;
 import com.showcase.data.ShareEntry;
+import com.showcase.data.ShareRepository;
+import com.showcase.event.ViewShowcaseEvent;
 import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
 import com.showcase.utils.*;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.BundleContentsComponent;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.time.Instant;
 import java.util.*;
@@ -26,15 +21,14 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.showcase.command.ShowcaseManager.ShareType.ITEM;
+import static com.showcase.command.ShowcaseManager.ShareType.STATS;
+import static com.showcase.utils.ScreenHandlerUtils.handlerTypeForRows;
+import static com.showcase.utils.StackUtils.*;
 
 public final class ShowcaseManager {
     public enum ShareType {
-        ITEM, INVENTORY, HOTBAR, ENDER_CHEST, CONTAINER, MERCHANT,
+        ITEM, INVENTORY, HOTBAR, ENDER_CHEST, CONTAINER, MERCHANT, STATS
     }
-
-    private static final Map<String, ShareEntry> SHARES = new ConcurrentHashMap<>();
-    private static final Map<UUID, EnumMap<ShareType, Long>> COOLDOWNS = new ConcurrentHashMap<>();
-    private static final ItemStack DIVIDER_ITEM;
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread t = new Thread(r, "Showcase‑Cleanup");
@@ -43,23 +37,36 @@ public final class ShowcaseManager {
     });
 
     static {
-        ItemStack temp = new ItemStack(Items.GRAY_STAINED_GLASS_PANE);
-        temp.set(DataComponentTypes.CUSTOM_NAME, Text.literal("⬛").formatted(Formatting.DARK_GRAY));
-        DIVIDER_ITEM = temp;
-
         // Schedule the recycler.
         long intervalSeconds = 60;
         SCHEDULER.scheduleAtFixedRate(ShowcaseManager::purgeExpired, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
     }
 
-    private ShowcaseManager() {}
+    private ShowcaseManager() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static void register(Map<String, ShareEntry> share) {
-        setShares(share);
+        if (share == null) {
+            ShowcaseMod.LOGGER.info("No saved showcase shares to load");
+            return;
+        }
+        ShareRepository.loadShares(share);
+        ShowcaseMod.LOGGER.info("Loaded {} showcase shares from storage", share.size());
     }
 
     private static String nextId() {
         return UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    public static String createStatsShare(ServerPlayerEntity owner, ItemStack stack, Integer duration, Collection<ServerPlayerEntity> receivers) {
+        String id = nextId();
+
+        ReadOnlyInventory inv = new ReadOnlyInventory(9, StackUtils.getDisplayName(stack), ScreenHandlerType.GENERIC_9X1);
+        inv.addStack(stack.copy());
+
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), STATS, inv, duration, receivers));
+        return id;
     }
 
     public static String createItemShare(ServerPlayerEntity owner, ItemStack stack, Integer duration, Collection<ServerPlayerEntity> receivers) {
@@ -69,21 +76,21 @@ public final class ShowcaseManager {
         inv.addStack(stack.copy());
         for (int i = 1; i < 9; i++) inv.setStack(i, DIVIDER_ITEM);
 
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ITEM, inv, duration, receivers));
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), ITEM, inv, duration, receivers));
         return id;
     }
 
     public static String createInventoryShare(ServerPlayerEntity owner, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         ReadOnlyInventory inv = snapshotFullInventory(owner);
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.INVENTORY, inv, duration, receivers));
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.INVENTORY, inv, duration, receivers));
         return id;
     }
 
     public static String createHotbarShare(ServerPlayerEntity owner, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         ReadOnlyInventory inv = new HotbarSnapshotInventory(owner.getInventory());
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.HOTBAR, inv, duration, receivers));
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.HOTBAR, inv, duration, receivers));
         return id;
     }
 
@@ -94,36 +101,49 @@ public final class ShowcaseManager {
         for (int i = 0; i < size; i++) {
             inv.setStack(i, owner.getEnderChestInventory().getStack(i).copy());
         }
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.ENDER_CHEST, inv, duration, receivers));
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.ENDER_CHEST, inv, duration, receivers));
         return id;
     }
 
     public static String createContainerShare(ServerPlayerEntity owner, ReadOnlyInventory container, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.CONTAINER, container, duration, receivers));
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.CONTAINER, container, duration, receivers));
         return id;
     }
 
     public static String createMerchantShare(ServerPlayerEntity owner, MerchantContext merchantContext, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
-        SHARES.put(id, new ShareEntry(owner.getUuid(), ShareType.MERCHANT, merchantContext, duration, receivers));
+        ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.MERCHANT, merchantContext, duration, receivers));
         return id;
     }
 
     public static boolean openSharedContent(ServerPlayerEntity viewer, String id) {
-        ShareEntry entry = SHARES.get(id);
+        ShareEntry entry = ShareRepository.get(id);
 
         if (entry == null || isExpired(entry)) {
             viewer.sendMessage(TextUtils.warning(Text.translatable("showcase.message.invalid_or_expired")));
-            SHARES.remove(id);
+            ShareRepository.remove(id);
             return false;
         }
-
 
         if (!canViewShare(entry, viewer) && !viewer.getUuid().equals(entry.getOwnerUuid()) && !PermissionChecker.isOp(viewer)) {
             viewer.sendMessage(TextUtils.warning(Text.translatable("showcase.message.manage.noPermission")));
             return false;
         }
+
+        // Get the original owner for the event
+        MinecraftServer server = viewer.getServer();
+        if (server == null) return false;
+        
+        ServerPlayerEntity originalOwner = server.getPlayerManager().getPlayer(entry.getOwnerUuid());
+        ViewShowcaseEvent event;
+
+        // For offline owners, we still need to get player info somehow
+        // We'll use PlayerUtils to get a safe display name instead
+        // For now, let's create a minimal event - developers can handle offline scenarios
+        // Fire the view event with the actual owner
+        event = new ViewShowcaseEvent(viewer, entry, id, Objects.requireNonNullElse(originalOwner, viewer));
+        if (!ShowcaseAPI.fireViewEvent(event)) return false;
 
         entry.incrementViewCount();
 
@@ -138,32 +158,25 @@ public final class ShowcaseManager {
     }
 
     public static boolean isOnCooldown(ServerPlayerEntity player, ShareType type) {
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) return false;
-
-        EnumMap<ShareType, Long> map = COOLDOWNS.get(player.getUuid());
-        if (map == null) return false;
-
-        long last = map.getOrDefault(type, 0L);
-        long cooldownMillis = ModConfigManager.getShareSettings(type).cooldown * 1000L;
-        long remaining = last + cooldownMillis - Instant.now().toEpochMilli();
-        if (remaining <= 0) return false;
-
-        player.sendMessage(TextUtils.warning(Text.translatable("showcase.message.cooldown", (int) Math.ceil(remaining / 1000.0))));
-        return true;
+        boolean onCooldown = CooldownManager.isOnCooldown(player, type);
+        if (onCooldown) {
+            long remaining = CooldownManager.getRemainingCooldown(player, type);
+            player.sendMessage(TextUtils.warning(Text.translatable("showcase.message.cooldown", (int) Math.ceil(remaining))));
+        }
+        return onCooldown;
     }
 
     public static boolean canViewShare(ShareEntry entry, ServerPlayerEntity viewer) {
-        if (entry.getReceiverUuids().isEmpty() || entry.getReceiverUuids() == null) return true;
+        if (entry.getReceiverUuids() == null || entry.getReceiverUuids().isEmpty()) return true;
         return entry.getReceiverUuids().contains(viewer.getUuid());
     }
 
     public static void setCooldown(ServerPlayerEntity player, ShareType type) {
-        COOLDOWNS.computeIfAbsent(player.getUuid(), k -> new EnumMap<>(ShareType.class))
-                .put(type, Instant.now().toEpochMilli());
+        CooldownManager.setCooldown(player, type);
     }
 
     public static boolean expireShareById(String id) {
-        ShareEntry e = SHARES.get(id);
+        ShareEntry e = ShareRepository.get(id);
         if (e == null) return false;
         e.invalidShare();
         return true;
@@ -171,7 +184,7 @@ public final class ShowcaseManager {
 
     public static int expireSharesByPlayer(UUID uuid) {
         int count = 0;
-        for (Map.Entry<String, ShareEntry> e : SHARES.entrySet()) {
+        for (Map.Entry<String, ShareEntry> e : ShareRepository.getAllShares().entrySet()) {
             if (uuid.equals(e.getValue().getOwnerUuid())) {
                 e.getValue().invalidShare();
                 count++;
@@ -183,38 +196,55 @@ public final class ShowcaseManager {
     public static void setShares(Map<String, ShareEntry> shares) {
         if (shares == null || shares.isEmpty()) return;
 
-        SHARES.clear();
-        SHARES.putAll(shares);
+        ShareRepository.loadShares(shares);
     }
 
     public static ShareEntry getShareById(String id) {
-        return SHARES.get(id);
+        return ShareRepository.get(id);
     }
 
     public static Map<String, ShareEntry> getActiveShares() {
-        return Map.copyOf(SHARES);
+        return ShareRepository.getAllShares();
+    }
+    
+    public static Map<String, ShareEntry> getAllActiveShares() {
+        return getActiveShares();
     }
 
     public static Map<String, ShareEntry> getUnmodifiableActiveShares() {
-        return Collections.unmodifiableMap(SHARES);
+        return ShareRepository.getUnmodifiableShares();
     }
 
     public static void clearAll() {
-        SHARES.clear();
-        COOLDOWNS.clear();
+        ShareRepository.clear();
+        CooldownManager.clearAllCooldowns();
         if (!SCHEDULER.isShutdown()) {
             SCHEDULER.shutdownNow();
         }
     }
 
     public static ShareEntry getShareEntry(String id) {
-        return SHARES.get(id);
+        return ShareRepository.get(id);
     }
 
     public static ItemStack getItemStackWithID(String shareId) {
         ShareEntry shareEntry = getShareEntry(shareId);
         if (shareEntry == null || shareEntry.getType() != ITEM) return null;
         return shareEntry.getInventory().getStack(0).copy();
+    }
+
+    public static List<ShareEntry> getPlayerShares(String playerUuid) {
+        return ShareRepository.getAllShares().values().stream()
+                .filter(entry -> entry.getOwnerUuid().toString().equals(playerUuid))
+                .collect(Collectors.toList());
+    }
+
+    public static boolean cancelShare(String shareId) {
+        return expireShareById(shareId);
+    }
+
+    public static long getRemainingCooldown(ServerPlayerEntity player, ShareType type) {
+        return CooldownManager.getRemainingCooldown(player, type);
     }
 
     public static List<String> getShareIdCompletions() {
@@ -251,6 +281,16 @@ public final class ShowcaseManager {
                 yield new ContainerGui(type, viewer, name, finalInv);
             }
 
+            case STATS -> {
+                ItemStack itemStack = inv.getStack(0);
+
+                if (StackUtils.isBook(itemStack)) {
+                    new BookOpener(viewer, itemStack).open();
+                    yield null;
+                }
+                yield null;
+            }
+
             case MERCHANT -> {
                 new ReadonlyMerchantGui(viewer, entry.getMerchantContext()).open();
                 yield null;
@@ -267,81 +307,17 @@ public final class ShowcaseManager {
         };
     }
 
-    private static ReadOnlyInventory unpackFromItemStack(ItemStack stack) {
-        List<ItemStack> tmp = new ArrayList<>();
-        Text itemName = StackUtils.getDisplayName(stack);
-
-        if (StackUtils.isBundle(stack)) {
-            BundleContentsComponent bundle = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
-            if (bundle != null) bundle.iterateCopy().forEach(tmp::add);
-            int rows = Math.min(6, Math.max(1, (tmp.size() + 8) / 9));
-            int size = rows * 9;
-            ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, handlerTypeForRows(rows));
-
-            for (int i = 0; i < tmp.size() && i < size; i++) inv.setStack(i, tmp.get(i));
-            return inv;
-        }
-
-        if (StackUtils.isShulkerBox(stack)) {
-            try {
-                ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
-                if (container != null) tmp.addAll(container.stream().toList());
-                int size = 27;
-                ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, ScreenHandlerType.SHULKER_BOX);
-                for (int i = 0; i < tmp.size() && i < size; i++) inv.setStack(i, tmp.get(i));
-                return inv;
-            } catch (RuntimeException e) {
-                ShowcaseMod.LOGGER.error(e.toString());
-                throw new RuntimeException(e);
-            }
-        }
-
-        return null;
-    }
-
-    private static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity player) {
-        ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, ScreenHandlerType.GENERIC_9X6);
-        ItemStack playerHead = StackUtils.getPlayerHead(player);
-
-        inv.setStack(0, playerHead.copy());
-        inv.setStack(1, DIVIDER_ITEM.copy());
-        inv.setStack(2, player.getEquippedStack(EquipmentSlot.HEAD).copy());
-        inv.setStack(3, player.getEquippedStack(EquipmentSlot.CHEST).copy());
-        inv.setStack(4, player.getEquippedStack(EquipmentSlot.LEGS).copy());
-        inv.setStack(5, player.getEquippedStack(EquipmentSlot.FEET).copy());
-        inv.setStack(6, DIVIDER_ITEM.copy());
-        inv.setStack(7, player.getEquippedStack(EquipmentSlot.OFFHAND).copy());
-
-        for (int i = 8; i < 9; i++) inv.setStack(i, DIVIDER_ITEM.copy());
-        for (int i = 0; i < 9; i++) inv.setStack(i + 9, player.getInventory().getStack(i).copy());
-        for (int i = 18; i < 27; i++) inv.setStack(i, DIVIDER_ITEM.copy());
-        for (int i = 9; i < 36; i++) inv.setStack(i + 18, player.getInventory().getStack(i).copy());
-
-        return inv;
-    }
-
     private static boolean isExpired(ShareEntry e) {
         if (e == null) return true;
         return e.getIsInvalid() || Instant.now().toEpochMilli() - e.getTimestamp() > e.getDuration() * 1000L;
     }
 
-    private static ScreenHandlerType<?> handlerTypeForRows(int rows) {
-        return switch (Math.max(1, Math.min(rows, 6))) {
-            case 1 -> ScreenHandlerType.GENERIC_9X1;
-            case 2 -> ScreenHandlerType.GENERIC_9X2;
-            case 3 -> ScreenHandlerType.GENERIC_9X3;
-            case 5 -> ScreenHandlerType.GENERIC_9X5;
-            case 6 -> ScreenHandlerType.GENERIC_9X6;
-            default -> ScreenHandlerType.GENERIC_9X4;
-        };
-    }
-
     private static void purgeExpired() {
         long now = Instant.now().toEpochMilli();
-        Set<String> toRemove = SHARES.entrySet().stream()
+        Set<String> toRemove = ShareRepository.getAllShares().entrySet().stream()
                 .filter(e -> now - e.getValue().getTimestamp() > e.getValue().getDuration() * 1000L || e.getValue().getIsInvalid())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
-        toRemove.forEach(SHARES::remove);
+        toRemove.forEach(ShareRepository::remove);
     }
 }
