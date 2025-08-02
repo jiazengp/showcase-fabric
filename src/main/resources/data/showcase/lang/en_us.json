@@ -2,12 +2,17 @@
   "showcase.message.cooldown": "§rYou've showcased too quickly. Please wait §l%d §rseconds before trying again",
   "showcase.message.no_item": "§rPlease hold an item to showcase",
   "showcase.message.item_shared": "§r%s I showcased my %s",
+  "showcase.message.stats_shared": "§r%s I showcased my %s",
   "showcase.message.inventory_shared": "§r%s I showcased my %s",
   "showcase.message.other_inventory_shared": "§r%s I showcased %s's %s",
   "showcase.message.ender_chest_shared": "§r%s I showcased my %s",
   "showcase.message.other_ender_chest_shared": "§r%s I showcased %s's %s",
   "showcase.message.hotbar_shared": "§r%s I showcased my %s",
   "showcase.message.other_hotbar_shared": "§r%s I showcased %s's %s",
+  "showcase.message.other_item_shared": "§r%s I showcased %s's %s",
+  "showcase.message.other_stats_shared": "§r%s I showcased %s's %s",
+  "showcase.message.other_container_shared": "§r%s I showcased %s's %s",
+  "showcase.message.other_merchant_shared": "§r%s I showcased %s's %s",
   "showcase.message.container_shared": "§r%s I showcased my %s",
   "showcase.message.merchant_shared": "§r%s I showcased a %s trading interface",
   "showcase.message.private_share_tip": "§rYou've privately showcased %s's %s to %s",
@@ -29,6 +34,7 @@
   "showcase.message.default.ender_chest": "§r%s I showcased my %s",
   "showcase.message.default.hotbar": "§r%s I showcased my %s",
   "showcase.message.default.item": "§r%s I showcased my %s",
+  "showcase.message.default.stats": "§r%s I showcased my %s",
   "showcase.message.default.container": "§r%s I showcased a %s",
   "showcase.message.default.merchant": "§r%s I showcased %s's trades",
   "showcase.message.invalid_id": "§rInvalid showcase ID",
@@ -48,5 +54,49 @@
   "showcase.message.manage.cancel.tip": "§rClick to cancel this showcase",
   "showcase.message.manage.cancel.success_player": "§rCanceled %s showcases from %s",
   "showcase.message.manage.cancel.empty": "§rNo active showcases found from %s",
-  "showcase.message.manage.cancel.not_found": "§rNo matching showcase ID or player name found"
+  "showcase.message.manage.cancel.not_found": "§rNo matching showcase ID or player name found",
+
+  "showcase.stats.category.time": "Time Statistics",
+  "showcase.stats.category.movement": "Movement Statistics", 
+  "showcase.stats.category.combat": "Combat Statistics",
+  "showcase.stats.category.interaction": "Interaction Statistics",
+  "showcase.stats.category.misc": "Miscellaneous Statistics",
+  "showcase.stats.category.blocks": "Block Statistics",
+  "showcase.stats.category.items": "Item Statistics",
+  "showcase.stats.category.entities": "Entity Statistics",
+
+  "showcase.stats.blocks.total_placed": "Total Blocks Placed",
+  "showcase.stats.blocks.total_broken": "Total Blocks Broken",
+  
+  "showcase.stats.block.building_blocks": "Building Blocks",
+  "showcase.stats.block.building_blocks.placed": "Building Blocks Placed",
+  "showcase.stats.block.building_blocks.broken": "Building Blocks Broken",
+  
+  "showcase.stats.block.colored_blocks": "Colored Blocks",
+  "showcase.stats.block.colored_blocks.placed": "Colored Blocks Placed", 
+  "showcase.stats.block.colored_blocks.broken": "Colored Blocks Broken",
+  
+  "showcase.stats.block.natural_blocks": "Natural Blocks",
+  "showcase.stats.block.natural_blocks.placed": "Natural Blocks Placed",
+  "showcase.stats.block.natural_blocks.broken": "Natural Blocks Broken",
+  
+  "showcase.stats.block.functional_blocks": "Functional Blocks", 
+  "showcase.stats.block.functional_blocks.placed": "Functional Blocks Placed",
+  "showcase.stats.block.functional_blocks.broken": "Functional Blocks Broken",
+  
+  "showcase.stats.block.redstone_blocks": "Redstone Blocks",
+  "showcase.stats.block.redstone_blocks.placed": "Redstone Blocks Placed",
+  "showcase.stats.block.redstone_blocks.broken": "Redstone Blocks Broken",
+  
+  "showcase.stats.block.combat": "Combat Blocks",
+  "showcase.stats.block.combat.placed": "Combat Blocks Placed",
+  "showcase.stats.block.combat.broken": "Combat Blocks Broken",
+  
+  "showcase.stats.block.ingredients": "Ingredient Blocks",
+  "showcase.stats.block.ingredients.placed": "Ingredient Blocks Placed",
+  "showcase.stats.block.ingredients.broken": "Ingredient Blocks Broken",
+  
+  "showcase.stats.block.unknown": "Unknown Blocks",
+  "showcase.stats.message.create_date": "Create Date",
+  "showcase.stats.message.total_pages": "Total Pages"
 }

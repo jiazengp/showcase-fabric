@@ -8,6 +8,10 @@
   "showcase.message.other_ender_chest_shared": "§r%s が %s の %s を共有しました。",
   "showcase.message.hotbar_shared": "§r%s が %s を共有しました。",
   "showcase.message.other_hotbar_shared": "§r%s が %s の %s を共有しました。",
+  "showcase.message.other_item_shared": "§r%s が %s の %s を共有しました。",
+  "showcase.message.other_stats_shared": "§r%s が %s の %s を共有しました。",
+  "showcase.message.other_container_shared": "§r%s が %s の %s を共有しました。",
+  "showcase.message.other_merchant_shared": "§r%s が %s の %s を共有しました。",
   "showcase.message.container_shared": "§r%s が %s を共有しました。",
   "showcase.message.merchant_shared": "§r%s が 商人の取引画面 を共有しました。",
   "showcase.message.private_share_tip": "§r%s の %s を %s に個別共有しました。",
@@ -48,5 +52,50 @@
   "showcase.message.manage.cancel.success_player": "§r%s の共有 %s 件をキャンセルしました。",
   "showcase.message.manage.cancel.empty": "§r%s による共有はありません。",
   "showcase.message.manage.cancel.not_found": "§r一致する共有 ID またはプレイヤーが見つかりません。",
-  "showcase.message.manage.noPermission": "§r申し訳ありませんが、これを見る権限がありません。"
+  "showcase.message.manage.noPermission": "§r申し訳ありませんが、これを見る権限がありません。",
+
+  "showcase.stats.category.time": "時間統計",
+  "showcase.stats.category.movement": "移動統計", 
+  "showcase.stats.category.combat": "戦闘統計",
+  "showcase.stats.category.interaction": "相互作用統計",
+  "showcase.stats.category.misc": "その他統計",
+  "showcase.stats.category.blocks": "ブロック統計",
+  "showcase.stats.category.items": "アイテム統計",
+  "showcase.stats.category.entities": "エンティティ統計",
+
+  "showcase.stats.blocks.total_placed": "設置ブロック総数",
+  "showcase.stats.blocks.total_broken": "破壊ブロック総数",
+  
+  "showcase.stats.block.building_blocks": "建築ブロック",
+  "showcase.stats.block.building_blocks.placed": "建築ブロック設置数",
+  "showcase.stats.block.building_blocks.broken": "建築ブロック破壊数",
+  
+  "showcase.stats.block.colored_blocks": "色付きブロック",
+  "showcase.stats.block.colored_blocks.placed": "色付きブロック設置数", 
+  "showcase.stats.block.colored_blocks.broken": "色付きブロック破壊数",
+  
+  "showcase.stats.block.natural_blocks": "自然ブロック",
+  "showcase.stats.block.natural_blocks.placed": "自然ブロック設置数",
+  "showcase.stats.block.natural_blocks.broken": "自然ブロック破壊数",
+  
+  "showcase.stats.block.functional_blocks": "機能ブロック", 
+  "showcase.stats.block.functional_blocks.placed": "機能ブロック設置数",
+  "showcase.stats.block.functional_blocks.broken": "機能ブロック破壊数",
+  
+  "showcase.stats.block.redstone_blocks": "レッドストーンブロック",
+  "showcase.stats.block.redstone_blocks.placed": "レッドストーンブロック設置数",
+  "showcase.stats.block.redstone_blocks.broken": "レッドストーンブロック破壊数",
+  
+  "showcase.stats.block.combat": "戦闘ブロック",
+  "showcase.stats.block.combat.placed": "戦闘ブロック設置数",
+  "showcase.stats.block.combat.broken": "戦闘ブロック破壊数",
+  
+  "showcase.stats.block.ingredients": "材料ブロック",
+  "showcase.stats.block.ingredients.placed": "材料ブロック設置数",
+  "showcase.stats.block.ingredients.broken": "材料ブロック破壊数",
+  
+  "showcase.stats.block.unknown": "未知のブロック",
+  
+  "showcase.stats.message.create_date": "作成日",
+  "showcase.stats.message.total_pages": "総ページ数"
 }

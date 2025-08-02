@@ -8,6 +8,10 @@
   "showcase.message.other_ender_chest_shared": "§r%s a montré le %s de %s.",
   "showcase.message.hotbar_shared": "§r%s a montré sa %s.",
   "showcase.message.other_hotbar_shared": "§r%s a montré la %s de %s.",
+  "showcase.message.other_item_shared": "§r%s a montré le %s de %s.",
+  "showcase.message.other_stats_shared": "§r%s a montré les %s de %s.",
+  "showcase.message.other_container_shared": "§r%s a montré le %s de %s.",
+  "showcase.message.other_merchant_shared": "§r%s a montré le %s de %s.",
   "showcase.message.container_shared": "§r%s a montré son %s.",
   "showcase.message.merchant_shared": "§r%s a montré le panneau d’échange de %s.",
   "showcase.message.private_share_tip": "§rVous avez montré le %s de %s à %s.",
@@ -55,5 +59,50 @@
   "showcase.message.about.contributors": "§rContributeurs",
 
   "showcase.message.reload.success": "§rConfiguration rechargée avec succès !",
-  "showcase.message.reload.fail": "§rÉchec du rechargement de la configuration !"
+  "showcase.message.reload.fail": "§rÉchec du rechargement de la configuration !",
+
+  "showcase.stats.category.time": "Statistiques de temps",
+  "showcase.stats.category.movement": "Statistiques de mouvement", 
+  "showcase.stats.category.combat": "Statistiques de combat",
+  "showcase.stats.category.interaction": "Statistiques d'interaction",
+  "showcase.stats.category.misc": "Statistiques diverses",
+  "showcase.stats.category.blocks": "Statistiques de blocs",
+  "showcase.stats.category.items": "Statistiques d'objets",
+  "showcase.stats.category.entities": "Statistiques d'entités",
+
+  "showcase.stats.blocks.total_placed": "Total de blocs posés",
+  "showcase.stats.blocks.total_broken": "Total de blocs cassés",
+  
+  "showcase.stats.block.building_blocks": "Blocs de construction",
+  "showcase.stats.block.building_blocks.placed": "Blocs de construction posés",
+  "showcase.stats.block.building_blocks.broken": "Blocs de construction cassés",
+  
+  "showcase.stats.block.colored_blocks": "Blocs colorés",
+  "showcase.stats.block.colored_blocks.placed": "Blocs colorés posés", 
+  "showcase.stats.block.colored_blocks.broken": "Blocs colorés cassés",
+  
+  "showcase.stats.block.natural_blocks": "Blocs naturels",
+  "showcase.stats.block.natural_blocks.placed": "Blocs naturels posés",
+  "showcase.stats.block.natural_blocks.broken": "Blocs naturels cassés",
+  
+  "showcase.stats.block.functional_blocks": "Blocs fonctionnels", 
+  "showcase.stats.block.functional_blocks.placed": "Blocs fonctionnels posés",
+  "showcase.stats.block.functional_blocks.broken": "Blocs fonctionnels cassés",
+  
+  "showcase.stats.block.redstone_blocks": "Blocs de redstone",
+  "showcase.stats.block.redstone_blocks.placed": "Blocs de redstone posés",
+  "showcase.stats.block.redstone_blocks.broken": "Blocs de redstone cassés",
+  
+  "showcase.stats.block.combat": "Blocs de combat",
+  "showcase.stats.block.combat.placed": "Blocs de combat posés",
+  "showcase.stats.block.combat.broken": "Blocs de combat cassés",
+  
+  "showcase.stats.block.ingredients": "Blocs de matériaux",
+  "showcase.stats.block.ingredients.placed": "Blocs de matériaux posés",
+  "showcase.stats.block.ingredients.broken": "Blocs de matériaux cassés",
+  
+  "showcase.stats.block.unknown": "Blocs inconnus",
+  
+  "showcase.stats.message.create_date": "Date de création",
+  "showcase.stats.message.total_pages": "Pages totales"
 }
