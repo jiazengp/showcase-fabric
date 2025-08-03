@@ -7,7 +7,8 @@
   "entrypoints": {
     "fabric-gametest": [
       "com.showcase.gametest.BlockCategoriesGameTest",
-      "com.showcase.gametest.DataPersistenceGameTest"
+      "com.showcase.gametest.DataPersistenceGameTest",
+      "com.showcase.gametest.EventSystemGameTest"
     ]
   }
 }
