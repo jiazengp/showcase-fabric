@@ -6,7 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
-import net.minecraft.world.GameMode;
+
 
 /**
  * GameTest for BlockCategories utility class
@@ -14,7 +14,7 @@ import net.minecraft.world.GameMode;
  */
 public class BlockCategoriesGameTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testColoredBlockCategorization(TestContext context) {
         // Test colored wool categorization
         var woolCategory = BlockCategories.getBlockCategory(Blocks.RED_WOOL);
@@ -38,7 +38,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testNaturalBlockCategorization(TestContext context) {
         // Test natural blocks
         var stoneCategory = BlockCategories.getBlockCategory(Blocks.STONE);
@@ -68,7 +68,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testBuildingBlockCategorization(TestContext context) {
         // Test building blocks
         var oakPlanksCategory = BlockCategories.getBlockCategory(Blocks.OAK_PLANKS);
@@ -92,7 +92,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testRedstoneBlockCategorization(TestContext context) {
         // Test redstone blocks
         var redstoneBlockCategory = BlockCategories.getBlockCategory(Blocks.REDSTONE_BLOCK);
@@ -122,7 +122,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest()
     public void testFunctionalBlockCategorization(TestContext context) {
         // Test functional blocks
         var craftingTableCategory = BlockCategories.getBlockCategory(Blocks.CRAFTING_TABLE);
@@ -152,7 +152,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testCombatBlockCategorization(TestContext context) {
         // Test combat blocks
         var tntCategory = BlockCategories.getBlockCategory(Blocks.TNT);
@@ -176,7 +176,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testDefaultCategorization(TestContext context) {
         // Test that unknown blocks default to BUILDING_BLOCKS
         var bedrockCategory = BlockCategories.getBlockCategory(Blocks.BEDROCK);
@@ -196,7 +196,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testCategoryTranslationKeys(TestContext context) {
         // Test translation key retrieval
         String buildingKey = BlockCategories.getCategoryTranslationKey(ItemGroups.BUILDING_BLOCKS);
@@ -220,7 +220,7 @@ public class BlockCategoriesGameTest {
         context.complete();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest
     public void testCategorizationConsistency(TestContext context) {
         // Test that categorization is consistent across multiple calls
         var firstCall = BlockCategories.getBlockCategory(Blocks.DIAMOND_BLOCK);

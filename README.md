@@ -57,43 +57,8 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 
 ## 🔌 Developer API
 
-### Events
-```java
-// Listen for when players create showcases
-ShowcaseAPI.getInstance().onShowcaseCreated(event -> {
-    ServerPlayerEntity sender = event.getSender();
-    ShowcaseManager.ShareType type = event.getShareType();
-    // Handle showcase creation
-});
-
-// Listen for when players view showcases
-ShowcaseAPI.getInstance().onShowcaseViewed(event -> {
-    ServerPlayerEntity viewer = event.getViewer();
-    String shareId = event.getShareId();
-    // Cancel viewing if needed
-    event.setCancelled(true);
-});
-```
-
-### API Access
-```java
-ShowcaseAPI api = ShowcaseAPI.getInstance();
-ShowcaseManagerWrapper manager = api.getShowcaseManager();
-
-// Get share entries
-ShareEntry entry = manager.getShareEntry("shareId");
-Map<String, ShareEntry> allShares = manager.getAllActiveShares();
-
-// Manage shares
-boolean cancelled = manager.cancelShare("shareId");
-boolean valid = manager.isValidShare("shareId");
-
-// Check cooldowns
-boolean onCooldown = manager.isOnCooldown(player, ShareType.ITEM);
-long remaining = manager.getRemainingCooldown(player, ShareType.ITEM);
-```
-
 ### PlaceholdersAPI Integration
+
 ```
 %showcase:item%        - Share held item
 %showcase:inventory%   - Share inventory  
