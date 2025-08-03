@@ -8,91 +8,121 @@ def versionProperties = new Properties()
 def targetPropertiesFile = file("version_properties/${project.minecraft_version}.properties")
 
 if (targetPropertiesFile.exists()) {
-    targetPropertiesFile.withInputStream { versionProperties.load(it) }
+	targetPropertiesFile.withInputStream { versionProperties.load(it) }
 }
 
 def compatibleVersions = versionProperties.getProperty("minecraft_version")
 
-archivesBaseName = project.archives_base_name
+base {
+	archivesName = project.archives_base_name
+}
+
 version = "${project.mod_version}+${compatibleVersions}"
 group = project.maven_group
 
-repositories {
-	// There might be other repos there too, just add it at the end
-	maven {
-		url "https://maven.nucleoid.xyz/"
-	}
+loom {
+	serverOnlyMinecraftJar()
+}
 
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "fabric-docs-reference-test-${project.name}"
+		eula = true
+	}
+}
+
+repositories {
 	mavenCentral()
 	mavenLocal()
+	maven {
+		url = "https://maven.nucleoid.xyz/"
+	}
 }
 
 dependencies {
-    // Version-specific dependencies
-    minecraft "com.mojang:minecraft:${versionProperties.getProperty("minecraft_version")}"
-    mappings "net.fabricmc:yarn:${versionProperties.getProperty("yarn_mappings_version")}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
+	implementation platform("net.fabricmc.fabric-api:fabric-api-bom:${versionProperties.getProperty("fabric_version")}")
 
-    // Fabric API
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
-    modImplementation include("eu.pb4:placeholder-api:${versionProperties.getProperty("placeholder_api_version")}")
+	minecraft "com.mojang:minecraft:${versionProperties.getProperty("minecraft_version")}"
+	mappings "net.fabricmc:yarn:${versionProperties.getProperty("yarn_mappings_version")}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
+
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
+	modImplementation include("eu.pb4:placeholder-api:${versionProperties.getProperty("placeholder_api_version")}")
 	modImplementation include("eu.pb4:sgui:${versionProperties.getProperty("sgui_api_version")}")
 	modImplementation include("xyz.nucleoid:server-translations-api:${versionProperties.getProperty("server_translations_api_version")}")
 
 	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0")))
-
 	include(modImplementation("me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"))
-	modImplementation "me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"
 
 	implementation("de.exlll:configlib-yaml:4.6.1")
+
+	// Test dependencies
+	testImplementation "net.fabricmc:fabric-loader-junit:${versionProperties.getProperty("fabric_loader_version")}"
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+	testImplementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
+	testImplementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
 }
 
-processResources {
-    inputs.property "version", version
-    inputs.property "minecraft_version", versionProperties.getProperty("minecraft_version")
-	inputs.property "java_version", versionProperties.getProperty("java_version")
-	inputs.property "sgui_version", versionProperties.getProperty("sgui_api_version")
-	inputs.property "fabricloader_version", versionProperties.getProperty("fabric_loader_version")
-	inputs.property "refmap_name", "showcase.mixins.refmap.json"
-
-    filesMatching("fabric.mod.json") {
-        expand(
-            "version": version,
-			"java_version": versionProperties.getProperty("java_version"),
-			"minecraft_version": versionProperties.getProperty("minecraft_version"),
-			"sgui_api_version": versionProperties.getProperty("sgui_api_version"),
-			"fabric_loader_version": versionProperties.getProperty("fabric_loader_version")
-        )
-    }
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.release = 21
 }
 
-java {
-	withSourcesJar()
+processResources {
+	inputs.property "version", version
+	inputs.property "minecraft_version", versionProperties.getProperty("minecraft_version")
+	inputs.property "java_version", versionProperties.getProperty("java_version")
+	inputs.property "sgui_version", versionProperties.getProperty("sgui_api_version")
+	inputs.property "fabricloader_version", versionProperties.getProperty("fabric_loader_version")
+	inputs.property "refmap_name", "showcase.mixins.refmap.json"
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
-
-jar {
-	inputs.property "archivesName", archivesBaseName
-
-	from("LICENSE") {
-		rename { "${it}_${inputs.properties.archivesName}"}
+	filesMatching("fabric.mod.json") {
+		expand(
+				"version": version,
+				"java_version": versionProperties.getProperty("java_version"),
+				"minecraft_version": versionProperties.getProperty("minecraft_version"),
+				"sgui_api_version": versionProperties.getProperty("sgui_api_version"),
+				"fabric_loader_version": versionProperties.getProperty("fabric_loader_version")
+		)
 	}
 }
 
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+
+	// Fabric environment for testing
+	systemProperty 'fabric.development', 'true'
+	systemProperty 'fabric.side', 'server'
+	systemProperty 'fabric.gameDir', file('run').absolutePath
+	systemProperty 'fabric.gametest', 'true'
+}
+
+jar {
+	inputs.property "archivesName", base.archivesName
+
+	from("LICENSE") {
+		rename { "${it}_${inputs.properties.archivesName}" }
+	}
+}
+
+// Modrinth publishing
 if (System.getenv("MODRINTH")) {
 	modrinth {
 		token = System.getenv("MODRINTH")
 		projectId = 'DC8AYtgP'
 		versionNumber = "" + version
 		versionType = "release"
-		changelog = System.getenv("CHANGELOG")
-		// On fabric, use 'remapJar' instead of 'jar'
+		changelog = rootProject.file("CHANGELOG.md").text
 		uploadFile = remapJar
 		gameVersions = [((String) project.minecraft_version)]
 		loaders = ["fabric", "quilt"]
