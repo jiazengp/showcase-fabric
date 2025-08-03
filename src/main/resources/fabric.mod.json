@@ -3,7 +3,7 @@
 	"id": "showcase",
 	"version": "${version}",
 	"name": "Showcase",
-	"description": "Allows players to easily showcase their various items, any container, or even villager trades to others via clickable share links and a read-only GUI.",
+	"description": "A server-side Minecraft mod that allows players to share links in chat to showcase items, inventories, containers, villager trades, and statistics through commands or chat keywords.",
 	"authors": [
 		"Hyouka233"
 	],

@@ -2,7 +2,7 @@
 
 > The current description is for V2. For V1, please [click here](https://modrinth.com/mod/showcase/version/1.1.0+mc1.21.6).
 
-A server-side Minecraft mod that allows players to showcase items, inventories, containers, and villager trades through clickable links with read-only GUIs.
+A server-side Minecraft mod that allows players to share links in chat to showcase items, inventories, containers, villager trades, and statistics through commands or chat keywords.
 
 ## ✨ Features
 
