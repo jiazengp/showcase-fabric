@@ -1,0 +1,10 @@
+[files]
+extend-exclude = [
+  "**/*.json",
+  "**/*.svg",
+  "pnpm-lock.yaml",
+  ".markdownlintignore",
+  ".prettierignore",
+  ".eslintrc.yml",
+  ".idea/**"
+]

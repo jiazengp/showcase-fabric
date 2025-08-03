@@ -11,6 +11,7 @@ import com.showcase.listener.ChatMessageListener;
 import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.placeholders.Placeholders;
 import com.showcase.utils.*;
+import com.showcase.utils.countdown.CountdownBossBarManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;

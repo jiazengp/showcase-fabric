@@ -2,68 +2,112 @@
 
 > The current description is for V2. For V1, please [click here](https://modrinth.com/mod/showcase/version/1.1.0+mc1.21.6).
 
-Allows players to easily showcase their various items, any container, or even villager trades to others via clickable share links and a read-only GUI.
+A server-side Minecraft mod that allows players to showcase items, inventories, containers, and villager trades through clickable links with read-only GUIs.
 
-## Features ✨
+## ✨ Features
 
-- Supports sharing any item, container, and even villager trade interfaces
-- Fully server-side mod: all features are provided independently by the server
-- Auto-unpack preview: when sharing shulker boxes or backpacks, users can click to view contents whether shared as items or containers
-- Supports preview interaction such as clicking to open book GUIs and view maps
-- Localization support with multiple languages available
-- Persistent data storage: all shares are saved automatically and deleted only after their configured expiration time
-- LuckPerms integration: all features and commands have corresponding permission nodes registered
-- Placeholder support: use specified placeholders directly in chat messages for dynamic content display
+- **Comprehensive Sharing**: Items, inventories, containers, and villager trades
+- **Server-Side**: No client installation required
+- **Interactive Previews**: Auto-unpack containers, view books and maps
+- **Multi-Language**: Support for 15+ languages
+- **Persistent Storage**: Shares saved until expiration
+- **Permission System**: LuckPerms integration
+- **Configurable Chat Keywords**: Customizable trigger words for quick sharing
+- **Statistics Tracking**: Player statistics with detailed categorization
+- **Developer Placeholders**: PlaceholderAPI integration for other plugins
 
 
-## Commands & Usage ⌨️
+## ⌨️ Commands
 
 ### Player Commands
 
-- `/showcase item [player (optional)] [valid duration (optional)] [description (optional)]`
-- `/showcase inventory [player (optional)] [valid duration (optional)] [description (optional)]`
-- `/showcase hotbar [player (optional)] [valid duration (optional)] [description (optional)]`
-- `/showcase enderchest [player (optional)] [valid duration (optional)] [description (optional)]`
-- `/showcase container [player (optional)] [valid duration (optional)] [description (optional)]`  
-  Share a container you open within 10 seconds
-- `/showcase merchant [player (optional)] [valid duration (optional)] [description (optional)]`  
-  Share the trade gui you open within 10 seconds
-- `/showcase cancel <id>`  
-  Cancel your share by share link ID
-- `/showcase-view <id>`  
-  View shared content by share link ID
+```
+/showcase <type> [player] [duration] [description]
+```
+**Types**: `item`, `inventory`, `hotbar`, `enderchest`, `container`, `merchant`, `stats`
+
+- `container` - Share a container opened within 10 seconds
+- `merchant` - Share a villager trade interface opened within 10 seconds
+- `stats` - Share player statistics with categorized data
+
+**Other Commands**:
+- `/showcase cancel <id>` - Cancel your share
+- `/showcase-view <id>` - View shared content
 
 ### Admin Commands
-
-- `/admin-showcase <type> <targetPlayer> [receiver (optional)] [valid duration (optional)] [description (optional)]`  
-  Share on behalf of another player (types: item, inventory, hotbar, enderchest)
-- `/showcase-manage reload`  
-  Reload the mod configuration
-- `/showcase-manage list [page (optional)]`  
-  List active shares with pagination
-- `/showcase-manage cancel <shareId|player>`  
-  Cancel a specific share or all shares from a player
-
-### Placeholders
-
-Use these placeholders in chat:
-
-- `%showcase:item%` - Share held item
-- `%showcase:inventory%` - Share inventory
-- `%showcase:hotbar%` - Share hotbar
-- `%showcase:ender_chest%` - Share ender chest
-
-## Configuration ⚙️
-
-```jsonc
-{
-  "shareLinkExpiryTime": 300,  // Maximum selectable expiry time for share links
-  "shareLinkMinimumExpiryTime": 60 // Minimum selectable expiry time for share links
-  "shareCommandCooldown": 10,  // Cooldown between commands
-  "containerListeningDuration": 10  // Time to open container
-}
+```
+/admin-showcase <type> <player> [receiver] [duration] [description]
+/showcase-manage <action> [args]
 ```
 
-## License
+**Actions**: `reload`, `list [page]`, `cancel <id|player>`
+
+### Chat Keywords
+
+Players can type keywords in square brackets to quickly share content:
+
+**Default Keywords** (configurable in `config.yml`):
+- `[item]` or `[i]` - Share held item
+- `[inventory]` or `[inv]` - Share inventory
+- `[hotbar]` or `[hb]` - Share hotbar
+- `[ender]` or `[ec]` - Share ender chest
+- `[stats]` or `[stat]` - Share statistics
+
+Example: `Check out my [item]!` → automatically replaced with clickable share link
+
+## 🔌 Developer API
+
+### Events
+```java
+// Listen for when players create showcases
+ShowcaseAPI.getInstance().onShowcaseCreated(event -> {
+    ServerPlayerEntity sender = event.getSender();
+    ShowcaseManager.ShareType type = event.getShareType();
+    // Handle showcase creation
+});
+
+// Listen for when players view showcases
+ShowcaseAPI.getInstance().onShowcaseViewed(event -> {
+    ServerPlayerEntity viewer = event.getViewer();
+    String shareId = event.getShareId();
+    // Cancel viewing if needed
+    event.setCancelled(true);
+});
+```
+
+### API Access
+```java
+ShowcaseAPI api = ShowcaseAPI.getInstance();
+ShowcaseManagerWrapper manager = api.getShowcaseManager();
+
+// Get share entries
+ShareEntry entry = manager.getShareEntry("shareId");
+Map<String, ShareEntry> allShares = manager.getAllActiveShares();
+
+// Manage shares
+boolean cancelled = manager.cancelShare("shareId");
+boolean valid = manager.isValidShare("shareId");
+
+// Check cooldowns
+boolean onCooldown = manager.isOnCooldown(player, ShareType.ITEM);
+long remaining = manager.getRemainingCooldown(player, ShareType.ITEM);
+```
+
+### PlaceholdersAPI Integration
+```
+%showcase:item%        - Share held item
+%showcase:inventory%   - Share inventory  
+%showcase:hotbar%      - Share hotbar
+%showcase:ender_chest% - Share ender chest
+%showcase:stats%       - Share statistics
+```
+
+## ⚙️ Configuration
+
+Main configuration file: `config/showcase/config.yml` (YAML format)
+
+Customize share settings, keywords, cooldowns, and statistics display options. Language files are built into the mod for automatic localization.
+
+## 📝 License
 
 [MIT](./LICENSE)
