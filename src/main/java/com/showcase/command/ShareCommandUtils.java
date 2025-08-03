@@ -5,7 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.showcase.api.ShowcaseAPI;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
-import com.showcase.event.ShowcaseEvent;
 import com.showcase.gui.MerchantContext;
 import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.StackUtils;
@@ -198,11 +197,8 @@ public class ShareCommandUtils {
         // Get the share entry for the event
         ShareEntry shareEntry = ShowcaseManager.getShareEntry(shareId);
         if (shareEntry != null) {
-            // Fire the ShowcaseEvent
-            ShowcaseEvent event = new ShowcaseEvent(
-                sender, sourcePlayer, receivers, type, shareEntry, shareId, description, duration
-            );
-            ShowcaseAPI.fireShowcaseEvent(event);
+            // Fire the showcase created event
+            ShowcaseAPI.fireShowcaseCreatedEvent(type, shareEntry, sender, sourcePlayer, receivers, shareId, description, duration);
         }
 
         MutableText clickableItemName = createClickableItemName(type, itemName, shareId);

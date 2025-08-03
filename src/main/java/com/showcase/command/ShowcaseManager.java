@@ -4,7 +4,6 @@ import com.showcase.ShowcaseMod;
 import com.showcase.api.ShowcaseAPI;
 import com.showcase.data.ShareEntry;
 import com.showcase.data.ShareRepository;
-import com.showcase.event.ViewShowcaseEvent;
 import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
@@ -137,14 +136,9 @@ public final class ShowcaseManager {
         if (server == null) return false;
         
         ServerPlayerEntity originalOwner = server.getPlayerManager().getPlayer(entry.getOwnerUuid());
-        ViewShowcaseEvent event;
-
-        // For offline owners, we still need to get player info somehow
-        // We'll use PlayerUtils to get a safe display name instead
-        // For now, let's create a minimal event - developers can handle offline scenarios
-        // Fire the view event with the actual owner
-        event = new ViewShowcaseEvent(viewer, entry, id, Objects.requireNonNullElse(originalOwner, viewer));
-        if (!ShowcaseAPI.fireViewEvent(event)) return false;
+        // Fire the showcase viewed event
+        net.minecraft.util.ActionResult result = ShowcaseAPI.fireShowcaseViewedEvent(viewer, entry, id, Objects.requireNonNullElse(originalOwner, viewer));
+        if (result == net.minecraft.util.ActionResult.FAIL) return false;
 
         entry.incrementViewCount();
 

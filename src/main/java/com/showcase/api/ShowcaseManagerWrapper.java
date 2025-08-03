@@ -90,7 +90,7 @@ public class ShowcaseManagerWrapper {
 
     /**
      * Opens shared content for a viewer.
-     * This method will fire ViewShowcaseEvent before opening.
+     * This method will fire ShowcaseViewedCallback before opening.
      *
      * @param viewer the player who wants to view the share
      * @param shareId the unique identifier of the share

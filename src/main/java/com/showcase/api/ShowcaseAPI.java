@@ -1,12 +1,12 @@
 package com.showcase.api;
 
-import com.showcase.ShowcaseMod;
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfig;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
-import com.showcase.event.ShowcaseEvent;
-import com.showcase.event.ViewShowcaseEvent;
+import com.showcase.event.ShowcaseCreatedCallback;
+import com.showcase.event.ShowcaseViewedCallback;
+import com.showcase.event.ShowcaseEvents;
 import com.showcase.utils.ModMetadataHolder;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import net.minecraft.util.ActionResult;
 
 /**
  * Main API class for the Showcase mod.
@@ -116,44 +116,53 @@ public final class ShowcaseAPI {
     }
 
     /**
-     * Registers a listener for ShowcaseEvent.
+     * Registers a listener for showcase creation events.
      * The listener will be called whenever a player creates a showcase.
      * 
      * @param listener the event listener
      */
-    public void onShowcaseCreated(@NotNull Consumer<ShowcaseEvent> listener) {
-        ShowcaseEventManager.registerShowcaseListener(listener);
+    public void onShowcaseCreated(@NotNull ShowcaseCreatedCallback listener) {
+        ShowcaseEvents.SHOWCASE_CREATED.register(listener);
     }
 
     /**
-     * Registers a listener for ViewShowcaseEvent.
+     * Registers a listener for showcase viewing events.
      * The listener will be called whenever a player views a showcase.
      * 
      * @param listener the event listener
      */
-    public void onShowcaseViewed(@NotNull Consumer<ViewShowcaseEvent> listener) {
-        ShowcaseEventManager.registerViewListener(listener);
+    public void onShowcaseViewed(@NotNull ShowcaseViewedCallback listener) {
+        ShowcaseEvents.SHOWCASE_VIEWED.register(listener);
     }
 
     /**
-     * Fires a ShowcaseEvent. This method is intended for internal use.
+     * Fires a showcase creation event. This method is intended for internal use.
      * 
-     * @param event the event to fire
+     * @return the action result from the event
      */
     @ApiStatus.Internal
-    public static void fireShowcaseEvent(@NotNull ShowcaseEvent event) {
-        ShowcaseEventManager.fireShowcaseEvent(event);
+    public static ActionResult fireShowcaseCreatedEvent(@NotNull com.showcase.command.ShowcaseManager.ShareType shareType,
+                                                         @NotNull com.showcase.data.ShareEntry shareEntry,
+                                                         @NotNull net.minecraft.server.network.ServerPlayerEntity sender,
+                                                         @NotNull net.minecraft.server.network.ServerPlayerEntity sourcePlayer,
+                                                         @org.jetbrains.annotations.Nullable java.util.Collection<net.minecraft.server.network.ServerPlayerEntity> receivers,
+                                                         @NotNull String shareId,
+                                                         @org.jetbrains.annotations.Nullable String description,
+                                                         @org.jetbrains.annotations.Nullable Integer duration) {
+        return ShowcaseEvents.SHOWCASE_CREATED.invoker().onShowcaseCreated(sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration);
     }
 
     /**
-     * Fires a ViewShowcaseEvent. This method is intended for internal use.
+     * Fires a showcase viewing event. This method is intended for internal use.
      * 
-     * @param event the event to fire
-     * @return true if the event was not cancelled, false if cancelled
+     * @return the action result from the event
      */
     @ApiStatus.Internal
-    public static boolean fireViewEvent(@NotNull ViewShowcaseEvent event) {
-        return ShowcaseEventManager.fireViewEvent(event);
+    public static ActionResult fireShowcaseViewedEvent(@NotNull net.minecraft.server.network.ServerPlayerEntity viewer,
+                                                        @NotNull com.showcase.data.ShareEntry shareEntry,
+                                                        @NotNull String shareId,
+                                                        @NotNull net.minecraft.server.network.ServerPlayerEntity originalOwner) {
+        return ShowcaseEvents.SHOWCASE_VIEWED.invoker().onShowcaseViewed(viewer, shareEntry, shareId, originalOwner);
     }
 
     /**
@@ -166,43 +175,4 @@ public final class ShowcaseAPI {
         return ModMetadataHolder.VERSION;
     }
 
-    /**
-     * Internal event manager for handling event listeners.
-     */
-    private static class ShowcaseEventManager {
-        private static final List<Consumer<ShowcaseEvent>> showcaseListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
-        private static final List<Consumer<ViewShowcaseEvent>> viewListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
-
-        static void registerShowcaseListener(Consumer<ShowcaseEvent> listener) {
-            showcaseListeners.add(listener);
-        }
-
-        static void registerViewListener(Consumer<ViewShowcaseEvent> listener) {
-            viewListeners.add(listener);
-        }
-
-        static void fireShowcaseEvent(ShowcaseEvent event) {
-            for (Consumer<ShowcaseEvent> listener : showcaseListeners) {
-                try {
-                    listener.accept(event);
-                } catch (Exception e) {
-                    ShowcaseMod.LOGGER.error("Error in ShowcaseEvent listener", e);
-                }
-            }
-        }
-
-        static boolean fireViewEvent(ViewShowcaseEvent event) {
-            for (Consumer<ViewShowcaseEvent> listener : viewListeners) {
-                try {
-                    listener.accept(event);
-                    if (event.isCancelled()) {
-                        return false;
-                    }
-                } catch (Exception e) {
-                    ShowcaseMod.LOGGER.error("Error in ViewShowcaseEvent listener", e);
-                }
-            }
-            return !event.isCancelled();
-        }
-    }
 }
