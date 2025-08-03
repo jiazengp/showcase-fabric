@@ -31,7 +31,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      */
     public ShowcaseEvent(@NotNull ServerPlayerEntity sender,
                          @NotNull ServerPlayerEntity sourcePlayer,
-                         @Nullable Collection<ServerPlayerEntity> receivers,
+                         Collection<ServerPlayerEntity> receivers,
                          @NotNull ShowcaseManager.ShareType shareType,
                          @NotNull ShareEntry shareEntry,
                          @NotNull String shareId,
@@ -53,8 +53,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the sender player
      */
     @Override
-    @NotNull
-    public ServerPlayerEntity sender() {
+    public @NotNull ServerPlayerEntity sender() {
         return sender;
     }
 
@@ -65,8 +64,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the source player
      */
     @Override
-    @NotNull
-    public ServerPlayerEntity sourcePlayer() {
+    public @NotNull ServerPlayerEntity sourcePlayer() {
         return sourcePlayer;
     }
 
@@ -76,7 +74,6 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return collection of receiver players, or null if this is a public broadcast
      */
     @Override
-    @Nullable
     public Collection<ServerPlayerEntity> receivers() {
         return receivers;
     }
@@ -87,8 +84,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the share type
      */
     @Override
-    @NotNull
-    public ShowcaseManager.ShareType shareType() {
+    public @NotNull ShowcaseManager.ShareType shareType() {
         return shareType;
     }
 
@@ -98,8 +94,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the share entry
      */
     @Override
-    @NotNull
-    public ShareEntry shareEntry() {
+    public @NotNull ShareEntry shareEntry() {
         return shareEntry;
     }
 
@@ -109,8 +104,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the share ID
      */
     @Override
-    @NotNull
-    public String shareId() {
+    public @NotNull String shareId() {
         return shareId;
     }
 
@@ -120,8 +114,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the description, or null if none was provided
      */
     @Override
-    @Nullable
-    public String description() {
+    public @Nullable String description() {
         return description;
     }
 
@@ -131,8 +124,7 @@ public record ShowcaseEvent(ServerPlayerEntity sender, ServerPlayerEntity source
      * @return the duration in seconds, or null if using default duration
      */
     @Override
-    @Nullable
-    public Integer duration() {
+    public @Nullable Integer duration() {
         return duration;
     }
 

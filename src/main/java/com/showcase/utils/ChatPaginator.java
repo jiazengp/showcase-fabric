@@ -2,8 +2,6 @@ package com.showcase.utils;
 
 import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
 import net.minecraft.util.Formatting;
 
 import java.util.Collections;
@@ -60,16 +58,16 @@ public class ChatPaginator<T> {
 
         if (page > 1) {
             nav.append(Text.translatable("spectatorMenu.previous_page").formatted(Formatting.BLUE)
-                    .styled(s -> s.withClickEvent(new ClickEvent.RunCommand(commandPrefix + " " + (page - 1)))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.translatable("spectatorMenu.previous_page")))));
+                    .styled(s -> s.withClickEvent(TextEventFactory.navigateToPage(commandPrefix, page - 1))
+                            .withHoverEvent(TextEventFactory.previousPageTooltip())));
         }
 
         nav.append(Text.literal(" | ").formatted(Formatting.DARK_GRAY));
 
         if (page < totalPages) {
             nav.append(Text.translatable("spectatorMenu.next_page").formatted(Formatting.BLUE)
-                    .styled(s -> s.withClickEvent(new ClickEvent.RunCommand(commandPrefix + " " + (page + 1)))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.translatable("spectatorMenu.next_page")))));
+                    .styled(s -> s.withClickEvent(TextEventFactory.navigateToPage(commandPrefix, page + 1))
+                            .withHoverEvent(TextEventFactory.nextPageTooltip())));
         }
 
         return nav;

@@ -9,6 +9,7 @@ import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
 import com.showcase.utils.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
@@ -121,7 +122,7 @@ public final class ShowcaseManager {
         ShareEntry entry = ShareRepository.get(id);
 
         if (entry == null || isExpired(entry)) {
-            viewer.sendMessage(TextUtils.warning(Text.translatable("showcase.message.invalid_or_expired")));
+            viewer.sendMessage(TextUtils.warning(Text.translatable("showcase.message.invalid_or_expired")), false);
             ShareRepository.remove(id);
             return false;
         }

@@ -12,6 +12,7 @@ import com.showcase.listener.ChatMessageListener;
 import com.showcase.utils.ChatPaginator;
 import com.showcase.utils.ModMetadataHolder;
 import com.showcase.utils.TextUtils;
+import com.showcase.utils.TextEventFactory;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -81,7 +82,7 @@ public class ShowcaseManageCommand {
 
             if (value.startsWith("https://")) {
                 line.append(Text.literal(value.replaceAll("https://", "")).styled(style -> style
-                        .withClickEvent(new ClickEvent.OpenUrl(URI.create(value)))
+                        .withClickEvent(TextEventFactory.openUrl(value))
                         .withUnderline(true)
                         .withColor(Formatting.AQUA)
                 ));

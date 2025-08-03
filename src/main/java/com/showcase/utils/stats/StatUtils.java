@@ -1,9 +1,9 @@
 package com.showcase.utils.stats;
 
-import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.TextUtils;
+import com.showcase.utils.TextEventFactory;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.ItemStack;
@@ -187,7 +187,7 @@ public class StatUtils {
                 Text.translatable("gui.stats")
                         .append(Text.literal(" - "))
                         .append(PlayerUtils.getSafeDisplayName(player))
-                        .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hoverText)))
+                        .setStyle(Style.EMPTY.withHoverEvent(TextEventFactory.showText(hoverText)))
         );
         
         return bookStack;

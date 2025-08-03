@@ -140,9 +140,11 @@ public final class ShareRepository {
      *
      * @param shares the shares to load
      */
-    public static void loadShares(@NotNull Map<String, ShareEntry> shares) {
+    public static void loadShares(@Nullable Map<String, ShareEntry> shares) {
         SHARES.clear();
-        SHARES.putAll(shares);
+        if (shares != null) {
+            SHARES.putAll(shares);
+        }
     }
 
     /**

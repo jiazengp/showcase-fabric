@@ -11,6 +11,7 @@ import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,6 +20,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
+import com.showcase.utils.TextEventFactory;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
 import org.jetbrains.annotations.ApiStatus;
@@ -179,14 +181,14 @@ public class ShareCommandUtils {
 
             if (stack != null && !stack.isEmpty()) {
                 hoverableName.setStyle(hoverableName.getStyle()
-                        .withHoverEvent(new HoverEvent.ShowItem(stack)));
+                        .withHoverEvent(TextEventFactory.showItem(stack)));
             }
             return hoverableName;
         }
 
         MutableText preview = getFinalPreviewText(itemName, type, shareId);
         hoverableName.setStyle(hoverableName.getStyle()
-                .withHoverEvent(new HoverEvent.ShowText(preview)));
+                .withHoverEvent(TextEventFactory.showText(preview)));
 
         return hoverableName;
     }
@@ -243,7 +245,7 @@ public class ShareCommandUtils {
     }
 
     public static ClickEvent createShareClickEvent(String id) {
-        return new ClickEvent.RunCommand("/" + VIEW_COMMAND + " " + id);
+        return TextEventFactory.runFullCommand("/" + VIEW_COMMAND + " " + id);
     }
 
     public static MutableText buildDefaultMessageForReceiver(ServerPlayerEntity sender,
@@ -361,8 +363,8 @@ public class ShareCommandUtils {
                 .append(Text.literal("[ID] ").formatted(Formatting.GRAY))
                 .append(Text.literal(shareId).formatted(Formatting.YELLOW)
                         .styled(style -> style
-                                .withClickEvent(new ClickEvent.CopyToClipboard(shareId))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Copy ID")))))
+                                .withClickEvent(TextEventFactory.copyToClipboard(shareId))
+                                .withHoverEvent(TextEventFactory.copyIdTooltip())))
                 .append(Text.literal("  "));
     }
 
@@ -404,8 +406,8 @@ public class ShareCommandUtils {
                 .append(Text.literal(" | [Cancel Share] ")
                         .styled(style -> style
                                 .withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent.RunCommand("/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
-                                .withHoverEvent(new HoverEvent.ShowText(translatable("showcase.message.manage.cancel.tip")))))
+                                .withClickEvent(TextEventFactory.runFullCommand("/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
+                                .withHoverEvent(TextEventFactory.cancelShareTooltip())))
                 .append(Text.literal("  "));
     }
 
