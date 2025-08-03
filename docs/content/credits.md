@@ -1,31 +1,34 @@
 ---
-title: 技术鸣谢
-description: 「空荧酒馆原神地图」项目使用了包括但不限于以下开源技术和美术资源，我们一直遵守各项使用协议。感谢作者们，是你们让世界更美好！
-aside: false
-layout: doc
-pageClass: credits
-search: false
+title: Credits
+description: 该项目使用了包括但不限于以下开源技术，我们一直遵守各项使用协议。感谢作者们，是你们让世界更美好！
 ---
 
-## Web
+## Dependencies
 
-| Name       | License name | Source Code                                 | Copyright                  |
-| :--------- | :----------: | :------------------------------------------ | :------------------------- |
-| Deckgl     |     MIT      | <https://github.com/visgl/deck.gl>          | Urban Computing Foundation |
-| Jquery     |     MIT      | <https://github.com/jquery/jquery>          | John Resig                 |
-| Jest       |     MIT      | <https://github.com/facebook/jest>          | Facebook                   |
-| Leaflet    |     BSD      | <https://github.com/Leaflet/Leaflet>        | Vladimir Agafonkin         |
-| Lerna      |     MIT      | <https://github.com/lerna/lerna>            | Lerna Contributors         |
-| React      |     MIT      | <https://github.com/facebook/react>         | Facebook                   |
-| Sass       |     MIT      | <https://github.com/sass/sass>              | Sass team                  |
-| TypeScript |  Apache-2.0  | <https://github.com/microsoft/TypeScript>   | Microsoft                  |
-| Vue        |     MIT      | <https://github.com/vuejs/vue>              | Evan You                   |
-| VuePress   |     MIT      | <https://github.com/vuepress/vuepress-next> | Evan You                   |
-| VueUse     |     MIT      | <https://github.com/vueuse/vueuse>          | Anthony Fu                 |
+| Name                     | License      | Source Code                                          | Copyright/Author           |
+| :----------------------- | :----------: | :--------------------------------------------------- | :------------------------- |
+| Fabric Loader            | Apache 2.0   | <https://github.com/FabricMC/fabric-loader>         | FabricMC                   |
+| Fabric API               | Apache 2.0   | <https://github.com/FabricMC/fabric>                | FabricMC                   |
+| Placeholder API          | MIT          | <https://github.com/Patbox/placeholder-api>         | Patbox                     |
+| SGUI                     | LGPL-3.0     | <https://github.com/Patbox/sgui>                    | Patbox                     |
+| Server Translations API  | MIT          | <https://github.com/NucleoidMC/server-translations-api> | Nucleoid MC             |
+| MixinExtras              | MIT          | <https://github.com/LlamaLad7/MixinExtras>           | LlamaLad7                  |
+| Fabric Permissions API   | MIT          | <https://github.com/lucko/fabric-permissions-api>   | lucko                      |
+| ConfigLib                | MIT          | <https://github.com/Exlll/ConfigLib>                | Exlll                      |
 
-## 美术
+## Test Dependencies
 
-| Name     | Description            | Link                                                     | CopyRight |
-| :------- | :--------------------- | :------------------------------------------------------- | :-------- |
-| MapImage | 地图相关素材           | [ys.mihoyo.com](https://ys.mihoyo.com)                   | MiHoYo    |
-| ばたばた | 客户端 [投币] 按钮素材 | [www.pixiv.net](https://www.pixiv.net/artworks/88007179) | Seseren   |
+| Name                     | License      | Source Code                                          | Copyright/Author           |
+| :----------------------- | :----------: | :--------------------------------------------------- | :------------------------- |
+| JUnit Jupiter            | EPL-2.0      | <https://github.com/junit-team/junit5>              | JUnit Team                 |
+| AssertJ                  | Apache 2.0   | <https://github.com/assertj/assertj-core>           | AssertJ                    |
+| Fabric Loader JUnit     | Apache 2.0   | <https://github.com/FabricMC/fabric-loader>         | FabricMC                   |
+
+## Build Tools
+
+| Name                     | License      | Source Code                                          | Copyright/Author           |
+| :----------------------- | :----------: | :--------------------------------------------------- | :------------------------- |
+| Fabric Loom              | MIT          | <https://github.com/FabricMC/fabric-loom>           | FabricMC                   |
+| Minotaur                 | MIT          | <https://github.com/modrinth/minotaur>               | Modrinth                   |
+
+

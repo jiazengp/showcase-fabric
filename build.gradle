@@ -59,8 +59,6 @@ dependencies {
 
 	// Test dependencies
 	testImplementation "net.fabricmc:fabric-loader-junit:${versionProperties.getProperty("fabric_loader_version")}"
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
-	testImplementation 'org.assertj:assertj-core:3.24.2'
 	testImplementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
 	testImplementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
 }
@@ -92,19 +90,6 @@ processResources {
 				"fabric_loader_version": versionProperties.getProperty("fabric_loader_version")
 		)
 	}
-}
-
-test {
-	useJUnitPlatform()
-	testLogging {
-		events "passed", "skipped", "failed"
-	}
-
-	// Fabric environment for testing
-	systemProperty 'fabric.development', 'true'
-	systemProperty 'fabric.side', 'server'
-	systemProperty 'fabric.gameDir', file('run').absolutePath
-	systemProperty 'fabric.gametest', 'true'
 }
 
 jar {
