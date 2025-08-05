@@ -165,7 +165,7 @@ public class Placeholders {
         if (isOp(player) && inputDuration > 0) {
             return inputDuration;
         }
-        if (inputDuration < ModConfigManager.getShareLinkMinExpiry() || inputDuration >ModConfigManager.getShareLinkDefaultExpiry()) {
+        if (inputDuration < ModConfigManager.getShareLinkMinExpiry() || inputDuration > ModConfigManager.getShareLinkDefaultExpiry()) {
             return -1;
         }
 

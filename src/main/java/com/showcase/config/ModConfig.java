@@ -1,6 +1,7 @@
 package com.showcase.config;
 
 import com.showcase.command.ShowcaseManager;
+import com.showcase.utils.ShareConstants;
 import de.exlll.configlib.Comment;
 import de.exlll.configlib.Configuration;
 
@@ -153,11 +154,11 @@ public class ModConfig {
     private static Map<ShowcaseManager.ShareType, ShareSettings> defaultShareSettings() {
         Map<ShowcaseManager.ShareType, ShareSettings> defaults = new EnumMap<>(ShowcaseManager.ShareType.class);
 
-        add(defaults, ShowcaseManager.ShareType.ITEM, 10, 0, Arrays.asList("item", "i"), -1);
-        add(defaults, ShowcaseManager.ShareType.INVENTORY, 10, 0, Arrays.asList("inventory", "inv"), -1);
-        add(defaults, ShowcaseManager.ShareType.HOTBAR, 10, 0, Arrays.asList("hotbar", "hb"), -1);
-        add(defaults, ShowcaseManager.ShareType.ENDER_CHEST, 10, 0, Arrays.asList("ender", "ec"), -1);
-        add(defaults, ShowcaseManager.ShareType.STATS, 10, 0, List.of("stats", "statistical", "stat"), -1);
+        add(defaults, ShowcaseManager.ShareType.ITEM, 10, 0, Arrays.asList(ShareConstants.ITEM, "i"), -1);
+        add(defaults, ShowcaseManager.ShareType.INVENTORY, 10, 0, Arrays.asList(ShareConstants.INVENTORY, "inv"), -1);
+        add(defaults, ShowcaseManager.ShareType.HOTBAR, 10, 0, Arrays.asList(ShareConstants.HOTBAR, "hb"), -1);
+        add(defaults, ShowcaseManager.ShareType.ENDER_CHEST, 10, 0, Arrays.asList(ShareConstants.ENDER_CHEST, "ec"), -1);
+        add(defaults, ShowcaseManager.ShareType.STATS, 10, 0, List.of(ShareConstants.STATS, "statistical", "stat"), -1);
         add(defaults, ShowcaseManager.ShareType.CONTAINER, 10, 0, List.of(), 10);
         add(defaults, ShowcaseManager.ShareType.MERCHANT, 10, 0, List.of(), 10);
 

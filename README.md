@@ -50,7 +50,7 @@ Players can type keywords in square brackets to quickly share content:
 - `[item]` or `[i]` - Share held item
 - `[inventory]` or `[inv]` - Share inventory
 - `[hotbar]` or `[hb]` - Share hotbar
-- `[ender]` or `[ec]` - Share ender chest
+- `[ender_chest]` or `[ec]` - Share ender chest
 - `[stats]` or `[stat]` - Share statistics
 
 Example: `Check out my [item]!` → automatically replaced with clickable share link

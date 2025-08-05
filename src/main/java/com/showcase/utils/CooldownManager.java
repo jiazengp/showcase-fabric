@@ -2,6 +2,8 @@ package com.showcase.utils;
 
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
+import com.showcase.utils.permissions.PermissionChecker;
+import com.showcase.utils.permissions.Permissions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +33,7 @@ public final class CooldownManager {
      */
     public static boolean isOnCooldown(@NotNull ServerPlayerEntity player, @NotNull ShowcaseManager.ShareType type) {
         if (FabricLoader.getInstance().isDevelopmentEnvironment()) return false;
-
+        if (PermissionChecker.isOp(player) || PermissionChecker.hasPermission(player, Permissions.getCommandTypeFromShareType(type).getCooldown(), 4)) return false;
         EnumMap<ShowcaseManager.ShareType, Long> map = COOLDOWNS.get(player.getUuid());
         if (map == null) return false;
 
