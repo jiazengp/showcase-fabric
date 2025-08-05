@@ -13,9 +13,7 @@ import java.net.URI;
  * that can be easily modified for different Minecraft versions.
  */
 public class TextEventFactory {
-    
-    // ClickEvent factory methods
-    
+
     /**
      * Creates a ClickEvent that runs a command when clicked
      * @param command The command to run (without leading slash)
@@ -107,16 +105,7 @@ public class TextEventFactory {
     public static ClickEvent viewShare(String shareId) {
         return runFullCommand("/showcase-view " + shareId);
     }
-    
-    /**
-     * Creates a ClickEvent for canceling a share with the given ID
-     * @param shareId The share ID
-     * @return ClickEvent instance
-     */
-    public static ClickEvent cancelShare(String shareId) {
-        return runFullCommand("/showcase-manage cancel " + shareId);
-    }
-    
+
     /**
      * Creates a ClickEvent for navigating to a specific page
      * @param commandPrefix The command prefix (e.g., "/showcase manage list")
@@ -126,15 +115,7 @@ public class TextEventFactory {
     public static ClickEvent navigateToPage(String commandPrefix, int page) {
         return runFullCommand(commandPrefix + " " + page);
     }
-    
-    /**
-     * Creates a HoverEvent with copy ID tooltip
-     * @return HoverEvent instance
-     */
-    public static HoverEvent copyIdTooltip() {
-        return showText("Copy ID");
-    }
-    
+
     /**
      * Creates a HoverEvent for previous page tooltip
      * @return HoverEvent instance
