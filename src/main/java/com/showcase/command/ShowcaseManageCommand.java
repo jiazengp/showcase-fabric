@@ -11,18 +11,17 @@ import com.showcase.data.ShareEntry;
 import com.showcase.listener.ChatMessageListener;
 import com.showcase.utils.ChatPaginator;
 import com.showcase.utils.ModMetadataHolder;
+import com.showcase.utils.permissions.Permissions;
 import com.showcase.utils.TextUtils;
 import com.showcase.utils.TextEventFactory;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URI;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 import static com.showcase.command.ShareCommandUtils.*;
 import static com.showcase.command.ShowcaseCommand.CANCEL_COMMAND;
 import static com.showcase.command.ShowcaseCommand.MANAGE_COMMAND;
-import static com.showcase.utils.PermissionChecker.hasPermission;
+import static com.showcase.utils.permissions.PermissionChecker.hasPermission;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -39,7 +38,7 @@ public class ShowcaseManageCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
         dispatcher.register(
                 literal(command)
-                        .requires(src -> hasPermission(src, "manage", 4))
+                        .requires(src -> hasPermission(src, Permissions.MANAGE, 4))
                         .then(createReloadCommand())
                         .then(createListCommand())
                         .then(createCancelCommand())
@@ -49,7 +48,7 @@ public class ShowcaseManageCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> createAboutCommand() {
         return literal("about")
-                .requires(src -> hasPermission(src, "manage.about", 0))
+                .requires(src -> hasPermission(src, Permissions.Manage.ABOUT, 0))
                 .executes(ctx -> {
                     ServerPlayerEntity player = getSenderPlayer(ctx);
 
@@ -96,7 +95,7 @@ public class ShowcaseManageCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> createReloadCommand() {
         return literal("reload")
-                .requires(src -> hasPermission(src, "manage.reload", 4))
+                .requires(src -> hasPermission(src, Permissions.Manage.RELOAD, 4))
                 .executes(ctx -> {
                     try {
                         ModConfigManager.reloadConfig();
@@ -113,7 +112,7 @@ public class ShowcaseManageCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> createListCommand() {
         return literal("list")
-                .requires(src -> hasPermission(src, "manage.list", 4))
+                .requires(src -> hasPermission(src, Permissions.Manage.LIST, 4))
                 .executes(ctx -> executeListCommand(ctx.getSource().getPlayerOrThrow(), 1))
                 .then(argument("page", IntegerArgumentType.integer(1))
                         .executes(ctx -> {
@@ -144,7 +143,7 @@ public class ShowcaseManageCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> createCancelCommand() {
         return literal(CANCEL_COMMAND)
-                .requires(src -> hasPermission(src, "manage.cancel", 4))
+                .requires(src -> hasPermission(src, Permissions.Manage.CANCEL, 4))
                 .then(argument("target", StringArgumentType.string())
                         .suggests((ctx, builder) -> {
                             ShowcaseManager.getShareIdCompletions().forEach(builder::suggest);

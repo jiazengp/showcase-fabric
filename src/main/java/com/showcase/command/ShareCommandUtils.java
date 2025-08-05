@@ -9,6 +9,8 @@ import com.showcase.gui.MerchantContext;
 import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
+import com.showcase.utils.permissions.PermissionChecker;
+import com.showcase.utils.permissions.Permissions;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -45,6 +47,30 @@ public class ShareCommandUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Check if player has permission to specify receivers for the given share type
+     */
+    public static boolean canSpecifyReceivers(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+        Permissions.CommandType commandType = Permissions.getCommandTypeFromShareType(shareType);
+        return PermissionChecker.hasPermission(player, commandType.receivers(), 2);
+    }
+
+    /**
+     * Check if player has permission to specify duration for the given share type
+     */
+    public static boolean canSpecifyDuration(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+        Permissions.CommandType commandType = Permissions.getCommandTypeFromShareType(shareType);
+        return PermissionChecker.hasPermission(player, commandType.duration(), 2);
+    }
+
+    /**
+     * Check if player has permission to specify description for the given share type
+     */
+    public static boolean canSpecifyDescription(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+        Permissions.CommandType commandType = Permissions.getCommandTypeFromShareType(shareType);
+        return PermissionChecker.hasPermission(player, commandType.description(), 1);
     }
 
     public static ServerPlayerEntity getSenderPlayer(CommandContext<ServerCommandSource> ctx) {
@@ -360,7 +386,7 @@ public class ShareCommandUtils {
                 .append(Text.literal(shareId).formatted(Formatting.YELLOW)
                         .styled(style -> style
                                 .withClickEvent(TextEventFactory.copyToClipboard(shareId))
-                                .withHoverEvent(TextEventFactory.copyIdTooltip())))
+                                .withHoverEvent(TextEventFactory.showText("Copy ID"))))
                 .append(Text.literal("  "));
     }
 

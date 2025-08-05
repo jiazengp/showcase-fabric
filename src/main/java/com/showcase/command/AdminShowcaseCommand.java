@@ -1,7 +1,7 @@
 package com.showcase.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.showcase.utils.PermissionChecker;
+import com.showcase.utils.permissions.PermissionChecker;
 import net.minecraft.server.command.ServerCommandSource;
 
 import static net.minecraft.server.command.CommandManager.literal;

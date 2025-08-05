@@ -8,7 +8,7 @@ import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
 import com.showcase.utils.*;
-import net.minecraft.entity.player.PlayerEntity;
+import com.showcase.utils.permissions.PermissionChecker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;

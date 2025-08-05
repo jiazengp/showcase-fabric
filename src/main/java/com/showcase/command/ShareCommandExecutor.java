@@ -11,6 +11,7 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.utils.*;
+import com.showcase.utils.ShareConstants;
 import com.showcase.utils.countdown.CountdownBossBar;
 import com.showcase.utils.countdown.CountdownBossBarManager;
 import com.showcase.utils.stats.StatUtils;
@@ -30,7 +31,7 @@ import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static com.showcase.command.ShareCommandUtils.*;
 import static com.showcase.command.ShowcaseCommand.*;
-import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.permissions.PermissionChecker.isOp;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 import static com.showcase.command.ShowcaseManager.ShareType.*;
@@ -54,36 +55,35 @@ public class ShareCommandExecutor {
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createItemShareCommand(boolean withSource) {
-        return createShareCommand("item", withSource, ShareCommandExecutor::shareItem);
+        return createShareCommand(ShareConstants.ITEM, withSource, ShareCommandExecutor::shareItem);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createStatsShareCommand(boolean withSource) {
-        return createShareCommand("stats", withSource, ShareCommandExecutor::shareStats);
+        return createShareCommand(ShareConstants.STATS, withSource, ShareCommandExecutor::shareStats);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createInventoryShareCommand(boolean withSource) {
-        return createShareCommand("inventory", withSource, ShareCommandExecutor::shareInventory);
+        return createShareCommand(ShareConstants.INVENTORY, withSource, ShareCommandExecutor::shareInventory);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createHotbarShareCommand(boolean withSource) {
-        return createShareCommand("hotbar", withSource, ShareCommandExecutor::shareHotbar);
+        return createShareCommand(ShareConstants.HOTBAR, withSource, ShareCommandExecutor::shareHotbar);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createEnderChestShareCommand(boolean withSource) {
-        return createShareCommand("ender_chest", withSource, ShareCommandExecutor::shareEnderChest);
+        return createShareCommand(ShareConstants.ENDER_CHEST, withSource, ShareCommandExecutor::shareEnderChest);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> createContainerShareCommand() {
-        return createSimpleShareCommand("container", ShareCommandExecutor::shareContainer);
+        return createSimpleShareCommand(ShareConstants.CONTAINER, ShareCommandExecutor::shareContainer);
     }
 
     public static LiteralArgumentBuilder<ServerCommandSource> shareMerchantShareCommand() {
-        return createSimpleShareCommand("merchant", ShareCommandExecutor::shareMerchant);
+        return createSimpleShareCommand(ShareConstants.MERCHANT, ShareCommandExecutor::shareMerchant);
     }
 
-
     public static LiteralArgumentBuilder<ServerCommandSource> createCancelCommand() {
-        return literal("cancel")
+        return literal(ShareConstants.CANCEL)
                 .then(argument("id", string())
                         .suggests((ctx, builder) -> {
                             ServerPlayerEntity player = getSenderPlayer(ctx);
@@ -166,6 +166,22 @@ public class ShareCommandExecutor {
             ServerPlayerEntity sender = getSenderPlayer(ctx);
             if (sender == null) return 0;
             if (ShowcaseManager.isOnCooldown(sender, type)) return 0;
+
+            // Check sub-permissions for optional parameters
+            if (receivers != null && !ShareCommandUtils.canSpecifyReceivers(sender, type)) {
+                sender.sendMessage(TextUtils.error(Text.translatable("showcase.command.no_permission.receivers")));
+                return 0;
+            }
+            
+            if (duration != null && !ShareCommandUtils.canSpecifyDuration(sender, type)) {
+                sender.sendMessage(TextUtils.error(Text.translatable("showcase.command.no_permission.duration")));
+                return 0;
+            }
+            
+            if (description != null && !description.isEmpty() && !ShareCommandUtils.canSpecifyDescription(sender, type)) {
+                sender.sendMessage(TextUtils.error(Text.translatable("showcase.command.no_permission.description")));
+                return 0;
+            }
 
             ServerPlayerEntity source = getSourceOrSender(ctx);
             ItemStack stack = ItemStack.EMPTY;
