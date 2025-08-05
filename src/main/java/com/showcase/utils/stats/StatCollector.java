@@ -1,5 +1,7 @@
 package com.showcase.utils.stats;
 
+import com.showcase.utils.minecraft.BlockCategoryCache;
+import com.showcase.utils.minecraft.BlockCategoryRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -98,8 +100,8 @@ public class StatCollector implements StatAPI {
                 int placed = statHandler.getStat(Stats.USED, blockItem);
                 if (placed > 0) {
                     totalBlocksPlaced += placed;
-                    var category = com.showcase.utils.BlockCategories.getBlockCategory(block);
-                    String categoryKey = com.showcase.utils.BlockCategories.getCategoryTranslationKey(category);
+                    var category = BlockCategoryCache.getCachedCategory(blockItem);
+                    String categoryKey = BlockCategoryRegistry.getTranslationKey(category);
                     placedByCategory.merge(categoryKey + ".placed", placed, Integer::sum);
                 }
             }
@@ -107,9 +109,11 @@ public class StatCollector implements StatAPI {
             int broken = statHandler.getStat(Stats.MINED, block);
             if (broken > 0) {
                 totalBlocksBroken += broken;
-                var category = com.showcase.utils.BlockCategories.getBlockCategory(block);
-                String categoryKey = com.showcase.utils.BlockCategories.getCategoryTranslationKey(category);
-                brokenByCategory.merge(categoryKey + ".broken", broken, Integer::sum);
+                if (blockItem != null) {
+                    var category = BlockCategoryCache.getCachedCategory(blockItem);
+                    String categoryKey = BlockCategoryRegistry.getTranslationKey(category);
+                    brokenByCategory.merge(categoryKey + ".broken", broken, Integer::sum);
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 package com.showcase.gametest;
 
-import com.showcase.utils.BlockCategories;
+import com.showcase.utils.minecraft.BlockCategoryCache;
+import com.showcase.utils.minecraft.BlockCategoryRegistry;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -86,67 +87,85 @@ public class BlockCategoriesGameTest {
     
     private void testCategoryGroup(TestContext context, RegistryKey<ItemGroup> expectedCategory, String categoryName, List<Block> blocks) {
         for (Block block : blocks) {
-            RegistryKey<ItemGroup> actualCategory = BlockCategories.getBlockCategory(block);
-            context.assertTrue(
-                actualCategory.equals(expectedCategory),
-                Text.of(String.format("%s should be categorized as %s, but got: %s", 
-                    block.getTranslationKey(), categoryName, actualCategory))
-            );
+            var blockItem = block.asItem();
+            if (blockItem != null) {
+                RegistryKey<ItemGroup> actualCategory = BlockCategoryCache.getCachedCategory(blockItem);
+                context.assertTrue(
+                    actualCategory.equals(expectedCategory),
+                    Text.of(String.format("%s should be categorized as %s, but got: %s", 
+                        block.getTranslationKey(), categoryName, actualCategory))
+                );
+            }
         }
     }
     
     private void testEdgeCases(TestContext context) {
         // Test that bedrock is categorized as NATURAL
-        RegistryKey<ItemGroup> bedrockCategory = BlockCategories.getBlockCategory(Blocks.BEDROCK);
-        context.assertTrue(
-            bedrockCategory.equals(ItemGroups.NATURAL),
-            Text.of("Bedrock should be categorized as NATURAL, but got: " + bedrockCategory)
-        );
+        var bedrockItem = Blocks.BEDROCK.asItem();
+        if (bedrockItem != null) {
+            RegistryKey<ItemGroup> bedrockCategory = BlockCategoryCache.getCachedCategory(bedrockItem);
+            context.assertTrue(
+                bedrockCategory.equals(ItemGroups.NATURAL),
+                Text.of("Bedrock should be categorized as NATURAL, but got: " + bedrockCategory)
+            );
+        }
 
         // Test that air gets default category
-        RegistryKey<ItemGroup> airCategory = BlockCategories.getBlockCategory(Blocks.AIR);
-        context.assertTrue(
-            airCategory.equals(ItemGroups.BUILDING_BLOCKS),
-            Text.of("Air should get default category BUILDING_BLOCKS, but got: " + airCategory)
-        );
+        var airItem = Blocks.AIR.asItem();
+        if (airItem != null) {
+            RegistryKey<ItemGroup> airCategory = BlockCategoryCache.getCachedCategory(airItem);
+            context.assertTrue(
+                airCategory.equals(ItemGroups.BUILDING_BLOCKS),
+                Text.of("Air should get default category BUILDING_BLOCKS, but got: " + airCategory)
+            );
+        }
     }
     
     private void testCategorizationConsistency(TestContext context) {
         // Test that categorization is consistent across multiple calls
-        RegistryKey<ItemGroup> firstCall = BlockCategories.getBlockCategory(Blocks.DIAMOND_BLOCK);
-        RegistryKey<ItemGroup> secondCall = BlockCategories.getBlockCategory(Blocks.DIAMOND_BLOCK);
-        
-        context.assertTrue(
-            firstCall.equals(secondCall),
-            Text.of("Block categorization should be consistent across calls")
-        );
+        var diamondBlockItem = Blocks.DIAMOND_BLOCK.asItem();
+        if (diamondBlockItem != null) {
+            RegistryKey<ItemGroup> firstCall = BlockCategoryCache.getCachedCategory(diamondBlockItem);
+            RegistryKey<ItemGroup> secondCall = BlockCategoryCache.getCachedCategory(diamondBlockItem);
+            
+            context.assertTrue(
+                firstCall.equals(secondCall),
+                Text.of("Block categorization should be consistent across calls")
+            );
+        }
 
         // Test multiple blocks of the same expected category
-        RegistryKey<ItemGroup> redWool = BlockCategories.getBlockCategory(Blocks.RED_WOOL);
-        RegistryKey<ItemGroup> blueWool = BlockCategories.getBlockCategory(Blocks.BLUE_WOOL);
-        RegistryKey<ItemGroup> greenWool = BlockCategories.getBlockCategory(Blocks.GREEN_WOOL);
+        var redWoolItem = Blocks.RED_WOOL.asItem();
+        var blueWoolItem = Blocks.BLUE_WOOL.asItem();
+        var greenWoolItem = Blocks.GREEN_WOOL.asItem();
+        
+        if (redWoolItem != null && blueWoolItem != null && greenWoolItem != null) {
+            RegistryKey<ItemGroup> redWool = BlockCategoryCache.getCachedCategory(redWoolItem);
+            RegistryKey<ItemGroup> blueWool = BlockCategoryCache.getCachedCategory(blueWoolItem);
+            RegistryKey<ItemGroup> greenWool = BlockCategoryCache.getCachedCategory(greenWoolItem);
 
-        context.assertTrue(
-            redWool.equals(blueWool) && blueWool.equals(greenWool),
-            Text.of("All colored wool should have the same category")
-        );
+            context.assertTrue(
+                redWool.equals(blueWool) && blueWool.equals(greenWool),
+                Text.of("All colored wool should have the same category")
+            );
+        }
     }
     
     private void testTranslationKeys(TestContext context) {
         // Test critical translation keys
-        String buildingKey = BlockCategories.getCategoryTranslationKey(ItemGroups.BUILDING_BLOCKS);
+        String buildingKey = BlockCategoryRegistry.getTranslationKey(ItemGroups.BUILDING_BLOCKS);
         context.assertTrue(
             "showcase.stats.block.building_blocks".equals(buildingKey),
             Text.of("Building blocks translation key should be 'showcase.stats.block.building_blocks', but got: " + buildingKey)
         );
 
-        String coloredKey = BlockCategories.getCategoryTranslationKey(ItemGroups.COLORED_BLOCKS);
+        String coloredKey = BlockCategoryRegistry.getTranslationKey(ItemGroups.COLORED_BLOCKS);
         context.assertTrue(
             "showcase.stats.block.colored_blocks".equals(coloredKey),
             Text.of("Colored blocks translation key should be 'showcase.stats.block.colored_blocks', but got: " + coloredKey)
         );
 
-        String naturalKey = BlockCategories.getCategoryTranslationKey(ItemGroups.NATURAL);
+        String naturalKey = BlockCategoryRegistry.getTranslationKey(ItemGroups.NATURAL);
         context.assertTrue(
             "showcase.stats.block.natural_blocks".equals(naturalKey),
             Text.of("Natural blocks translation key should be 'showcase.stats.block.natural_blocks', but got: " + naturalKey)
