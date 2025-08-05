@@ -2,7 +2,8 @@ package com.showcase.listener;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
-import com.showcase.utils.PermissionChecker;
+import com.showcase.utils.permissions.PermissionChecker;
+import com.showcase.utils.permissions.Permissions;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
@@ -12,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import static com.showcase.listener.ChatKeywordHandler.getSupportedPlaceholders;
-import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.permissions.PermissionChecker.isOp;
 
 public class ChatMessageListener {
     private static ChatKeywordHandler keywordHandler;
@@ -34,7 +35,7 @@ public class ChatMessageListener {
             ShowcaseMod.LOGGER.warn("ChatKeywordHandler not initialized; skipping placeholder processing.");
             return true;
         }
-        if (!PermissionChecker.hasPermission(sender, "chat.placeholder", 1)) return true;
+        if (!PermissionChecker.hasPermission(sender, Permissions.Chat.PLACEHOLDER, 1)) return true;
         if (message.getContent().getString().length() >= 100 && !isOp(sender)) return true;
 
         String originalText = message.getContent().getString();

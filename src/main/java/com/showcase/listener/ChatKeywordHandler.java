@@ -5,7 +5,8 @@ import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfig;
 import com.showcase.config.ModConfigManager;
 import com.showcase.placeholders.Placeholders;
-import com.showcase.utils.PermissionChecker;
+import com.showcase.utils.permissions.PermissionChecker;
+import com.showcase.utils.permissions.Permissions;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
@@ -14,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.permissions.PermissionChecker.isOp;
 
 public class ChatKeywordHandler {
     private final ModConfig config;
@@ -132,7 +133,9 @@ public class ChatKeywordHandler {
     private boolean hasPermission(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
         ModConfig.ShareSettings settings = config.shareSettings.get(shareType);
         return settings != null &&
-                PermissionChecker.hasPermission(player, shareType.name().toLowerCase(Locale.ROOT), settings.defaultPermission);
+                PermissionChecker.hasPermission(player, 
+                    Permissions.getCommandTypeFromShareType(shareType).getPermission(), 
+                    settings.defaultPermission);
     }
 
     public Map<ShowcaseManager.ShareType, List<String>> getSupportedKeywords() {

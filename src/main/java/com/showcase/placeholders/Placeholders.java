@@ -1,10 +1,11 @@
 package com.showcase.placeholders;
 
-import com.showcase.ShowcaseMod;
 import com.showcase.command.ShareCommandUtils;
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
-import com.showcase.utils.PermissionChecker;
+import com.showcase.utils.permissions.PermissionChecker;
+import com.showcase.utils.permissions.Permissions;
+import com.showcase.utils.ShareConstants;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
 import com.showcase.utils.stats.StatUtils;
@@ -22,14 +23,14 @@ import net.minecraft.util.Identifier;
 
 import java.util.function.Function;
 
-import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.permissions.PermissionChecker.isOp;
 
 public class Placeholders {
-    public static final Identifier INVENTORY = Identifier.of(ShowcaseMod.MOD_ID, "inventory");
-    public static final Identifier HOTBAR = Identifier.of(ShowcaseMod.MOD_ID, "hotbar");
-    public static final Identifier ITEM = Identifier.of(ShowcaseMod.MOD_ID, "item");
-    public static final Identifier ENDER_CHEST = Identifier.of(ShowcaseMod.MOD_ID, "ender_chest");
-    public static final Identifier STATS = Identifier.of(ShowcaseMod.MOD_ID, "stats");
+    public static final Identifier INVENTORY = ShareConstants.PlaceholderIds.INVENTORY;
+    public static final Identifier HOTBAR = ShareConstants.PlaceholderIds.HOTBAR;
+    public static final Identifier ITEM = ShareConstants.PlaceholderIds.ITEM;
+    public static final Identifier ENDER_CHEST = ShareConstants.PlaceholderIds.ENDER_CHEST;
+    public static final Identifier STATS = ShareConstants.PlaceholderIds.STATS;
 
     private static final String NO_PERMISSION = "You don't have permission to use this placeholder!";
     private static final String ON_COOLDOWN = "You have reached the usage limit. Please try again later.";
@@ -77,28 +78,28 @@ public class Placeholders {
     }
 
     public static void registerPlaceholders() {
-        registerPlaceholder(INVENTORY, ShowcaseManager.ShareType.INVENTORY, "chat.placeholder.inventory",
+        registerPlaceholder(INVENTORY, ShowcaseManager.ShareType.INVENTORY, Permissions.Chat.Placeholder.INVENTORY,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.INVENTORY,
                         TextUtils.INVENTORY,
                         ShowcaseManager.createInventoryShare(shareData.player, shareData.duration, null)
                 ));
 
-        registerPlaceholder(HOTBAR, ShowcaseManager.ShareType.HOTBAR, "chat.placeholder.hotbar",
+        registerPlaceholder(HOTBAR, ShowcaseManager.ShareType.HOTBAR, Permissions.Chat.Placeholder.HOTBAR,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.HOTBAR,
                         TextUtils.HOTBAR,
                         ShowcaseManager.createHotbarShare(shareData.player, shareData.duration, null)
                 ));
 
-        registerPlaceholder(ENDER_CHEST, ShowcaseManager.ShareType.ENDER_CHEST, "chat.placeholder.ender_chest",
+        registerPlaceholder(ENDER_CHEST, ShowcaseManager.ShareType.ENDER_CHEST, Permissions.Chat.Placeholder.ENDERCHEST,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.ENDER_CHEST,
                         TextUtils.ENDER_CHEST,
                         ShowcaseManager.createEnderChestShare(shareData.player, shareData.duration, null)
                 ));
 
-        registerPlaceholder(STATS, ShowcaseManager.ShareType.STATS, "chat.placeholder.stat",
+        registerPlaceholder(STATS, ShowcaseManager.ShareType.STATS, Permissions.Chat.Placeholder.STATS,
                 (shareData) -> {
                     ItemStack stack = StatUtils.createStatsBook(shareData.player);
                     if (stack.isEmpty()) {
@@ -111,7 +112,7 @@ public class Placeholders {
                     );
                 });
 
-        registerPlaceholder(ITEM, ShowcaseManager.ShareType.ITEM, "chat.placeholder.item",
+        registerPlaceholder(ITEM, ShowcaseManager.ShareType.ITEM, Permissions.Chat.Placeholder.ITEM,
                 (shareData) -> {
                     ItemStack stack = shareData.player.getEquippedStack(EquipmentSlot.MAINHAND);
                     if (stack.isEmpty()) {
