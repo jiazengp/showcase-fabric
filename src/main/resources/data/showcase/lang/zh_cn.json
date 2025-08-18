@@ -31,6 +31,7 @@
   "showcase.screen.item_title": "§r%s的%s",
   "showcase.screen.container_title": "§r%s展示的%s",
   "showcase.screen.merchant_title": "§r%s展示的%s交易面板",
+  "showcase.screen.player_level": "§r等级 %d",
 
   "showcase.message.default.inventory": "§r%s 展示了%s",
   "showcase.message.default.ender_chest": "§r%s 展示了%s",

@@ -30,6 +30,7 @@
   "showcase.screen.item_title": "§r%s's %s",
   "showcase.screen.container_title": "§r%s's showcased %s",
   "showcase.screen.merchant_title": "§r%s's showcased %s trading",
+  "showcase.screen.player_level": "§rLevel %d",
   "showcase.message.default.inventory": "§r%s I showcased my %s",
   "showcase.message.default.ender_chest": "§r%s I showcased my %s",
   "showcase.message.default.hotbar": "§r%s I showcased my %s",

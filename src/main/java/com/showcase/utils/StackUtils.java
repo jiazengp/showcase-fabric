@@ -134,15 +134,21 @@ public class StackUtils {
         ItemStack playerHead = StackUtils.getPlayerHead(player);
 
         inv.setStack(0, playerHead.copy());
-        inv.setStack(1, DIVIDER_ITEM.copy());
-        inv.setStack(2, player.getEquippedStack(EquipmentSlot.HEAD).copy());
-        inv.setStack(3, player.getEquippedStack(EquipmentSlot.CHEST).copy());
-        inv.setStack(4, player.getEquippedStack(EquipmentSlot.LEGS).copy());
-        inv.setStack(5, player.getEquippedStack(EquipmentSlot.FEET).copy());
-        inv.setStack(6, DIVIDER_ITEM.copy());
-        inv.setStack(7, player.getEquippedStack(EquipmentSlot.OFFHAND).copy());
+        
+        // Add experience bottle with player's level
+        ItemStack experienceBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
+        experienceBottle.set(DataComponentTypes.CUSTOM_NAME, 
+            Text.translatable("showcase.screen.player_level", player.experienceLevel));
+        inv.setStack(1, experienceBottle);
+        
+        inv.setStack(2, DIVIDER_ITEM.copy());
+        inv.setStack(3, player.getEquippedStack(EquipmentSlot.HEAD).copy());
+        inv.setStack(4, player.getEquippedStack(EquipmentSlot.CHEST).copy());
+        inv.setStack(5, player.getEquippedStack(EquipmentSlot.LEGS).copy());
+        inv.setStack(6, player.getEquippedStack(EquipmentSlot.FEET).copy());
+        inv.setStack(7, DIVIDER_ITEM.copy());
+        inv.setStack(8, player.getEquippedStack(EquipmentSlot.OFFHAND).copy());
 
-        for (int i = 8; i < 9; i++) inv.setStack(i, DIVIDER_ITEM.copy());
         for (int i = 0; i < 9; i++) inv.setStack(i + 9, player.getInventory().getStack(i).copy());
         for (int i = 18; i < 27; i++) inv.setStack(i, DIVIDER_ITEM.copy());
         for (int i = 9; i < 36; i++) inv.setStack(i + 18, player.getInventory().getStack(i).copy());
