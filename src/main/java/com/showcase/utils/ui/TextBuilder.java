@@ -8,10 +8,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * Unified text creation utility that combines functionality from TextUtils and TextEventFactory
@@ -99,7 +96,7 @@ public final class TextBuilder {
     }
 
     public static HoverEvent showItem(ItemStack itemStack) {
-        return new HoverEvent.ShowItem(itemStack);
+        return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(itemStack));
     }
     /**
      * Creates info text from translation key
@@ -162,7 +159,7 @@ public final class TextBuilder {
      * @return clickable command text
      */
     public static MutableText runCommand(Text text, String command) {
-        return clickable(text,new ClickEvent.RunCommand("/" + command));
+        return clickable(text, new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command));
     }
     
     /**
@@ -172,7 +169,7 @@ public final class TextBuilder {
      * @return clickable suggestion text
      */
     public static MutableText suggestCommand(Text text, String command) {
-        return clickable(text, new ClickEvent.SuggestCommand("/" + command));
+        return clickable(text, new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + command));
     }
     
     /**
@@ -182,7 +179,7 @@ public final class TextBuilder {
      * @return clickable URL text
      */
     public static MutableText url(Text text, String url) throws URISyntaxException {
-        return clickable(text, new ClickEvent.OpenUrl(new URI(url)));
+        return clickable(text, new ClickEvent(ClickEvent.Action.OPEN_URL, url));
     }
     
     /**
@@ -192,7 +189,7 @@ public final class TextBuilder {
      * @return text with hover event
      */
     public static MutableText withTooltip(Text text, Text tooltip) {
-        return text.copy().styled(style -> style.withHoverEvent(new HoverEvent.ShowText(tooltip)));
+        return text.copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip)));
     }
     
     // Builder pattern for complex text construction
@@ -247,19 +244,19 @@ public final class TextBuilder {
         }
         
         public TextComponentBuilder runCommand(String command) {
-            return click(new ClickEvent.RunCommand("/" + command));
+            return click(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command));
         }
         
         public TextComponentBuilder suggestCommand(String command) {
-            return click(new ClickEvent.SuggestCommand("/" + command));
+            return click(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + command));
         }
         
         public TextComponentBuilder url(String url) throws URISyntaxException {
-            return click(new ClickEvent.OpenUrl(new URI(url)));
+            return click(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         }
         
         public TextComponentBuilder tooltip(Text tooltip) {
-            return hover(new HoverEvent.ShowText(tooltip));
+            return hover(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip));
         }
         
         public TextComponentBuilder append(Text other) {

@@ -28,7 +28,7 @@ public final class MerchantContext {
 
     public MerchantContext(VillagerEntity villager) {
         this.offers = villager.getOffers() != null ? villager.getOffers() : new TradeOfferList();
-        this.level = villager.getVillagerData().level();
+        this.level = villager.getVillagerData().getLevel();
         this.experience = villager.getExperience();
         this.isLeveled = true;
         this.displayName = villager.getDisplayName() != null ? villager.getDisplayName() : Text.empty();

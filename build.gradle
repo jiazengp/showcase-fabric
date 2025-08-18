@@ -24,13 +24,13 @@ loom {
 	serverOnlyMinecraftJar()
 }
 
-fabricApi {
-	configureTests {
-		createSourceSet = true
-		modId = "fabric-docs-reference-test-${project.name}"
-		eula = true
-	}
-}
+//fabricApi {
+//	configureTests {
+//		createSourceSet = true
+//		modId = "fabric-docs-reference-test-${project.name}"
+//		eula = true
+//	}
+//}
 
 repositories {
 	mavenCentral()
