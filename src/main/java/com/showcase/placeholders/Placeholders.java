@@ -23,6 +23,7 @@ import net.minecraft.util.Identifier;
 import java.util.function.Function;
 
 import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.Permissions.*;
 
 public class Placeholders {
     public static final Identifier INVENTORY = Identifier.of(ShowcaseMod.MOD_ID, "inventory");
@@ -64,10 +65,9 @@ public class Placeholders {
         if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
         
         int duration = getDurationFromSimpleArguments(arg, player);
-        if (duration == -1) return PlaceholderResult.invalid(INVALID_DURATION);
         
-        if (!PermissionChecker.hasPermission(player, permission,
-                ModConfigManager.getShareSettings(shareType).defaultPermission))
+        var settings = ModConfigManager.getShareSettings(shareType);
+        if (settings == null || !PermissionChecker.hasPermission(player, permission, settings.defaultPermission))
             return PlaceholderResult.invalid(NO_PERMISSION);
         
         if (ShowcaseManager.isOnCooldown(player, shareType))
@@ -77,28 +77,28 @@ public class Placeholders {
     }
 
     public static void registerPlaceholders() {
-        registerPlaceholder(INVENTORY, ShowcaseManager.ShareType.INVENTORY, "chat.placeholder.inventory",
+        registerPlaceholder(INVENTORY, ShowcaseManager.ShareType.INVENTORY, COMMANDS_INVENTORY,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.INVENTORY,
                         TextUtils.INVENTORY,
                         ShowcaseManager.createInventoryShare(shareData.player, shareData.duration, null)
                 ));
 
-        registerPlaceholder(HOTBAR, ShowcaseManager.ShareType.HOTBAR, "chat.placeholder.hotbar",
+        registerPlaceholder(HOTBAR, ShowcaseManager.ShareType.HOTBAR, COMMANDS_HOTBAR,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.HOTBAR,
                         TextUtils.HOTBAR,
                         ShowcaseManager.createHotbarShare(shareData.player, shareData.duration, null)
                 ));
 
-        registerPlaceholder(ENDER_CHEST, ShowcaseManager.ShareType.ENDER_CHEST, "chat.placeholder.ender_chest",
+        registerPlaceholder(ENDER_CHEST, ShowcaseManager.ShareType.ENDER_CHEST, COMMANDS_ENDER_CHEST,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.ENDER_CHEST,
                         TextUtils.ENDER_CHEST,
                         ShowcaseManager.createEnderChestShare(shareData.player, shareData.duration, null)
                 ));
 
-        registerPlaceholder(STATS, ShowcaseManager.ShareType.STATS, "chat.placeholder.stat",
+        registerPlaceholder(STATS, ShowcaseManager.ShareType.STATS, COMMANDS_STATS,
                 (shareData) -> {
                     ItemStack stack = StatUtils.createStatsBook(shareData.player);
                     if (stack.isEmpty()) {
@@ -111,7 +111,7 @@ public class Placeholders {
                     );
                 });
 
-        registerPlaceholder(ITEM, ShowcaseManager.ShareType.ITEM, "chat.placeholder.item",
+        registerPlaceholder(ITEM, ShowcaseManager.ShareType.ITEM, COMMANDS_ITEM,
                 (shareData) -> {
                     ItemStack stack = shareData.player.getEquippedStack(EquipmentSlot.MAINHAND);
                     if (stack.isEmpty()) {
@@ -161,11 +161,19 @@ public class Placeholders {
     private static int getDurationFromSimpleArguments(String arg, ServerPlayerEntity player) {
         int inputDuration = SimpleArguments.intNumber(arg, ModConfigManager.getShareLinkDefaultExpiry());
 
-        if (isOp(player) && inputDuration > 0) {
-            return inputDuration;
+        if (isOp(player)) {
+            return inputDuration > 0 ? inputDuration : ModConfigManager.getShareLinkDefaultExpiry();
         }
-        if (inputDuration < ModConfigManager.getShareLinkMinExpiry() || inputDuration >ModConfigManager.getShareLinkDefaultExpiry()) {
-            return -1;
+        if (inputDuration <= 0) {
+            return ModConfigManager.getShareLinkDefaultExpiry();
+        }
+        
+        if (inputDuration < ModConfigManager.getShareLinkMinExpiry()) {
+            return ModConfigManager.getShareLinkMinExpiry();
+        }
+        
+        if (inputDuration > ModConfigManager.getShareLinkDefaultExpiry()) {
+            return ModConfigManager.getShareLinkDefaultExpiry();
         }
 
         return inputDuration;

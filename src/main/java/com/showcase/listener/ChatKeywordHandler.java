@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.Permissions.commands;
 
 public class ChatKeywordHandler {
     private final ModConfig config;
@@ -132,7 +133,7 @@ public class ChatKeywordHandler {
     private boolean hasPermission(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
         ModConfig.ShareSettings settings = config.shareSettings.get(shareType);
         return settings != null &&
-                PermissionChecker.hasPermission(player, shareType.name().toLowerCase(Locale.ROOT), settings.defaultPermission);
+                PermissionChecker.hasPermission(player, commands(shareType), settings.defaultPermission);
     }
 
     public Map<ShowcaseManager.ShareType, List<String>> getSupportedKeywords() {

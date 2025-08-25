@@ -5,6 +5,8 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import static com.showcase.utils.Permissions.ADMIN;
+
 public class PermissionChecker {
     public static boolean hasPermission(CommandSource ctx, String permission, int fallbackLevel) {
         return Permissions.check(ctx,ShowcaseMod.MOD_ID.toLowerCase() + "." + permission, fallbackLevel);
@@ -15,10 +17,10 @@ public class PermissionChecker {
     }
 
     public static boolean isOp(CommandSource ctx) {
-        return hasPermission(ctx, "admin", 4);
+        return hasPermission(ctx, ADMIN, 4);
     }
 
     public static boolean isOp(ServerPlayerEntity player) {
-        return hasPermission(player, "admin", 4);
+        return hasPermission(player, ADMIN, 4);
     }
 }

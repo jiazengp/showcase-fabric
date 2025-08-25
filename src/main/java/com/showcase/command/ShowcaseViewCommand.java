@@ -9,11 +9,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
+import static com.showcase.utils.Permissions.COMMANDS_VIEW;
 
 public class ShowcaseViewCommand {
         public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
             dispatcher.register(literal(command)
-                    .requires(ctx -> PermissionChecker.hasPermission(ctx, "commands.view", 0))
+                    .requires(ctx -> PermissionChecker.hasPermission(ctx, COMMANDS_VIEW, 0))
                     .then(argument("id", StringArgumentType.string())
                             .executes(ctx -> {
                                 ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();

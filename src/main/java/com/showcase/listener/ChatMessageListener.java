@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 
 import static com.showcase.listener.ChatKeywordHandler.getSupportedPlaceholders;
 import static com.showcase.utils.PermissionChecker.isOp;
+import static com.showcase.utils.Permissions.CHAT_PLACEHOLDER;
 
 public class ChatMessageListener {
     private static ChatKeywordHandler keywordHandler;
@@ -34,7 +35,7 @@ public class ChatMessageListener {
             ShowcaseMod.LOGGER.warn("ChatKeywordHandler not initialized; skipping placeholder processing.");
             return true;
         }
-        if (!PermissionChecker.hasPermission(sender, "chat.placeholder", 1)) return true;
+        if (!PermissionChecker.hasPermission(sender, CHAT_PLACEHOLDER, 1)) return true;
         if (message.getContent().getString().length() >= 100 && !isOp(sender)) return true;
 
         String originalText = message.getContent().getString();

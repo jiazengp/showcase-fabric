@@ -53,7 +53,19 @@ Players can type keywords in square brackets to quickly share content:
 - `[ender]` or `[ec]` - Share ender chest
 - `[stats]` or `[stat]` - Share statistics
 
+**Permission Nodes**: `showcase.chat.placeholder` and `showcase.commands.<type>`
+
 Example: `Check out my [item]!` → automatically replaced with clickable share link
+
+## 🛡️ Permissions
+
+### Main Permission Nodes
+
+- `showcase.commands.<type>` - Share specific content (item, inventory, etc.)
+- `showcase.chat.placeholder` - Use chat keywords `[item]`, `[inv]`, etc.
+- `showcase.admin` - Admin commands
+
+> **Note**: Some permission nodes register after first use.
 
 ## 🔌 Developer API
 
@@ -67,11 +79,13 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 %showcase:stats%       - Share statistics
 ```
 
+**Permissions**: `showcase.chat.placeholder` + `showcase.commands.<type>`
+
 ## ⚙️ Configuration
 
 Main configuration file: `config/showcase/config.yml` (YAML format)
 
-Customize share settings, keywords, cooldowns, and statistics display options. Language files are built into the mod for automatic localization.
+Language files are built into the mod for automatic localization.
 
 ## 📝 License
 
