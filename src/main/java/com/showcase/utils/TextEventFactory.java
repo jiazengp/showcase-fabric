@@ -20,7 +20,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent runCommand(String command) {
-        return new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + command);
+        return new ClickEvent.RunCommand("/" + command);
     }
     
     /**
@@ -29,7 +29,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent runFullCommand(String command) {
-        return new ClickEvent(ClickEvent.Action.RUN_COMMAND, command);
+        return new ClickEvent.RunCommand(command);
     }
     
     /**
@@ -38,7 +38,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent suggestCommand(String command) {
-        return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command);
+        return new ClickEvent.SuggestCommand(command);
     }
     
     /**
@@ -47,7 +47,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent openUrl(String url) {
-        return new ClickEvent(ClickEvent.Action.OPEN_URL, url);
+        return new ClickEvent.OpenUrl(URI.create(url));
     }
     
     /**
@@ -56,7 +56,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent openUrl(URI uri) {
-        return new ClickEvent(ClickEvent.Action.OPEN_URL, uri.toString());
+        return new ClickEvent.OpenUrl(uri);
     }
     
     /**
@@ -65,7 +65,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent copyToClipboard(String text) {
-        return new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, text);
+        return new ClickEvent.CopyToClipboard(text);
     }
 
     // HoverEvent factory methods
@@ -76,7 +76,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent showText(Text text) {
-        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, text);
+        return new HoverEvent.ShowText(text);
     }
     
     /**
@@ -85,7 +85,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent showText(String text) {
-        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(text));
+        return new HoverEvent.ShowText(Text.literal(text));
     }
     
     /**
@@ -94,7 +94,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent showItem(ItemStack itemStack) {
-        return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(itemStack));
+        return new HoverEvent.ShowItem(itemStack);
     }
 
     /**
