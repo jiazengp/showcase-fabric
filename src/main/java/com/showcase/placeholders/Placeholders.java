@@ -65,10 +65,9 @@ public class Placeholders {
         if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
         
         int duration = getDurationFromSimpleArguments(arg, player);
-        if (duration == -1) return PlaceholderResult.invalid(INVALID_DURATION);
         
-        if (!PermissionChecker.hasPermission(player, permission,
-                ModConfigManager.getShareSettings(shareType).defaultPermission))
+        var settings = ModConfigManager.getShareSettings(shareType);
+        if (settings == null || !PermissionChecker.hasPermission(player, permission, settings.defaultPermission))
             return PlaceholderResult.invalid(NO_PERMISSION);
         
         if (ShowcaseManager.isOnCooldown(player, shareType))
@@ -162,11 +161,20 @@ public class Placeholders {
     private static int getDurationFromSimpleArguments(String arg, ServerPlayerEntity player) {
         int inputDuration = SimpleArguments.intNumber(arg, ModConfigManager.getShareLinkDefaultExpiry());
 
-        if (isOp(player) && inputDuration > 0) {
-            return inputDuration;
+        if (isOp(player)) {
+            return inputDuration > 0 ? inputDuration : ModConfigManager.getShareLinkDefaultExpiry();
         }
-        if (inputDuration < ModConfigManager.getShareLinkMinExpiry() || inputDuration > ModConfigManager.getShareLinkDefaultExpiry()) {
-            return -1;
+        
+        if (inputDuration <= 0) {
+            return ModConfigManager.getShareLinkDefaultExpiry();
+        }
+        
+        if (inputDuration < ModConfigManager.getShareLinkMinExpiry()) {
+            return ModConfigManager.getShareLinkMinExpiry();
+        }
+        
+        if (inputDuration > ModConfigManager.getShareLinkDefaultExpiry()) {
+            return ModConfigManager.getShareLinkDefaultExpiry();
         }
 
         return inputDuration;

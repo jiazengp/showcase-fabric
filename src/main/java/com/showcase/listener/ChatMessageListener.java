@@ -35,7 +35,7 @@ public class ChatMessageListener {
             ShowcaseMod.LOGGER.warn("ChatKeywordHandler not initialized; skipping placeholder processing.");
             return true;
         }
-        if (!PermissionChecker.hasPermission(sender, Permissions.Chat.PLACEHOLDER, 1)) return true;
+        if (!PermissionChecker.hasPermission(sender, Permissions.Chat.PLACEHOLDER, 0)) return true;
         if (message.getContent().getString().length() >= 100 && !isOp(sender)) return true;
 
         String originalText = message.getContent().getString();
