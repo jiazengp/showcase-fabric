@@ -1,0 +1,204 @@
+name: Multi-Version Compatibility Test
+
+on:
+  pull_request:
+    branches: [ main, minor ]
+  push:
+    branches: [ main, minor ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      minecraft-versions: ${{ steps.get-versions.outputs.versions }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      
+      - name: get minecraft versions
+        id: get-versions
+        run: |
+          # Extract versions from version_properties directory
+          versions=$(find version_properties/ -name "*.properties" -exec basename {} .properties \; | jq -R -s -c 'split("\n")[:-1]')
+          echo "versions=$versions" >> $GITHUB_OUTPUT
+          echo "Found versions: $versions"
+
+  compatibility-test:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        minecraft-version: ${{ fromJson(needs.generate-matrix.outputs.minecraft-versions) }}
+      fail-fast: false
+    
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: setup jdk
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'microsoft'
+
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: verify version properties
+        run: |
+          if [ ! -f "version_properties/${{ matrix.minecraft-version }}.properties" ]; then
+            echo "ERROR: Properties file not found for Minecraft ${{ matrix.minecraft-version }}"
+            exit 1
+          fi
+          echo "✓ Properties file exists for Minecraft ${{ matrix.minecraft-version }}"
+
+      - name: validate version configuration
+        run: |
+          echo "Validating configuration for Minecraft ${{ matrix.minecraft-version }}..."
+          
+          # Check required properties exist
+          PROPS_FILE="version_properties/${{ matrix.minecraft-version }}.properties"
+          
+          required_props=("minecraft_version" "fabric_loader_version" "fabric_version" "yarn_mappings_version")
+          
+          for prop in "${required_props[@]}"; do
+            if ! grep -q "^${prop}=" "$PROPS_FILE"; then
+              echo "ERROR: Missing required property: $prop"
+              exit 1
+            fi
+            value=$(grep "^${prop}=" "$PROPS_FILE" | cut -d'=' -f2)
+            echo "✓ $prop = $value"
+          done
+
+      - name: test build configuration
+        run: |
+          echo "Testing build configuration for Minecraft ${{ matrix.minecraft-version }}..."
+          ./gradlew properties -PmcVer=${{ matrix.minecraft-version }} | grep -E "(version|minecraft_version|fabric)"
+
+      - name: build mod for version
+        run: |
+          echo "Building mod for Minecraft ${{ matrix.minecraft-version }}..."
+          ./gradlew build -PmcVer=${{ matrix.minecraft-version }}
+
+      - name: verify build artifacts
+        run: |
+          echo "Verifying build artifacts for Minecraft ${{ matrix.minecraft-version }}..."
+          
+          # Check JAR file exists
+          if ! ls build/libs/showcase-*+${{ matrix.minecraft-version }}.jar >/dev/null 2>&1; then
+            echo "ERROR: JAR file not found for Minecraft ${{ matrix.minecraft-version }}"
+            exit 1
+          fi
+          
+          # Check JAR file size (should be reasonable)
+          jar_file=$(ls build/libs/showcase-*+${{ matrix.minecraft-version }}.jar)
+          jar_size=$(stat -c%s "$jar_file")
+          
+          if [ "$jar_size" -lt 10000 ]; then
+            echo "ERROR: JAR file seems too small ($jar_size bytes)"
+            exit 1
+          fi
+          
+          echo "✓ JAR file created successfully: $(basename "$jar_file") ($jar_size bytes)"
+
+      - name: run compatibility tests
+        run: |
+          echo "Running compatibility tests for Minecraft ${{ matrix.minecraft-version }}..."
+          ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }}
+
+      - name: verify mod metadata
+        run: |
+          echo "Verifying mod metadata for Minecraft ${{ matrix.minecraft-version }}..."
+          
+          jar_file=$(ls build/libs/showcase-*+${{ matrix.minecraft-version }}.jar)
+          
+          # Extract and check fabric.mod.json
+          unzip -q "$jar_file" fabric.mod.json -d temp_extract/
+          
+          if [ ! -f "temp_extract/fabric.mod.json" ]; then
+            echo "ERROR: fabric.mod.json not found in JAR"
+            exit 1
+          fi
+          
+          # Verify mod metadata contains correct version info
+          if ! grep -q "${{ matrix.minecraft-version }}" temp_extract/fabric.mod.json; then
+            echo "ERROR: fabric.mod.json does not contain correct Minecraft version"
+            cat temp_extract/fabric.mod.json
+            exit 1
+          fi
+          
+          echo "✓ Mod metadata verified"
+          rm -rf temp_extract/
+
+      - name: store build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-test-${{ matrix.minecraft-version }}
+          path: |
+            build/libs/showcase-*+${{ matrix.minecraft-version }}.jar
+            build.properties
+          retention-days: 7
+
+      - name: store test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.minecraft-version }}
+          path: |
+            **/build/reports/
+            **/build/test-results/
+          retention-days: 14
+
+  compatibility-summary:
+    needs: [generate-matrix, compatibility-test]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Generate compatibility report
+        run: |
+          echo "# Multi-Version Compatibility Report" > compatibility-report.md
+          echo "" >> compatibility-report.md
+          echo "Build Status: ${{ needs.compatibility-test.result }}" >> compatibility-report.md
+          echo "" >> compatibility-report.md
+          echo "## Tested Versions" >> compatibility-report.md
+          
+          # Get versions dynamically from version_properties directory
+          for props_file in version_properties/*.properties; do
+            if [ -f "$props_file" ]; then
+              version=$(basename "$props_file" .properties)
+              if [ -d "artifacts/compatibility-test-$version" ]; then
+                echo "- ✅ Minecraft $version: Build successful" >> compatibility-report.md
+              else
+                echo "- ❌ Minecraft $version: Build failed" >> compatibility-report.md
+              fi
+            fi
+          done
+          
+          echo "" >> compatibility-report.md
+          echo "## Build Artifacts" >> compatibility-report.md
+          find artifacts/ -name "*.jar" -exec basename {} \; | sort >> compatibility-report.md
+          
+          cat compatibility-report.md
+
+      - name: Upload compatibility report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-report
+          path: compatibility-report.md
