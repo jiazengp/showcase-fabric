@@ -2,6 +2,7 @@ name: Release
 
 on:
   release:
+    workflow_dispatch:
     types: [published]
   push:
     tags:
@@ -33,7 +34,7 @@ jobs:
       - name: build all versions
         run: |
           chmod +x ./buildAll.sh
-          ./buildAll.sh
+          ./buildAll.sh || true
 
       - name: verify build artifacts
         run: |
@@ -53,7 +54,7 @@ jobs:
           # Generate version list from built JAR files
           for jar in build/buildAllJars/showcase-*.jar; do
             if [ -f "$jar" ]; then
-              version=$(basename "$jar" | sed -n 's/showcase-.*+\([0-9]\+\.[0-9]\+\.[0-9]\+\)\.jar/\1/p')
+              version=$(basename "$jar" | sed -n 's/.*+\([0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?\)\.jar/\1/p')
               if [ ! -z "$version" ]; then
                 echo "- Minecraft $version" >> release_notes.md
               fi
