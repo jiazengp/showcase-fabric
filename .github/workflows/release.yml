@@ -58,15 +58,20 @@ jobs:
           COMPATIBLE_VERSIONS_RAW=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} compatible_minecraft_versions)
           RELEASE_TYPE=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} release_type)
           
-          # Convert JSON array to comma-separated string for mc-publish
-          # Remove brackets and quotes, then replace spaces with nothing
-          COMPATIBLE_VERSIONS=$(echo "$COMPATIBLE_VERSIONS_RAW" | sed 's/\[//g' | sed 's/\]//g' | sed 's/"//g' | sed 's/ //g')
+          # Convert JSON array to multiline format for mc-publish
+          # Remove brackets and quotes, then replace commas with newlines
+          COMPATIBLE_VERSIONS=$(echo "$COMPATIBLE_VERSIONS_RAW" | sed 's/\[//g' | sed 's/\]//g' | sed 's/"//g' | sed 's/,/\n/g' | sed 's/^ *//g')
           
-          echo "compatible-versions=$COMPATIBLE_VERSIONS" >> $GITHUB_OUTPUT
+          # Set multiline output for GitHub Actions
+          echo "compatible-versions<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMPATIBLE_VERSIONS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
           echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
           
           echo "Minecraft ${{ matrix.mc_version }} compatible versions (raw): $COMPATIBLE_VERSIONS_RAW"
-          echo "Minecraft ${{ matrix.mc_version }} compatible versions (parsed): $COMPATIBLE_VERSIONS"
+          echo "Minecraft ${{ matrix.mc_version }} compatible versions (parsed):"
+          echo "$COMPATIBLE_VERSIONS"
           echo "Release type: $RELEASE_TYPE"
 
       - name: build for specific version
@@ -86,7 +91,7 @@ jobs:
         run: |
           # Create changelog that links to the repository CHANGELOG.md
           cat > version_changelog.md << EOF
-          ## Showcase v${{ github.ref_name }} for Minecraft ${{ matrix.mc_version }}
+          ## Showcase ${{ github.ref_name }} for Minecraft ${{ matrix.mc_version }}
           
           Compatible Minecraft versions: ${{ steps.version-props.outputs.compatible-versions }}
           
@@ -122,15 +127,16 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           
           # Project metadata - version specific
-          name: "Showcase v${{ github.ref_name }} (MC ${{ matrix.mc_version }})"
+          name: "Showcase ${{ github.ref_name }} (MC ${{ matrix.mc_version }})"
           version: "${{ github.ref_name }}+${{ matrix.mc_version }}"
           changelog-file: version_changelog.md
           
           # Files to publish - single version JAR
           files: build/libs/*.jar
           
-          # Specific game versions from properties
-          game-versions: ${{ steps.version-props.outputs.compatible-versions }}
+          # Specific game versions from properties (multiline format)
+          game-versions: |
+            ${{ steps.version-props.outputs.compatible-versions }}
           
           # Loader configuration
           loaders: fabric
