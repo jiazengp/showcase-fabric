@@ -1,5 +1,6 @@
 package com.showcase.utils;
 
+import com.showcase.utils.compat.TextEventCompat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -20,7 +21,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent runCommand(String command) {
-        return new ClickEvent.RunCommand("/" + command);
+        return TextEventCompat.runCommand("/" + command);
     }
     
     /**
@@ -29,7 +30,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent runFullCommand(String command) {
-        return new ClickEvent.RunCommand(command);
+        return TextEventCompat.runCommand(command);
     }
     
     /**
@@ -38,7 +39,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent suggestCommand(String command) {
-        return new ClickEvent.SuggestCommand(command);
+        return TextEventCompat.suggestCommand(command);
     }
     
     /**
@@ -47,7 +48,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent openUrl(String url) {
-        return new ClickEvent.OpenUrl(URI.create(url));
+        return TextEventCompat.openUrl(url);
     }
     
     /**
@@ -56,7 +57,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent openUrl(URI uri) {
-        return new ClickEvent.OpenUrl(uri);
+        return TextEventCompat.openUrl(uri);
     }
     
     /**
@@ -65,7 +66,7 @@ public class TextEventFactory {
      * @return ClickEvent instance
      */
     public static ClickEvent copyToClipboard(String text) {
-        return new ClickEvent.CopyToClipboard(text);
+        return TextEventCompat.copyToClipboard(text);
     }
 
     // HoverEvent factory methods
@@ -76,7 +77,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent showText(Text text) {
-        return new HoverEvent.ShowText(text);
+        return TextEventCompat.showText(text);
     }
     
     /**
@@ -85,7 +86,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent showText(String text) {
-        return new HoverEvent.ShowText(Text.literal(text));
+        return TextEventCompat.showText(text);
     }
     
     /**
@@ -94,7 +95,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent showItem(ItemStack itemStack) {
-        return new HoverEvent.ShowItem(itemStack);
+        return TextEventCompat.showItem(itemStack);
     }
 
     /**

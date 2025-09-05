@@ -7,8 +7,29 @@ name: build
 on: [pull_request, push]
 
 jobs:
-  build:
+  generate-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      minecraft-versions: ${{ steps.get-versions.outputs.versions }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      
+      - name: get minecraft versions
+        id: get-versions
+        run: |
+          # Extract versions from version_properties directory
+          versions=$(find version_properties/ -name "*.properties" -exec basename {} .properties \; | jq -R -s -c 'split("\n")[:-1]')
+          echo "versions=$versions" >> $GITHUB_OUTPUT
+          echo "Found versions: $versions"
+
+  build:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        minecraft-version: ${{ fromJson(needs.generate-matrix.outputs.minecraft-versions) }}
+      fail-fast: false
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
@@ -25,14 +46,14 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: build
-        run: ./gradlew build
+      - name: build for Minecraft ${{ matrix.minecraft-version }}
+        run: ./gradlew build -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Store reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: reports
+          name: reports-${{ matrix.minecraft-version }}
           path: |
             **/build/reports/
             **/build/test-results/
@@ -40,5 +61,5 @@ jobs:
       - name: capture build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Artifacts
+          name: Artifacts-${{ matrix.minecraft-version }}
           path: build/libs/

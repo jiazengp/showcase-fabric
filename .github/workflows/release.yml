@@ -30,12 +30,45 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: build
-        run: ./gradlew build
+      - name: build all versions
+        run: |
+          chmod +x ./buildAll.sh
+          ./buildAll.sh
 
-      - name: Upload to Release
+      - name: verify build artifacts
+        run: |
+          echo "Built JAR files:"
+          ls -la build/buildAllJars/*.jar
+          if [ ! -d "build/buildAllJars" ] || [ -z "$(ls -A build/buildAllJars/*.jar 2>/dev/null)" ]; then
+            echo "ERROR: No JAR files found in build/buildAllJars directory"
+            exit 1
+          fi
+
+      - name: Generate release notes
+        run: |
+          echo "## Multi-Version Release" > release_notes.md
+          echo "" >> release_notes.md
+          echo "This release supports the following Minecraft versions:" >> release_notes.md
+          
+          # Generate version list from built JAR files
+          for jar in build/buildAllJars/showcase-*.jar; do
+            if [ -f "$jar" ]; then
+              version=$(basename "$jar" | sed -n 's/showcase-.*+\([0-9]\+\.[0-9]\+\.[0-9]\+\)\.jar/\1/p')
+              if [ ! -z "$version" ]; then
+                echo "- Minecraft $version" >> release_notes.md
+              fi
+            fi
+          done
+          
+          echo "" >> release_notes.md
+          echo "Download the appropriate JAR file for your Minecraft version." >> release_notes.md
+          
+          cat release_notes.md
+
+      - name: Upload multi-version JARs to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/libs/*.jar
+          files: build/buildAllJars/*.jar
+          body_path: release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -10,7 +10,9 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import net.minecraft.component.DataComponentTypes;
+#if MC_VER >= 1212
 import net.minecraft.component.type.BundleContentsComponent;
+#endif
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -107,13 +109,14 @@ public class ContainerGui extends SimpleGui {
     }
 
     private static DefaultedList<ItemStack> getBundleContents(ItemStack bundle) {
+        DefaultedList<ItemStack> items = DefaultedList.of();
+        #if MC_VER >= 1212
         BundleContentsComponent bundleContents = bundle.get(DataComponentTypes.BUNDLE_CONTENTS);
         if (bundleContents != null) {
-            DefaultedList<ItemStack> items = DefaultedList.of();
             bundleContents.iterate().forEach(items::add);
-            return items;
         }
-        return DefaultedList.of();
+        #endif
+        return items;
     }
 
     private static ScreenHandlerType<?> getShulkerBoxContainerType() {

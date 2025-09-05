@@ -2,16 +2,72 @@ plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
+	id 'java'
+	id "systems.manifold.manifold-gradle-plugin" version "0.0.2-alpha"
 }
 
-def versionProperties = new Properties()
-def targetPropertiesFile = file("version_properties/${project.minecraft_version}.properties")
-
-if (targetPropertiesFile.exists()) {
-	targetPropertiesFile.withInputStream { versionProperties.load(it) }
+// Enhanced version properties loading with preprocessor support
+def loadVersionProperties() {
+	def mcVer = project.findProperty('mcVer') ?: project.findProperty('minecraft_version') ?: gradle.ext.mcVer
+	def targetPropertiesFile = file("version_properties/${mcVer}.properties")
+	
+	def versionProperties = new Properties()
+	if (targetPropertiesFile.exists()) {
+		targetPropertiesFile.withInputStream { versionProperties.load(it) }
+	} else {
+		throw new GradleException("Version properties file not found for Minecraft ${mcVer}")
+	}
+	
+	return versionProperties
 }
 
+def versionProperties = loadVersionProperties()
 def compatibleVersions = versionProperties.getProperty("minecraft_version")
+
+// Generate build.properties for preprocessor definitions (inspired by Fuji)
+def writeBuildGradlePredefine(Properties versionProps) {
+	def currentMcVer = versionProps.getProperty("minecraft_version")
+	def buildPropsFile = file("build.properties")
+	
+	StringBuilder sb = new StringBuilder()
+	sb.append("# Generated preprocessor definitions for Minecraft ${currentMcVer}\n")
+	sb.append("# Generated at: ${new Date()}\n")
+	sb.append("\n")
+	
+	// Generate version-specific flags
+	def mcMajor = versionProps.getProperty("mc_ver_major", "1")
+	def mcMinor = versionProps.getProperty("mc_ver_minor", "21") 
+	def mcPatch = versionProps.getProperty("mc_ver_patch", "4")
+	
+	// Version flags (MC_1_21_4=1, others=0)
+	sb.append("MC_VER=${mcMajor}${mcMinor}${mcPatch}\n")
+	sb.append("MC_${mcMajor}_${mcMinor}_${mcPatch}=1\n")
+	sb.append("MC_MAJOR=${mcMajor}\n")
+	sb.append("MC_MINOR=${mcMinor}\n") 
+	sb.append("MC_PATCH=${mcPatch}\n")
+	
+	// Set other version flags to 0 for conditional compilation
+	def availableVersions = gradle.ext.mcVers ?: []
+	availableVersions.each { version ->
+		if (version != currentMcVer) {
+			def parts = version.split('\\.')
+			if (parts.length >= 3) {
+				sb.append("MC_${parts[0]}_${parts[1]}_${parts[2]}=0\n")
+			}
+		}
+	}
+	
+	buildPropsFile.text = sb.toString()
+	println "Generated build.properties for Minecraft ${currentMcVer}"
+}
+
+// Generate preprocessor definitions before compilation
+writeBuildGradlePredefine(versionProperties)
+
+// Manifold preprocessor configuration
+manifold {
+	manifoldVersion = "2024.1.42"
+}
 
 base {
 	archivesName = project.archives_base_name
@@ -58,6 +114,10 @@ dependencies {
 	include(implementation("de.exlll:configlib-core:4.6.1"))
 	include(implementation("de.exlll:configlib-yaml:4.6.1"))
 	include(implementation("org.snakeyaml:snakeyaml-engine:2.8"))
+	
+	// Manifold preprocessor for version compatibility (inspired by Fuji)
+	annotationProcessor 'systems.manifold:manifold-preprocessor:2024.1.42'
+	testAnnotationProcessor 'systems.manifold:manifold-preprocessor:2024.1.42'
 
 	// Test dependencies
 	testImplementation "net.fabricmc:fabric-loader-junit:${versionProperties.getProperty("fabric_loader_version")}"
@@ -78,9 +138,13 @@ tasks.withType(JavaCompile).configureEach {
 processResources {
 	inputs.property "version", version
 	inputs.property "minecraft_version", versionProperties.getProperty("minecraft_version")
+	inputs.property "compatible_minecraft_versions", versionProperties.getProperty("compatible_minecraft_versions", "[]")
 	inputs.property "java_version", versionProperties.getProperty("java_version")
 	inputs.property "sgui_version", versionProperties.getProperty("sgui_api_version")
 	inputs.property "fabricloader_version", versionProperties.getProperty("fabric_loader_version")
+	inputs.property "mc_ver_major", versionProperties.getProperty("mc_ver_major", "1")
+	inputs.property "mc_ver_minor", versionProperties.getProperty("mc_ver_minor", "21")
+	inputs.property "mc_ver_patch", versionProperties.getProperty("mc_ver_patch", "4")
 	inputs.property "refmap_name", "showcase.mixins.refmap.json"
 
 	filesMatching("fabric.mod.json") {
@@ -88,9 +152,24 @@ processResources {
 				"version": version,
 				"java_version": versionProperties.getProperty("java_version"),
 				"minecraft_version": versionProperties.getProperty("minecraft_version"),
+				"compatible_minecraft_versions": versionProperties.getProperty("compatible_minecraft_versions", "[]"),
 				"sgui_api_version": versionProperties.getProperty("sgui_api_version"),
-				"fabric_loader_version": versionProperties.getProperty("fabric_loader_version")
+				"fabric_loader_version": versionProperties.getProperty("fabric_loader_version"),
+				"mc_ver_major": versionProperties.getProperty("mc_ver_major", "1"),
+				"mc_ver_minor": versionProperties.getProperty("mc_ver_minor", "21"),
+				"mc_ver_patch": versionProperties.getProperty("mc_ver_patch", "4")
 		)
+	}
+	
+	// Copy version-specific access widener if it exists
+	def accessWidenerVersion = versionProperties.getProperty("access_widener_version")
+	if (accessWidenerVersion) {
+		def sourceAccessWidener = file("src/main/resources/showcase_${accessWidenerVersion}.accesswidener")
+		if (sourceAccessWidener.exists()) {
+			from(sourceAccessWidener) {
+				rename { "showcase.accesswidener" }
+			}
+		}
 	}
 }
 
@@ -118,5 +197,43 @@ if (System.getenv("MODRINTH")) {
 
 	remapJar {
 		finalizedBy project.tasks.modrinth
+	}
+}
+
+// Task to list available Minecraft versions
+task listVersions {
+	group = 'showcase'
+	description = 'List all available Minecraft versions for building'
+	
+	doLast {
+		def versionPropertiesDir = file("version_properties")
+		def availableVersions = []
+		
+		if (versionPropertiesDir.exists()) {
+			versionPropertiesDir.listFiles().each { file ->
+				if (file.name.endsWith('.properties')) {
+					availableVersions.add(file.name.replace('.properties', ''))
+				}
+			}
+		}
+		
+		// Sort versions (newest first)
+		availableVersions.sort { a, b -> 
+			def aParts = a.split('\\.')
+			def bParts = b.split('\\.')
+			for (int i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+				int aNum = i < aParts.length ? Integer.parseInt(aParts[i]) : 0
+				int bNum = i < bParts.length ? Integer.parseInt(bParts[i]) : 0
+				if (aNum != bNum) return bNum - aNum
+			}
+			return 0
+		}
+		
+		println "Available Minecraft versions for building:"
+		availableVersions.each { version ->
+			println "  - ${version}"
+		}
+		println "\nTo build for a specific version: ./gradlew build -PmcVer=<version>"
+		println "To build for all versions: ./buildAll.sh (Linux/Mac) or buildAll.bat (Windows)"
 	}
 }

@@ -2,6 +2,7 @@ package com.showcase.gui;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.showcase.utils.compat.VillagerCompat;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -28,7 +29,7 @@ public final class MerchantContext {
 
     public MerchantContext(VillagerEntity villager) {
         this.offers = villager.getOffers() != null ? villager.getOffers() : new TradeOfferList();
-        this.level = villager.getVillagerData().level();
+        this.level = VillagerCompat.getLevel(villager.getVillagerData());
         this.experience = villager.getExperience();
         this.isLeveled = true;
         this.displayName = villager.getDisplayName() != null ? villager.getDisplayName() : Text.empty();

@@ -6,8 +6,28 @@ permissions:
   contents: read # to fetch code (actions/checkout)
 
 jobs:
-  test:
+  generate-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      minecraft-versions: ${{ steps.get-versions.outputs.versions }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: get minecraft versions
+        id: get-versions
+        run: |
+          # Extract versions from version_properties directory
+          versions=$(find version_properties/ -name "*.properties" -exec basename {} .properties \; | jq -R -s -c 'split("\n")[:-1]')
+          echo "versions=$versions" >> $GITHUB_OUTPUT
+          echo "Found versions: $versions"
+
+  test:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        minecraft-version: ${{ fromJson(needs.generate-matrix.outputs.minecraft-versions) }}
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
 
@@ -23,14 +43,17 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: GameTest
-        run: ./gradlew runGameTest
+      - name: GameTest for Minecraft ${{ matrix.minecraft-version }}
+        run: ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }}
+
+      - name: Unit Tests for Minecraft ${{ matrix.minecraft-version }}
+        run: ./gradlew test -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Store reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: reports
+          name: test-reports-${{ matrix.minecraft-version }}
           path: |
             **/build/reports/
             **/build/test-results/

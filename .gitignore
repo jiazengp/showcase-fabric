@@ -41,3 +41,4 @@ replay_*.log
 
 .locale.env
 /CLAUDE.md
+.claude

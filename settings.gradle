@@ -8,3 +8,57 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+
+// Enhanced version properties loading system inspired by Fuji
+def loadProperties() {
+	def versionPropertiesDir = file("version_properties")
+	def availableVersions = []
+	
+	if (versionPropertiesDir.exists()) {
+		versionPropertiesDir.listFiles().each { file ->
+			if (file.name.endsWith('.properties')) {
+				availableVersions.add(file.name.replace('.properties', ''))
+			}
+		}
+	}
+	
+	// Sort versions for consistent ordering
+	availableVersions.sort { a, b -> 
+		def aParts = a.split('\\.')
+		def bParts = b.split('\\.')
+		for (int i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+			int aNum = i < aParts.length ? Integer.parseInt(aParts[i]) : 0
+			int bNum = i < bParts.length ? Integer.parseInt(bParts[i]) : 0
+			if (aNum != bNum) return bNum - aNum // Reverse order (newest first)
+		}
+		return 0
+	}
+	
+	// Determine target Minecraft version
+	def targetMcVer = System.getProperty('mcVer') ?: System.getProperty('minecraft_version') ?: availableVersions[0]
+	
+	if (!targetMcVer) {
+		throw new GradleException("No Minecraft version specified and no version properties found")
+	}
+	
+	def propertiesFile = file("version_properties/${targetMcVer}.properties")
+	if (!propertiesFile.exists()) {
+		throw new GradleException("Version properties file not found for Minecraft ${targetMcVer}")
+	}
+	
+	// Load properties
+	def versionProperties = new Properties()
+	propertiesFile.withInputStream { versionProperties.load(it) }
+	
+	// Set gradle extension properties
+	gradle.ext.mcVer = targetMcVer
+	gradle.ext.mcVers = availableVersions
+	gradle.ext.mcIndex = availableVersions.indexOf(targetMcVer)
+	gradle.ext.versionProperties = versionProperties
+	
+	println "Loading version properties for Minecraft ${targetMcVer}"
+	println "Available versions: ${availableVersions.join(', ')}"
+}
+
+// Load properties during settings evaluation
+loadProperties()
