@@ -29,7 +29,7 @@ public class PlayerUtils {
     }
 
     public static MutableText getSafeDisplayName(MinecraftServer server, UUID uuid) {
-        if (server == null) return null;
+        if (server == null) return Text.translatable("argument.entity.notfound.player");
         ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
         if (player != null) return getSafeDisplayName(player);
         Optional<String> playerName = getPlayerNameFromUuid(server, uuid);

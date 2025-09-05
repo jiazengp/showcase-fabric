@@ -1,8 +1,11 @@
 package com.showcase.utils;
 
 import com.showcase.ShowcaseMod;
+import com.showcase.utils.ui.ItemIconProvider;
 import net.minecraft.component.DataComponentTypes;
+#if MC_VER >= 1212
 import net.minecraft.component.type.BundleContentsComponent;
+#endif
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.EquipmentSlot;
@@ -44,7 +47,12 @@ public class StackUtils {
     }
 
     public static boolean isBundle(ItemStack itemStack) {
+        #if MC_VER >= 1212
         return itemStack.isIn(ItemTags.BUNDLES);
+        #else
+        // Bundles don't exist in versions < 1.21.2
+        return false;
+        #endif
     }
 
     public static boolean isDivider(ItemStack s) {
@@ -75,7 +83,15 @@ public class StackUtils {
         }
 
         boolean isBook = StackUtils.isBook(stack);
+        
+        // Add icon prefix for items inside the brackets
+        MutableText iconPrefix = ItemIconProvider.getIconForItem(stack);
+        
         MutableText base = Text.literal(isBook ? "《" : "[");
+        
+        // Add icon inside the brackets/book markers, wrapped to preserve original style
+        MutableText iconWrapper = Text.empty().append(iconPrefix);
+        base.append(iconWrapper);
 
         Text displayName = stack.getName();
         Text translatedName = Text.translatable(stack.getItem().getTranslationKey());
@@ -102,8 +118,10 @@ public class StackUtils {
         Text itemName = StackUtils.getDisplayName(stack);
 
         if (StackUtils.isBundle(stack)) {
+            #if MC_VER >= 1212
             BundleContentsComponent bundle = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
             if (bundle != null) bundle.iterateCopy().forEach(tmp::add);
+            #endif
             int rows = Math.min(6, Math.max(1, (tmp.size() + 8) / 9));
             int size = rows * 9;
             ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, handlerTypeForRows(rows));

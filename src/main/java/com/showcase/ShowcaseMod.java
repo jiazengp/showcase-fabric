@@ -15,6 +15,7 @@ import com.showcase.utils.countdown.CountdownBossBarManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,9 @@ public class ShowcaseMod implements ModInitializer {
 			try {
 				Map<String, ShareEntry> data = GlobalDataManager.getData(server, PLAYER_SHARE_STORAGE_ID);
 				if (data != null) ShowcaseManager.register(data);
+				
+				// Check resource pack configuration for icon feature
+				ResourcePackChecker.checkResourcePackConfiguration(server);
 			} catch (Exception e) {
 				LOGGER.error("Failed to load showcase data", e);
 			}
@@ -70,7 +74,13 @@ public class ShowcaseMod implements ModInitializer {
 				LOGGER.error("Failed to save showcase data", e);
 			}
 			ShowcaseManager.clearAll();
+			ResourcePackChecker.reset();
 			LOGGER.info("Cleaned up shared items on server shutdown");
+		});
+
+		// Send resource pack warning to ops when they join
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			ResourcePackChecker.sendResourcePackWarningToPlayer(handler.getPlayer());
 		});
 
 		LOGGER.info("Showcase Mod initialized successfully!");

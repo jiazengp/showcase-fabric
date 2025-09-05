@@ -14,6 +14,7 @@ import com.showcase.utils.ModMetadataHolder;
 import com.showcase.utils.permissions.Permissions;
 import com.showcase.utils.TextUtils;
 import com.showcase.utils.TextEventFactory;
+import com.showcase.utils.ui.TextBuilder;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -80,11 +81,10 @@ public class ShowcaseManageCommand {
                     .append(Text.literal(": ").formatted(Formatting.GRAY));
 
             if (value.startsWith("https://")) {
-                line.append(Text.literal(value.replaceAll("https://", "")).styled(style -> style
-                        .withClickEvent(TextEventFactory.openUrl(value))
-                        .withUnderline(true)
-                        .withColor(Formatting.AQUA)
-                ));
+                line.append(TextBuilder.clickableWithConfig(
+                        Text.literal(value.replaceAll("https://", "")),
+                        TextEventFactory.openUrl(value)
+                ).styled(style -> style.withColor(Formatting.AQUA)));
             } else {
                 line.append(Text.literal(value).formatted(Formatting.WHITE));
             }

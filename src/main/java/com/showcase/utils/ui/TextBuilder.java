@@ -1,5 +1,7 @@
 package com.showcase.utils.ui;
 
+import com.showcase.config.ModConfigManager;
+import com.showcase.utils.compat.TextEventCompat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -96,7 +98,7 @@ public final class TextBuilder {
     }
 
     public static HoverEvent showItem(ItemStack itemStack) {
-        return new HoverEvent.ShowItem(itemStack);
+        return TextEventCompat.showItem(itemStack);
     }
     /**
      * Creates info text from translation key
@@ -138,6 +140,33 @@ public final class TextBuilder {
     public static MutableText clickable(Text text, ClickEvent clickEvent) {
         return text.copy().styled(style -> style.withClickEvent(clickEvent));
     }
+
+    /**
+     * Creates clickable text with a click event, optionally applying underline based on configuration
+     * @param text the text content
+     * @param clickEvent the click event
+     * @param applyUnderline whether to apply underline styling (respects config if true)
+     * @return clickable text with optional underline
+     */
+    public static MutableText clickableWithConfig(Text text, ClickEvent clickEvent, boolean applyUnderline) {
+        return text.copy().styled(style -> {
+            Style newStyle = style.withClickEvent(clickEvent);
+            if (applyUnderline && ModConfigManager.getConfig().shareLink.enableClickableTextUnderline) {
+                newStyle = newStyle.withUnderline(true);
+            }
+            return newStyle;
+        });
+    }
+
+    /**
+     * Creates clickable text with a click event, applying underline based on configuration
+     * @param text the text content
+     * @param clickEvent the click event
+     * @return clickable text with conditional underline
+     */
+    public static MutableText clickableWithConfig(Text text, ClickEvent clickEvent) {
+        return clickableWithConfig(text, clickEvent, true);
+    }
     
     /**
      * Creates clickable text with hover and click events
@@ -151,6 +180,35 @@ public final class TextBuilder {
                 .withClickEvent(clickEvent)
                 .withHoverEvent(hoverEvent));
     }
+
+    /**
+     * Creates interactive text with hover and click events, applying underline based on configuration
+     * @param text the text content
+     * @param clickEvent the click event
+     * @param hoverEvent the hover event
+     * @param applyUnderline whether to apply underline styling (respects config if true)
+     * @return interactive text with both events and optional underline
+     */
+    public static MutableText interactiveWithConfig(Text text, ClickEvent clickEvent, HoverEvent hoverEvent, boolean applyUnderline) {
+        return text.copy().styled(style -> {
+            Style newStyle = style.withClickEvent(clickEvent).withHoverEvent(hoverEvent);
+            if (applyUnderline && ModConfigManager.getConfig().shareLink.enableClickableTextUnderline) {
+                newStyle = newStyle.withUnderline(true);
+            }
+            return newStyle;
+        });
+    }
+
+    /**
+     * Creates interactive text with hover and click events, applying underline based on configuration
+     * @param text the text content
+     * @param clickEvent the click event
+     * @param hoverEvent the hover event
+     * @return interactive text with both events and conditional underline
+     */
+    public static MutableText interactiveWithConfig(Text text, ClickEvent clickEvent, HoverEvent hoverEvent) {
+        return interactiveWithConfig(text, clickEvent, hoverEvent, true);
+    }
     
     /**
      * Creates a run command clickable text
@@ -159,7 +217,7 @@ public final class TextBuilder {
      * @return clickable command text
      */
     public static MutableText runCommand(Text text, String command) {
-        return clickable(text, new ClickEvent.RunCommand("/" + command));
+        return clickable(text, TextEventCompat.runCommand("/" + command));
     }
     
     /**
@@ -169,7 +227,7 @@ public final class TextBuilder {
      * @return clickable suggestion text
      */
     public static MutableText suggestCommand(Text text, String command) {
-        return clickable(text, new ClickEvent.SuggestCommand("/" + command));
+        return clickable(text, TextEventCompat.suggestCommand("/" + command));
     }
     
     /**
@@ -179,7 +237,7 @@ public final class TextBuilder {
      * @return clickable URL text
      */
     public static MutableText url(Text text, String url) {
-        return clickable(text, new ClickEvent.OpenUrl(URI.create(url)));
+        return clickable(text, TextEventCompat.openUrl(url));
     }
     
     /**
@@ -189,7 +247,7 @@ public final class TextBuilder {
      * @return text with hover event
      */
     public static MutableText withTooltip(Text text, Text tooltip) {
-        return text.copy().styled(style -> style.withHoverEvent(new HoverEvent.ShowText(tooltip)));
+        return text.copy().styled(style -> style.withHoverEvent(TextEventCompat.showText(tooltip)));
     }
     
     // Builder pattern for complex text construction
@@ -237,6 +295,21 @@ public final class TextBuilder {
             text.styled(style -> style.withClickEvent(clickEvent));
             return this;
         }
+
+        public TextComponentBuilder clickWithConfig(ClickEvent clickEvent) {
+            return clickWithConfig(clickEvent, true);
+        }
+
+        public TextComponentBuilder clickWithConfig(ClickEvent clickEvent, boolean applyUnderline) {
+            text.styled(style -> {
+                Style newStyle = style.withClickEvent(clickEvent);
+                if (applyUnderline && ModConfigManager.getConfig().shareLink.enableClickableTextUnderline) {
+                    newStyle = newStyle.withUnderline(true);
+                }
+                return newStyle;
+            });
+            return this;
+        }
         
         public TextComponentBuilder hover(HoverEvent hoverEvent) {
             text.styled(style -> style.withHoverEvent(hoverEvent));
@@ -244,19 +317,19 @@ public final class TextBuilder {
         }
         
         public TextComponentBuilder runCommand(String command) {
-            return click(new ClickEvent.RunCommand("/" + command));
+            return click(TextEventCompat.runCommand("/" + command));
         }
         
         public TextComponentBuilder suggestCommand(String command) {
-            return click(new ClickEvent.SuggestCommand("/" + command));
+            return click(TextEventCompat.suggestCommand("/" + command));
         }
         
         public TextComponentBuilder url(String url) {
-            return click(new ClickEvent.OpenUrl(URI.create(url)));
+            return click(TextEventCompat.openUrl(url));
         }
         
         public TextComponentBuilder tooltip(Text tooltip) {
-            return hover(new HoverEvent.ShowText(tooltip));
+            return hover(TextEventCompat.showText(tooltip));
         }
         
         public TextComponentBuilder append(Text other) {

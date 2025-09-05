@@ -9,12 +9,12 @@ public class MapViewerGui extends BaseWorldGui {
 
     @Override
     protected void buildUi() {
-        this.addSlot(context.getMap());
+        this.addSlot(((MapViewerContext) context).getMap());
     }
 
     @Override
-    protected MapViewerContext.SwitchEntry asSwitchableUi() {
-        return new MapViewerContext.SwitchEntry(MapViewerGui::new, this.getSelectedSlot());
+    protected BaseViewerContext.SwitchEntry asSwitchableUi() {
+        return new BaseViewerContext.SwitchEntry((context, slot) -> new MapViewerGui((MapViewerContext) context, slot), this.getSelectedSlot());
     }
 
     @Override

@@ -74,7 +74,11 @@ public class ShareCommandUtils {
     }
 
     public static ServerPlayerEntity getSenderPlayer(CommandContext<ServerCommandSource> ctx) {
-        return ctx.getSource().getPlayer();
+        try {
+            return ctx.getSource().getPlayerOrThrow();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static ServerPlayerEntity getSourcePlayer(CommandContext<ServerCommandSource> ctx) {

@@ -3,40 +3,31 @@ package com.showcase.gui;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public final class MapViewerContext {
-    public final ServerPlayerEntity player;
+public final class MapViewerContext extends BaseViewerContext {
     public ItemStack map;
-    public final List<SwitchEntry> interfaceList = new ArrayList<>();
-
 
     public MapViewerContext(ServerPlayerEntity player, ItemStack map) {
-        this.player = player;
+        super(player);
         this.map = map;
     }
 
+    public MapViewerContext(ServerPlayerEntity player, ItemStack map, int durationSeconds) {
+        super(player, durationSeconds);
+        this.map = map;
+    }
+
+    @Override
     public void close() {
+        super.close();
         this.map = null;
     }
 
+    @Override
     public boolean checkClosed() {
-        return this.map == null;
+        return super.checkClosed() || this.map == null;
     }
 
     public ItemStack getMap() {
         return map;
-    }
-
-    @FunctionalInterface
-    public interface SwitchableUi {
-        void openUi(MapViewerContext context, int selectedSlot);
-    }
-
-    public record SwitchEntry(SwitchableUi ui, int currentSlot) {
-        public void open(MapViewerContext context) {
-            ui.openUi(context, currentSlot);
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.showcase.command;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.api.ShowcaseAPI;
+import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.data.ShareRepository;
 import com.showcase.gui.ContainerGui;
@@ -252,7 +253,7 @@ public final class ShowcaseManager {
 
         if (server == null) return null;
 
-        Text ownerName =  PlayerUtils.getSafeDisplayName(server, entry.getOwnerUuid());
+        Text ownerName = PlayerUtils.getSafeDisplayName(server, entry.getOwnerUuid());
 
         return switch (entry.getType()) {
             case ITEM -> {
@@ -263,17 +264,26 @@ public final class ShowcaseManager {
                     yield null;
                 }
 
-                if (StackUtils.isMap(itemStack)) {
+                if (StackUtils.isMap(itemStack) && ModConfigManager.getConfig().mapViewDuration != -1) {
+                    // Check if map preview is enabled
                     MapViewer.viewMap(viewer, itemStack);
                     yield null;
+                    // If map preview is disabled, fall through to use item preview system
                 }
 
+                // Use new ItemPreviewManager for unified item preview
                 ReadOnlyInventory unpackInv = unpackFromItemStack(itemStack);
-                ReadOnlyInventory finalInv = unpackInv != null ? unpackInv : inv;
-                ScreenHandlerType<?> type = finalInv.getType();
-                Text name = Text.translatable("showcase.screen.item_title", ownerName, finalInv.getName());
-
-                yield new ContainerGui(type, viewer, name, finalInv);
+                if (unpackInv != null) {
+                    // For unpacked items (shulker boxes, bundles), use container view
+                    ScreenHandlerType<?> type = unpackInv.getType();
+                    Text name = Text.translatable("showcase.screen.item_title", ownerName, unpackInv.getName());
+                    yield new ContainerGui(type, viewer, name, unpackInv);
+                } else {
+                    // For single items, use the new preview manager
+                    Text customTitle = Text.translatable("showcase.screen.item_title", ownerName, StackUtils.getDisplayName(itemStack));
+                    ItemPreviewManager.showItemPreviewWithTitle(viewer, itemStack, customTitle);
+                    yield null;
+                }
             }
 
             case STATS -> {

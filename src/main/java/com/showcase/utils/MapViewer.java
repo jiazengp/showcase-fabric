@@ -65,23 +65,23 @@ public final class MapViewer {
         nbt.putBoolean(MAP_MARK, true);
         displayMap.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
 
-        MapViewerGui gui = new MapViewerGui(new MapViewerContext(player, displayMap), 0) {
-            @Override
-            public void onClose() {
-                super.onClose();
-                handleMapViewerClose(player, displayMap);
-            }
-        };
-
+        MapViewerContext context = new MapViewerContext(player, displayMap, displaySeconds);
+        context.setCloseCallback(() -> handleMapViewerClose(player, displayMap));
+        
+        MapViewerGui gui = new MapViewerGui(context, 0);
         gui.open();
 
-        int autoRestoreTick = player.getWorld().getServer().getTicks() + displaySeconds * 20;
-        viewingSessions.put(playerId, new ViewingSession(displayMap, autoRestoreTick));
+        viewingSessions.put(playerId, new ViewingSession(displayMap, player.getWorld().getServer().getTicks() + displaySeconds * 20));
     }
 
     public static void viewMap(ServerPlayerEntity player, ItemStack mapItem) {
         if (player != null && mapItem != null) {
-            open(player, mapItem, ModConfigManager.getConfig().mapViewDuration);
+            int mapViewDuration = ModConfigManager.getConfig().mapViewDuration;
+            if (mapViewDuration == -1) {
+                // Map preview is disabled, do nothing
+                return;
+            }
+            open(player, mapItem, mapViewDuration);
         }
     }
 

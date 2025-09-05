@@ -9,8 +9,17 @@ import java.util.*;
 
 @Configuration
 public class ModConfig {
-    @Comment("The duration of the map that player can view (seconds)")
+    @Comment({"Map view mode configuration:",
+              "-1: Disable map preview functionality",
+              "0: Use map preview with no time limit", 
+              ">0: Use map preview with specified duration in seconds"})
     public int mapViewDuration = 10;
+
+    @Comment({"Item view mode configuration:",
+              "-1: Use traditional container view (no time limit)",
+              "0: Use hotbar preview with no time limit",
+              ">0: Use hotbar preview with specified duration in seconds"})
+    public int itemViewDuration = 10;
 
     @Comment("The maximum number of placeholders that can be replaced in a single chat message.")
     public int  maxPlaceholdersPerMessage = 2;
@@ -53,11 +62,17 @@ public class ModConfig {
         @Comment("Default expiry time in seconds for share links")
         public int defaultExpiryTime = 300;
 
+        @Comment("Enable underline for clickable text messages")
+        public boolean enableClickableTextUnderline = false;
+
         public ShareLinkSettings() {}
     }
 
     @Comment("Settings related to how player statistics are displayed")
     public StatsDisplaySettings statsDisplay = new StatsDisplaySettings();
+
+    @Comment("Settings for item icons in showcase messages")
+    public ItemIconSettings itemIcons = new ItemIconSettings();
 
     @Configuration
     public static class StatsDisplaySettings {
@@ -149,6 +164,20 @@ public class ModConfig {
         public boolean showBothFormats = false;
 
         public DamageFormatSettings() {}
+    }
+
+    @Configuration
+    public static class ItemIconSettings {
+        @Comment("Enable item icons in showcase messages")
+        public boolean enabled = true;
+
+        @Comment("Font namespace for item icons (e.g., 'custom', 'showcase')")
+        public String fontNamespace = "iconifycraft";
+
+        @Comment("Include item icons in item names")
+        public boolean includeInItemNames = true;
+
+        public ItemIconSettings() {}
     }
 
     private static Map<ShowcaseManager.ShareType, ShareSettings> defaultShareSettings() {

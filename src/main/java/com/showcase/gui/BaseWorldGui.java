@@ -20,10 +20,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.MathHelper;
 
 public abstract class BaseWorldGui extends HotbarGui {
-    protected MapViewerContext context;
+    protected BaseViewerContext context;
     private final int currentBlockClickTick;
 
-    public BaseWorldGui(MapViewerContext context, int selectedSlot) {
+    public BaseWorldGui(BaseViewerContext context, int selectedSlot) {
         super(context.player);
         this.setSelectedSlot(selectedSlot);
         this.context = context;
@@ -114,7 +114,7 @@ public abstract class BaseWorldGui extends HotbarGui {
 
     protected abstract void buildUi();
 
-    protected abstract MapViewerContext.SwitchEntry asSwitchableUi();
+    protected abstract BaseViewerContext.SwitchEntry asSwitchableUi();
 
     protected GuiElementBuilder baseElement(ItemStack itemStack, String name, boolean selected) {
         var builder = new GuiElementBuilder(itemStack);
@@ -139,7 +139,7 @@ public abstract class BaseWorldGui extends HotbarGui {
         return builder;
     }
 
-    protected GuiElementBuilder switchElement(Item item, String name, MapViewerContext.SwitchableUi ui) {
+    protected GuiElementBuilder switchElement(Item item, String name, BaseViewerContext.SwitchableUi ui) {
         return new GuiElementBuilder()
                 .model(item)
                 .setName(Text.literal("entry." + name).formatted(Formatting.WHITE))
@@ -147,14 +147,14 @@ public abstract class BaseWorldGui extends HotbarGui {
                 .setCallback(switchCallback(ui));
     }
 
-    protected GuiElementInterface.ClickCallback switchCallback(MapViewerContext.SwitchableUi ui) {
+    protected GuiElementInterface.ClickCallback switchCallback(BaseViewerContext.SwitchableUi ui) {
         return (x, y, z, c) -> {
             this.playSound();
-            this.switchUi(new MapViewerContext.SwitchEntry(ui, 0), true);
+            this.switchUi(new BaseViewerContext.SwitchEntry(ui, 0), true);
         };
     }
 
-    public void switchUi(MapViewerContext.SwitchEntry uiOpener, boolean addSelf) {
+    public void switchUi(BaseViewerContext.SwitchEntry uiOpener, boolean addSelf) {
         var context = this.context;
         if (addSelf) {
             context.interfaceList.addFirst(this.asSwitchableUi());
