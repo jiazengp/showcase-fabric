@@ -55,13 +55,18 @@ jobs:
         id: version-props
         run: |
           chmod +x .github/scripts/get-version-info.sh
-          COMPATIBLE_VERSIONS=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} compatible_minecraft_versions)
+          COMPATIBLE_VERSIONS_RAW=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} compatible_minecraft_versions)
           RELEASE_TYPE=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} release_type)
+          
+          # Convert JSON array to comma-separated string for mc-publish
+          # Remove brackets and quotes, then replace spaces with nothing
+          COMPATIBLE_VERSIONS=$(echo "$COMPATIBLE_VERSIONS_RAW" | sed 's/\[//g' | sed 's/\]//g' | sed 's/"//g' | sed 's/ //g')
           
           echo "compatible-versions=$COMPATIBLE_VERSIONS" >> $GITHUB_OUTPUT
           echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
           
-          echo "Minecraft ${{ matrix.mc_version }} compatible versions: $COMPATIBLE_VERSIONS"
+          echo "Minecraft ${{ matrix.mc_version }} compatible versions (raw): $COMPATIBLE_VERSIONS_RAW"
+          echo "Minecraft ${{ matrix.mc_version }} compatible versions (parsed): $COMPATIBLE_VERSIONS"
           echo "Release type: $RELEASE_TYPE"
 
       - name: build for specific version
