@@ -122,11 +122,12 @@ missing_jars=0
 for props_file in version_properties/*.properties; do
     version=$(basename "$props_file" .properties)
     echo "Checking for Minecraft $version JAR..."
-    if ! ls build/buildAllJars/showcase-*+$version.jar >/dev/null 2>&1; then
+    # More flexible pattern matching for JAR files
+    if ls build/buildAllJars/showcase-*$version.jar >/dev/null 2>&1; then
+        echo "✓ Found JAR for Minecraft $version"
+    else
         echo "WARNING: Missing JAR for Minecraft $version"
         ((missing_jars++))
-    else
-        echo "✓ Found JAR for Minecraft $version"
     fi
 done
 

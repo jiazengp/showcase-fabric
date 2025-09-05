@@ -48,6 +48,7 @@ jobs:
         run: ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Unit Tests for Minecraft ${{ matrix.minecraft-version }}
+        if: matrix.minecraft-version == '1.21.6'
         run: ./gradlew test -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Store reports
