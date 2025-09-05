@@ -2,7 +2,6 @@
 # Multi-version build script for Showcase mod
 # Inspired by Fuji's buildAll script
 
-set -e  # Exit on any error
 
 echo "Starting multi-version build for Showcase mod..."
 echo "Build started at: $(date)"
@@ -73,21 +72,30 @@ build_version() {
     local duration=$((end_time - start_time))
     echo "✓ Build completed for Minecraft $mcver in ${duration}s"
     
+    # Stop Gradle daemon to avoid conflicts with next build
+    ./gradlew --stop >/dev/null 2>&1 || true
+    
     return 0
 }
 
 # Build for all available versions
 echo ""
 echo "Starting builds..."
+echo "Version properties files found:"
+ls -la version_properties/*.properties || echo "No properties files found"
+
 for props_file in version_properties/*.properties; do
     if [ -f "$props_file" ]; then
         version=$(basename "$props_file" .properties)
+        echo "Processing Minecraft version: $version"
         if build_version "$version"; then
             ((successful_builds++))
         else
             ((failed_builds++))
             echo "✗ Failed to build for Minecraft $version"
         fi
+    else
+        echo "WARNING: Properties file not found: $props_file"
     fi
 done
 
