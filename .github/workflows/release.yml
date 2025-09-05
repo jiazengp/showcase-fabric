@@ -12,8 +12,28 @@ permissions:
   contents: write
 
 jobs:
-  publish:
+  get-versions:
     runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.versions.outputs.versions }}
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      
+      - name: get available versions
+        id: versions
+        run: |
+          chmod +x .github/scripts/get-all-versions.sh
+          VERSIONS=$(.github/scripts/get-all-versions.sh)
+          echo "versions=$VERSIONS" >> $GITHUB_OUTPUT
+          echo "Available versions: $VERSIONS"
+
+  publish:
+    needs: get-versions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mc_version: ${{ fromJson(needs.get-versions.outputs.versions) }}
 
     steps:
       - name: checkout repository
@@ -31,51 +51,61 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: build all versions
+      - name: get version properties
+        id: version-props
         run: |
-          chmod +x ./buildAll.sh
-          ./buildAll.sh
+          chmod +x .github/scripts/get-version-info.sh
+          COMPATIBLE_VERSIONS=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} compatible_minecraft_versions)
+          RELEASE_TYPE=$(.github/scripts/get-version-info.sh ${{ matrix.mc_version }} release_type)
+          
+          echo "compatible-versions=$COMPATIBLE_VERSIONS" >> $GITHUB_OUTPUT
+          echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          
+          echo "Minecraft ${{ matrix.mc_version }} compatible versions: $COMPATIBLE_VERSIONS"
+          echo "Release type: $RELEASE_TYPE"
 
-      - name: verify build artifacts
+      - name: build for specific version
+        run: ./gradlew build -PmcVer=${{ matrix.mc_version }}
+
+      - name: verify build artifact
         run: |
-          echo "Built JAR files:"
-          ls -la build/buildAllJars/*.jar
-          if [ ! -d "build/buildAllJars" ] || [ -z "$(ls -A build/buildAllJars/*.jar 2>/dev/null)" ]; then
-            echo "ERROR: No JAR files found in build/buildAllJars directory"
+          echo "Built JAR for Minecraft ${{ matrix.mc_version }}:"
+          ls -la build/libs/*.jar
+          if [ ! -d "build/libs" ] || [ -z "$(ls -A build/libs/*.jar 2>/dev/null)" ]; then
+            echo "ERROR: No JAR files found in build/libs directory"
             exit 1
           fi
 
-      - name: Generate release notes
+      - name: generate version-specific changelog
+        id: changelog
         run: |
-          echo "## Multi-Version Release" > release_notes.md
-          echo "" >> release_notes.md
-          echo "This release supports the following Minecraft versions:" >> release_notes.md
+          # Create changelog that links to the repository CHANGELOG.md
+          cat > version_changelog.md << EOF
+          ## Showcase v${{ github.ref_name }} for Minecraft ${{ matrix.mc_version }}
           
-          # Generate version list from built JAR files
-          for jar in build/buildAllJars/showcase-*.jar; do
-            if [ -f "$jar" ]; then
-              version=$(basename "$jar" | sed -n 's/.*+\([0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?\)\.jar/\1/p')
-              if [ ! -z "$version" ]; then
-                echo "- Minecraft $version" >> release_notes.md
-              fi
-            fi
-          done
+          Compatible Minecraft versions: ${{ steps.version-props.outputs.compatible-versions }}
           
-          echo "" >> release_notes.md
-          echo "Download the appropriate JAR file for your Minecraft version." >> release_notes.md
+          For detailed changelog, please visit: [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
           
-          cat release_notes.md
+          ### Quick Links
+          - [GitHub Repository](https://github.com/${{ github.repository }})
+          - [Full Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+          - [Issues & Bug Reports](https://github.com/${{ github.repository }}/issues)
+          EOF
+          
+          echo "Generated changelog for Minecraft ${{ matrix.mc_version }}:"
+          cat version_changelog.md
 
-      - name: Upload multi-version JARs to Release
+      - name: upload to github release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/buildAllJars/*.jar
-          body_path: release_notes.md
+          files: build/libs/*.jar
+          body_path: version_changelog.md
+          append_body: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-      - name: Publish to Modrinth and CurseForge
+      - name: publish to modrinth and curseforge
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           # Modrinth configuration
@@ -86,18 +116,19 @@ jobs:
           curseforge-id: 1341517
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           
-          # Project metadata
-          name: "Showcase v${{ github.ref_name }}"
-          version: ${{ github.ref_name }}
-          changelog-file: release_notes.md
+          # Project metadata - version specific
+          name: "Showcase v${{ github.ref_name }} (MC ${{ matrix.mc_version }})"
+          version: "${{ github.ref_name }}+${{ matrix.mc_version }}"
+          changelog-file: version_changelog.md
           
-          # Files to publish - all JAR files from multi-version build
-          files: build/buildAllJars/*.jar
+          # Files to publish - single version JAR
+          files: build/libs/*.jar
           
-          # Auto-detect game versions from fabric.mod.json in JAR files
+          # Specific game versions from properties
+          game-versions: ${{ steps.version-props.outputs.compatible-versions }}
           
           # Loader configuration
           loaders: fabric
           
-          # Version type (will be auto-detected from version tag)
-          version-type: release
+          # Version type from properties
+          version-type: ${{ steps.version-props.outputs.release-type }}
