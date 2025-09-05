@@ -86,6 +86,14 @@ jobs:
             exit 1
           fi
 
+      - name: identify main jar file
+        id: main-jar
+        run: |
+          # Find the main JAR file (exclude sources and javadoc)
+          MAIN_JAR=$(find build/libs/ -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -1)
+          echo "main-jar=$MAIN_JAR" >> $GITHUB_OUTPUT
+          echo "Main JAR file: $MAIN_JAR"
+
       - name: generate version-specific changelog
         id: changelog
         run: |
@@ -131,8 +139,8 @@ jobs:
           version: "${{ github.ref_name }}+${{ matrix.mc_version }}"
           changelog-file: version_changelog.md
           
-          # Files to publish - single version JAR
-          files: build/libs/*.jar
+          # Files to publish - main JAR only (exclude sources and javadoc)
+          files: ${{ steps.main-jar.outputs.main-jar }}
           
           # Specific game versions from properties (multiline format)
           game-versions: |
@@ -143,3 +151,12 @@ jobs:
           
           # Version type from properties
           version-type: ${{ steps.version-props.outputs.release-type }}
+          
+          # Dependencies configuration 
+          dependencies: |
+            fabric-api(required)
+            luckperms(optional)
+            placeholder-api(optional)
+            
+          # Java version
+          java: 21
