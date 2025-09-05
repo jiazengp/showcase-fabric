@@ -107,5 +107,8 @@
   "showcase.stats.block.unknown": "未知方块",
   
   "showcase.stats.message.create_date": "创建时间",
-  "showcase.stats.message.total_pages": "总页数"
+  "showcase.stats.message.total_pages": "总页数",
+
+  "showcase.viewer.countdown_title": "正在查看内容",
+  "showcase.viewer.instructions": "§r§7按 §fQ §7键或丢弃物品来关闭 • 使用滚轮导航"
 }

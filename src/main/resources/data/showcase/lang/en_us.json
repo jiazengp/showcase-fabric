@@ -99,5 +99,8 @@
   
   "showcase.stats.block.unknown": "Unknown Blocks",
   "showcase.stats.message.create_date": "Create Date",
-  "showcase.stats.message.total_pages": "Total Pages"
+  "showcase.stats.message.total_pages": "Total Pages",
+
+  "showcase.viewer.countdown_title": "Viewing Content",
+  "showcase.viewer.instructions": "§r§7Press §fQ §7or drop item to close • Use scrollwheel to navigate"
 }
