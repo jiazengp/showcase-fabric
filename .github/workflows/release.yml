@@ -127,7 +127,7 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
           
           # Project metadata - version specific
-          name: "Showcase ${{ github.ref_name }} (MC ${{ matrix.mc_version }})"
+          name: "Showcase ${{ github.ref_name }} for Minecraft ${{ matrix.mc_version }}"
           version: "${{ github.ref_name }}+${{ matrix.mc_version }}"
           changelog-file: version_changelog.md
           
