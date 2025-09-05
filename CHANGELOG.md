@@ -1,5 +1,17 @@
-# [](https://github.com/jiazengp/showcase-fabric/compare/v2.1.0...v) (2025-08-03)
+# ChangeLog
 
+## [2.3.0](https://github.com/jiazengp/showcase-fabric/releases/tag/v2.3.0) (2025-09-05)
+
+### Bug Fixes
+
+* Fixed an issue where overly strict default permission checks prevented regular players from triggering sharing via keywords in chat
+
+### Features
+
+* Added support for previewing Item shares directly when holding the item
+* Item share messages now support displaying item icons (experimental)
+
+## [](https://github.com/jiazengp/showcase-fabric/compare/v2.1.0...v) (2025-08-03)
 
 ### Bug Fixes
 
@@ -26,7 +38,7 @@
 
 
 
-# [](https://github.com/jiazengp/showcase-fabric/compare/v2.1.0...v) (2025-08-02)
+## [](https://github.com/jiazengp/showcase-fabric/compare/v2.1.0...v) (2025-08-02)
 
 
 ### Bug Fixes
@@ -43,7 +55,7 @@
 
 
 
-# [2.1.0](https://github.com/jiazengp/showcase-fabric/compare/c9eda13c947e2b4ebcc6d5de16691342ce36f903...v2.1.0) (2025-07-27)
+## [2.1.0](https://github.com/jiazengp/showcase-fabric/compare/c9eda13c947e2b4ebcc6d5de16691342ce36f903...v2.1.0) (2025-07-27)
 
 
 ### Bug Fixes
