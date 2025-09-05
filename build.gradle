@@ -1,7 +1,6 @@
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
-	id "com.modrinth.minotaur" version "2.+"
 	id 'java'
 	id "systems.manifold.manifold-gradle-plugin" version "0.0.2-alpha"
 }
@@ -24,8 +23,21 @@ def loadVersionProperties() {
 def versionProperties = loadVersionProperties()
 def compatibleVersions = versionProperties.getProperty("minecraft_version")
 
+// Parse version components once for reuse
+def parseVersionComponents(String version) {
+	def parts = version.split('\\.')
+	return [
+		major: parts.length > 0 ? parts[0] : "1",
+		minor: parts.length > 1 ? parts[1] : "21", 
+		patch: parts.length > 2 ? parts[2] : "0",
+		full: version
+	]
+}
+
+def mcVersionInfo = parseVersionComponents(versionProperties.getProperty("minecraft_version"))
+
 // Generate build.properties for preprocessor definitions (inspired by Fuji)
-def writeBuildGradlePredefine(Properties versionProps) {
+def writeBuildGradlePredefine(Properties versionProps, mcInfo) {
 	def currentMcVer = versionProps.getProperty("minecraft_version")
 	def buildPropsFile = file("build.properties")
 	
@@ -34,25 +46,23 @@ def writeBuildGradlePredefine(Properties versionProps) {
 	sb.append("# Generated at: ${new Date()}\n")
 	sb.append("\n")
 	
-	// Generate version-specific flags
-	def mcMajor = versionProps.getProperty("mc_ver_major", "1")
-	def mcMinor = versionProps.getProperty("mc_ver_minor", "21") 
-	def mcPatch = versionProps.getProperty("mc_ver_patch", "4")
-	
-	// Version flags (MC_1_21_4=1, others=0)
-	sb.append("MC_VER=${mcMajor}${mcMinor}${mcPatch}\n")
-	sb.append("MC_${mcMajor}_${mcMinor}_${mcPatch}=1\n")
-	sb.append("MC_MAJOR=${mcMajor}\n")
-	sb.append("MC_MINOR=${mcMinor}\n") 
-	sb.append("MC_PATCH=${mcPatch}\n")
+	// Version flags using parsed components
+	sb.append("MC_VER=${mcInfo.major}${mcInfo.minor}${mcInfo.patch}\n")
+	sb.append("MC_${mcInfo.major}_${mcInfo.minor}_${mcInfo.patch}=1\n")
+	sb.append("MC_MAJOR=${mcInfo.major}\n")
+	sb.append("MC_MINOR=${mcInfo.minor}\n") 
+	sb.append("MC_PATCH=${mcInfo.patch}\n")
 	
 	// Set other version flags to 0 for conditional compilation
-	def availableVersions = gradle.ext.mcVers ?: []
-	availableVersions.each { version ->
-		if (version != currentMcVer) {
-			def parts = version.split('\\.')
-			if (parts.length >= 3) {
-				sb.append("MC_${parts[0]}_${parts[1]}_${parts[2]}=0\n")
+	def versionPropertiesDir = file("version_properties")
+	if (versionPropertiesDir.exists()) {
+		versionPropertiesDir.listFiles().each { file ->
+			if (file.name.endsWith('.properties')) {
+				def otherVersion = file.name.replace('.properties', '')
+				if (otherVersion != currentMcVer) {
+					def otherInfo = parseVersionComponents(otherVersion)
+					sb.append("MC_${otherInfo.major}_${otherInfo.minor}_${otherInfo.patch}=0\n")
+				}
 			}
 		}
 	}
@@ -62,7 +72,7 @@ def writeBuildGradlePredefine(Properties versionProps) {
 }
 
 // Generate preprocessor definitions before compilation
-writeBuildGradlePredefine(versionProperties)
+writeBuildGradlePredefine(versionProperties, mcVersionInfo)
 
 // Manifold preprocessor configuration
 manifold {
@@ -75,18 +85,6 @@ base {
 
 version = "${project.mod_version}+${compatibleVersions}"
 group = project.maven_group
-
-loom {
-	serverOnlyMinecraftJar()
-}
-
-//fabricApi {
-//	configureTests {
-//		createSourceSet = true
-//		modId = "fabric-docs-reference-test-${project.name}"
-//		eula = true
-//	}
-//}
 
 repositories {
 	mavenCentral()
@@ -137,40 +135,30 @@ tasks.withType(JavaCompile).configureEach {
 
 processResources {
 	inputs.property "version", version
-	inputs.property "minecraft_version", versionProperties.getProperty("minecraft_version")
+	inputs.property "minecraft_version", mcVersionInfo.full
 	inputs.property "compatible_minecraft_versions", versionProperties.getProperty("compatible_minecraft_versions", "[]")
 	inputs.property "java_version", versionProperties.getProperty("java_version")
 	inputs.property "sgui_version", versionProperties.getProperty("sgui_api_version")
 	inputs.property "fabricloader_version", versionProperties.getProperty("fabric_loader_version")
-	inputs.property "mc_ver_major", versionProperties.getProperty("mc_ver_major", "1")
-	inputs.property "mc_ver_minor", versionProperties.getProperty("mc_ver_minor", "21")
-	inputs.property "mc_ver_patch", versionProperties.getProperty("mc_ver_patch", "4")
+	inputs.property "mc_ver_major", mcVersionInfo.major
+	inputs.property "mc_ver_minor", mcVersionInfo.minor
+	inputs.property "mc_ver_patch", mcVersionInfo.patch
 	inputs.property "refmap_name", "showcase.mixins.refmap.json"
 
 	filesMatching("fabric.mod.json") {
 		expand(
 				"version": version,
 				"java_version": versionProperties.getProperty("java_version"),
-				"minecraft_version": versionProperties.getProperty("minecraft_version"),
+				"minecraft_version": mcVersionInfo.full,
 				"compatible_minecraft_versions": versionProperties.getProperty("compatible_minecraft_versions", "[]"),
 				"sgui_api_version": versionProperties.getProperty("sgui_api_version"),
 				"fabric_loader_version": versionProperties.getProperty("fabric_loader_version"),
-				"mc_ver_major": versionProperties.getProperty("mc_ver_major", "1"),
-				"mc_ver_minor": versionProperties.getProperty("mc_ver_minor", "21"),
-				"mc_ver_patch": versionProperties.getProperty("mc_ver_patch", "4")
+				"mc_ver_major": mcVersionInfo.major,
+				"mc_ver_minor": mcVersionInfo.minor,
+				"mc_ver_patch": mcVersionInfo.patch
 		)
 	}
 	
-	// Copy version-specific access widener if it exists
-	def accessWidenerVersion = versionProperties.getProperty("access_widener_version")
-	if (accessWidenerVersion) {
-		def sourceAccessWidener = file("src/main/resources/showcase_${accessWidenerVersion}.accesswidener")
-		if (sourceAccessWidener.exists()) {
-			from(sourceAccessWidener) {
-				rename { "showcase.accesswidener" }
-			}
-		}
-	}
 }
 
 jar {
@@ -181,24 +169,6 @@ jar {
 	}
 }
 
-// Modrinth publishing
-if (System.getenv("MODRINTH")) {
-	modrinth {
-		token = System.getenv("MODRINTH")
-		projectId = 'DC8AYtgP'
-		versionNumber = "" + version
-		versionType = "release"
-		changelog = rootProject.file("CHANGELOG.md").text
-		uploadFile = remapJar
-		gameVersions = [((String) project.minecraft_version)]
-		loaders = ["fabric", "quilt"]
-		syncBodyFrom = rootProject.file("README.md").text
-	}
-
-	remapJar {
-		finalizedBy project.tasks.modrinth
-	}
-}
 
 // Task to list available Minecraft versions
 task listVersions {
