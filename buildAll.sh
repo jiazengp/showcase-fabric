@@ -115,12 +115,18 @@ ls -la build/buildAllJars/*.jar 2>/dev/null || echo "No JAR files found"
 # Verify all expected JARs exist
 echo ""
 echo "Verifying build artifacts..."
+echo "Available JAR files:"
+ls -la build/buildAllJars/*.jar 2>/dev/null || echo "No JAR files found"
+
 missing_jars=0
 for props_file in version_properties/*.properties; do
     version=$(basename "$props_file" .properties)
+    echo "Checking for Minecraft $version JAR..."
     if ! ls build/buildAllJars/showcase-*+$version.jar >/dev/null 2>&1; then
         echo "WARNING: Missing JAR for Minecraft $version"
         ((missing_jars++))
+    else
+        echo "✓ Found JAR for Minecraft $version"
     fi
 done
 
