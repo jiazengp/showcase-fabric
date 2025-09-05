@@ -15,7 +15,36 @@ A server-side Minecraft mod that allows players to share links in chat to showca
 - **Configurable Chat Keywords**: Customizable trigger words for quick sharing
 - **Statistics Tracking**: Player statistics with detailed categorization
 - **Developer Placeholders**: PlaceholderAPI integration for other plugins
+- **Chat Item Icons**: Customizable item icons in chat messages (Experimental)
 
+<details>
+<summary><strong>About Chat Item Icons</strong> (Experimental)</summary>
+
+Displays item icons in chat messages for shared items.
+
+**Why Resource Pack?** As a server-side mod, we use Minecraft's custom font system to render icons.
+
+**Setup**:
+1. Generate resource pack at [IconifyCraft](https://iconifycraft.vercel.app/)
+2. Host the pack on a web server
+3. Enable in `config/showcase/config.yml`: `itemIcons.enabled = true`
+4. Add to `server.properties`:
+   ```properties
+   resource-pack=<your-hosted-pack-url>
+   resource-pack-sha1=<pack-sha1-hash>
+   require-resource-pack=true
+   ```
+
+**Config Options**:
+```yaml
+itemIcons:
+  enabled: false                    # Enable/disable icons
+  fontNamespace: "iconifycraft"     # Resource pack namespace
+  includeInItemNames: true          # Show icons in item names
+```
+
+⚠Warning: Experimental feature. Current support for displaying blocks, including chests and ender chests, is incomplete.
+</details>
 
 ## ⌨️ Commands
 
