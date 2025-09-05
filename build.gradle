@@ -111,7 +111,7 @@ dependencies {
 
 	include(implementation("de.exlll:configlib-core:4.6.1"))
 	include(implementation("de.exlll:configlib-yaml:4.6.1"))
-	include(implementation("org.snakeyaml:snakeyaml-engine:2.8"))
+	include(implementation("org.snakeyaml:snakeyaml-engine:2.10"))
 	
 	// Manifold preprocessor for version compatibility (inspired by Fuji)
 	annotationProcessor 'systems.manifold:manifold-preprocessor:2024.1.42'
