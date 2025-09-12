@@ -14,6 +14,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
+#if MC_VER < 1212
+import net.minecraft.util.TypedActionResult;
+#endif
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +46,11 @@ public final class MapViewer {
             toRemove.forEach(viewingSessions::remove);
         });
 
-        UseItemCallback.EVENT.register((player, world, hand) -> getCheckResult(player));
+        #if MC_VER >= 1212
+        UseItemCallback.EVENT.register((player, world, hand) -> (ActionResult) com.showcase.utils.compat.CallbackCompat.getUseItemCallbackResult(player, getCheckResult(player)));
+        #else
+        UseItemCallback.EVENT.register((player, world, hand) -> (TypedActionResult) com.showcase.utils.compat.CallbackCompat.getUseItemCallbackResult(player, getCheckResult(player)));
+        #endif
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> getCheckResult(player));
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> getCheckResult(player));
     }

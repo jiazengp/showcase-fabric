@@ -43,7 +43,7 @@ public class StackUtils {
     }
 
     public static boolean isShulkerBox(ItemStack itemStack) {
-        return itemStack.isIn(ItemTags.SHULKER_BOXES);
+        return com.showcase.utils.compat.ItemTagsCompat.isShulkerBox(itemStack);
     }
 
     public static boolean isBundle(ItemStack itemStack) {

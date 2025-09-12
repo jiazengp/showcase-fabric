@@ -72,8 +72,7 @@ public abstract class BaseWorldGui extends HotbarGui {
             this.clearSlot(i);
         }
         this.buildUi();
-        this.setSlot(8, new GuiElementBuilder()
-                .model(Items.BARRIER)
+        this.setSlot(8, com.showcase.utils.compat.GuiElementBuilderCompat.setModel(new GuiElementBuilder(), Items.BARRIER)
                 .setName(Text.translatable(context.interfaceList.isEmpty() ? "mco.notification.dismiss" : "gui.back"))
                 .setRarity(Rarity.COMMON)
                 .hideDefaultTooltip()
@@ -127,8 +126,7 @@ public abstract class BaseWorldGui extends HotbarGui {
     }
 
     protected GuiElementBuilder baseElement(Item item, MutableText text, boolean selected) {
-        var builder = new GuiElementBuilder()
-                .model(item)
+        var builder = com.showcase.utils.compat.GuiElementBuilderCompat.setModel(new GuiElementBuilder(), item)
                 .setName(text.formatted(Formatting.WHITE))
                 .hideDefaultTooltip();
 
@@ -140,8 +138,7 @@ public abstract class BaseWorldGui extends HotbarGui {
     }
 
     protected GuiElementBuilder switchElement(Item item, String name, BaseViewerContext.SwitchableUi ui) {
-        return new GuiElementBuilder()
-                .model(item)
+        return com.showcase.utils.compat.GuiElementBuilderCompat.setModel(new GuiElementBuilder(), item)
                 .setName(Text.literal("entry." + name).formatted(Formatting.WHITE))
                 .hideDefaultTooltip()
                 .setCallback(switchCallback(ui));
