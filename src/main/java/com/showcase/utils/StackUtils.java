@@ -84,14 +84,16 @@ public class StackUtils {
 
         boolean isBook = StackUtils.isBook(stack);
         
-        // Add icon prefix for items inside the brackets
+        // Add icon prefix for items outside the brackets on the left
         MutableText iconPrefix = ItemIconProvider.getIconForItem(stack);
         
-        MutableText base = Text.literal(isBook ? "《" : "[");
+        MutableText base = Text.empty();
         
-        // Add icon inside the brackets/book markers, wrapped to preserve original style
-        MutableText iconWrapper = Text.empty().append(iconPrefix);
-        base.append(iconWrapper);
+        // Add icon outside the brackets/book markers on the left
+        if (!iconPrefix.getString().isEmpty()) {
+            base.append(iconPrefix).append(" ");
+        }
+        base.append(Text.literal(isBook ? "《" : "["));
 
         Text displayName = stack.getName();
         Text translatedName = Text.translatable(stack.getItem().getTranslationKey());

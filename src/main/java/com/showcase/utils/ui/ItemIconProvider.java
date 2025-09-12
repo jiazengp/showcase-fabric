@@ -70,8 +70,7 @@ public class ItemIconProvider {
      */
     private static MutableText createBlockIcon(String blockName) {
         MutableText blockIcon = createIconText(MINECRAFT_BLOCK_PATH + blockName + (blockName.contains("shulker_box") ? "" : "_top"));
-        // Add thin spacing around block icons using thin space character (U+2009)
-        return Text.literal(" ").append(blockIcon).append(" ");
+        return blockIcon;
     }
     
     /**
