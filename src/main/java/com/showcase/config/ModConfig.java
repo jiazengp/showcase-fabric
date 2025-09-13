@@ -19,7 +19,7 @@ public class ModConfig {
               "-1: Use traditional container view (no time limit)",
               "0: Use hotbar preview with no time limit",
               ">0: Use hotbar preview with specified duration in seconds"})
-    public int itemViewDuration = 10;
+    public int itemViewDuration = -1;
 
     @Comment("The maximum number of placeholders that can be replaced in a single chat message.")
     public int  maxPlaceholdersPerMessage = 2;
@@ -169,7 +169,7 @@ public class ModConfig {
     @Configuration
     public static class ItemIconSettings {
         @Comment("Enable item icons in showcase messages")
-        public boolean enabled = false;
+        public boolean enabled = true;
 
         @Comment("Font namespace for item icons (e.g., 'custom', 'showcase')")
         public String fontNamespace = "iconifycraft";
