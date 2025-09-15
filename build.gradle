@@ -114,8 +114,8 @@ dependencies {
 	include(implementation("org.snakeyaml:snakeyaml-engine:2.8"))
 	
 	// Manifold preprocessor for version compatibility (inspired by Fuji)
-	annotationProcessor 'systems.manifold:manifold-preprocessor:2024.1.42'
-	testAnnotationProcessor 'systems.manifold:manifold-preprocessor:2024.1.42'
+	annotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
+	testAnnotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 
 	// Test dependencies
 	testImplementation "net.fabricmc:fabric-loader-junit:${versionProperties.getProperty("fabric_loader_version")}"
