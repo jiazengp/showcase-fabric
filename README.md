@@ -4,6 +4,8 @@
 
 A server-side Minecraft mod that allows players to share links in chat to showcase items, inventories, containers, villager trades, and statistics through commands or chat keywords.
 
+📖 **[Complete Documentation](https://showcase-fabric.vercel.app)** | 🚀 **[Getting Started](https://showcase-fabric.vercel.app/docs/getting-started)** | 🔧 **[Configuration Guide](https://showcase-fabric.vercel.app/docs/configuration)**
+
 ## ✨ Features
 
 - **Comprehensive Sharing**: Items, inventories, containers, and villager trades
@@ -48,6 +50,8 @@ itemIcons:
 
 ## ⌨️ Commands
 
+> 💡 **[View detailed command reference](https://showcase-fabric.vercel.app/docs/commands)** with examples and permissions
+
 ### Player Commands
 
 ```
@@ -86,21 +90,59 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 
 ## 🔌 Developer API
 
+> 🔗 **[Full API Documentation](https://showcase-fabric.vercel.app/docs/developers)** - Integration guides and examples
+
 ### PlaceholdersAPI Integration
 
 ```
 %showcase:item%        - Share held item
-%showcase:inventory%   - Share inventory  
+%showcase:inventory%   - Share inventory
 %showcase:hotbar%      - Share hotbar
 %showcase:ender_chest% - Share ender chest
 %showcase:stats%       - Share statistics
 ```
 
+**Extended Placeholders**: 60+ placeholders for advanced integrations
+- Player statistics: `%showcase:shares_count%`, `%showcase:total_views%`
+- Performance metrics: `%showcase:cache_hit_rate%`, `%showcase:server_uptime%`
+- Permission checks: `%showcase:can_share_item%`, `%showcase:has_admin_perms%`
+
+📚 **[View all placeholders](https://showcase-fabric.vercel.app/docs/developers/placeholderapi)**
+
 ## ⚙️ Configuration
+
+> ⚙️ **[Configuration Reference](https://showcase-fabric.vercel.app/docs/configuration)** - Complete settings guide
 
 Main configuration file: `config/showcase/config.yml` (YAML format)
 
-Customize share settings, keywords, cooldowns, and statistics display options. Language files are built into the mod for automatic localization.
+**Key Settings**:
+- Share cooldowns and permissions
+- Chat keywords and triggers
+- Statistics tracking options
+- Performance optimization
+- Multi-language support
+
+📖 **[View example config](https://showcase-fabric.vercel.app/docs/configuration/config-file)** | 🔐 **[Permission setup](https://showcase-fabric.vercel.app/docs/configuration/permissions)**
+
+## 📚 Documentation & Resources
+
+### 📖 Official Documentation
+- **[Complete Documentation](https://showcase-fabric.vercel.app)** - Full feature documentation
+- **[Getting Started](https://showcase-fabric.vercel.app/docs/getting-started)** - Installation and setup guide
+- **[Command Reference](https://showcase-fabric.vercel.app/docs/commands)** - All commands with examples
+- **[Configuration Guide](https://showcase-fabric.vercel.app/docs/configuration)** - Settings and customization
+- **[Developer API](https://showcase-fabric.vercel.app/docs/developers)** - PlaceholderAPI integration
+- **[FAQ & Troubleshooting](https://showcase-fabric.vercel.app/docs/support/faq)** - Common issues and solutions
+
+### 🔗 Download Links
+- **[Modrinth](https://modrinth.com/mod/showcase)** - Recommended
+- **[CurseForge](https://www.curseforge.com/minecraft/mc-mods/showcasemod)** - Alternative
+- **[GitHub Releases](https://github.com/jiazengp/showcase-fabric/releases)** - Source & development builds
+
+### 💬 Community & Support
+- **[Issues & Bug Reports](https://github.com/jiazengp/showcase-fabric/issues)** - GitHub Issues
+- **[Feature Requests](https://github.com/jiazengp/showcase-fabric/discussions)** - GitHub Discussions
+- **[Changelog](https://showcase-fabric.vercel.app/docs/support/changelog)** - Version history
 
 ## 📝 License
 

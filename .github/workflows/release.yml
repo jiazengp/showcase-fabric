@@ -97,17 +97,18 @@ jobs:
       - name: generate version-specific changelog
         id: changelog
         run: |
-          # Create changelog that links to the repository CHANGELOG.md
+          # Create changelog that links to the website changelog
           cat > version_changelog.md << EOF
           ## Showcase ${{ github.ref_name }} for Minecraft ${{ matrix.mc_version }}
-          
+
           Compatible Minecraft versions: ${{ steps.version-props.outputs.compatible-versions }}
-          
-          For detailed changelog, please visit: [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
-          
+
+          For detailed changelog, please visit: [Changelog](https://showcase-fabric.vercel.app/docs/support/changelog)
+
           ### Quick Links
           - [GitHub Repository](https://github.com/${{ github.repository }})
-          - [Full Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+          - [Full Changelog](https://showcase-fabric.vercel.app/docs/support/changelog)
+          - [Documentation](https://showcase-fabric.vercel.app)
           - [Issues & Bug Reports](https://github.com/${{ github.repository }}/issues)
           EOF
           
