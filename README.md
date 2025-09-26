@@ -11,7 +11,7 @@ A server-side Minecraft mod that allows players to share links in chat to showca
 - **Comprehensive Sharing**: Items, inventories, containers, and villager trades
 - **Server-Side**: No client installation required
 - **Interactive Previews**: Auto-unpack containers, view books and maps
-- **Multi-Language**: Support for 15+ languages
+- **Multi-Language**: Support for 17+ languages
 - **Persistent Storage**: Shares saved until expiration
 - **Permission System**: LuckPerms integration
 - **Configurable Chat Keywords**: Customizable trigger words for quick sharing
@@ -50,7 +50,7 @@ itemIcons:
 
 ## ⌨️ Commands
 
-> 💡 **[View detailed command reference](https://showcase-fabric.vercel.app/docs/commands)** with examples and permissions
+> 💡 **[View detailed command reference](https://showcase-fabric.vercel.app/docs/commands/player-commands)** with examples and permissions
 
 ### Player Commands
 
@@ -88,7 +88,7 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 
 ## 🔌 Developer API
 
-> 🔗 **[Full API Documentation](https://showcase-fabric.vercel.app/docs/developers)** - Integration guides and examples
+> 🔗 **[Full API Documentation](https://showcase-fabric.vercel.app/docs/developers/api-overview)** - Integration guides and examples
 
 ### PlaceholdersAPI Integration
 
@@ -113,7 +113,7 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 
 ## ⚙️ Configuration
 
-> ⚙️ **[Configuration Reference](https://showcase-fabric.vercel.app/docs/configuration)** - Complete settings guide
+> ⚙️ **[Configuration Reference](https://showcase-fabric.vercel.app/docs/configuration/config-file)** - Complete settings guide
 
 Main configuration file: `config/showcase/config.yml` (YAML format)
 
@@ -129,10 +129,10 @@ Main configuration file: `config/showcase/config.yml` (YAML format)
 ## 📚 Documentation & Resources
 
 - **[Complete Documentation](https://showcase-fabric.vercel.app)** - Full feature documentation
-- **[Getting Started](https://showcase-fabric.vercel.app/docs/getting-started)** - Installation and setup guide
-- **[Command Reference](https://showcase-fabric.vercel.app/docs/commands)** - All commands with examples
-- **[Configuration Guide](https://showcase-fabric.vercel.app/docs/configuration)** - Settings and customization
-- **[Developer API](https://showcase-fabric.vercel.app/docs/developers)** - PlaceholderAPI integration
+- **[Getting Started](https://showcase-fabric.vercel.app/docs/getting-started/installation)** - Installation and setup guide
+- **[Command Reference](https://showcase-fabric.vercel.app/docs/commands/player-commands)** - All commands with examples
+- **[Configuration Guide](https://showcase-fabric.vercel.app/docs/configuration/config-file)** - Settings and customization
+- **[Developer API](https://showcase-fabric.vercel.app/docs/developers/api-overview)** - PlaceholderAPI integration
 - **[FAQ & Troubleshooting](https://showcase-fabric.vercel.app/docs/support/faq)** - Common issues and solutions
 
 ## 📝 License
