@@ -45,6 +45,8 @@
   "showcase.preview_text.more_trades": "§rAnd §l%d §rmore trades",
   "showcase.preview_text.more": "§r%s more items not shown…",
   "showcase.message.invalid_duration_exception": "§rDuration must be between §l%d §rand §l%d §rseconds",
+  "showcase.command.invalid_time_format": "§rInvalid time format. Use formats like '30s', '5m', '1h', or '1h30m'",
+  "showcase.command.time_out_of_range": "§rTime must be between §l%d §rand §l%d §rseconds",
   "showcase.message.about.version": "§rVersion: %s",
   "showcase.message.about.contributors": "§rContributors",
   "showcase.message.reload.success": "§rSuccessfully reloaded configuration!",

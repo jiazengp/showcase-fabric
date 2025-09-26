@@ -49,6 +49,8 @@
   "showcase.preview_text.more_trades": "§r以及§l%d§r个其他交易内容",
   "showcase.preview_text.more": "§r还有%s项未显示…",
   "showcase.message.invalid_duration_exception": "§r有效时长必须在§l%d§r到§l%d§r秒之间",
+  "showcase.command.invalid_time_format": "§r无效的时间格式。请使用如 '30s'、'5m'、'1h' 或 '1h30m' 的格式",
+  "showcase.command.time_out_of_range": "§r时间必须在§l%d§r到§l%d§r秒之间",
 
   "showcase.message.about.version": "§r版本：%s",
   "showcase.message.about.contributors": "§r贡献者",

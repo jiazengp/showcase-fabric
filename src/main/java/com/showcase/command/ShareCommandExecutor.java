@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.showcase.command.TimeArgumentType;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ContainerOpenWatcher;
@@ -47,8 +48,8 @@ public class ShareCommandExecutor {
         int execute(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer durationSeconds);
     }
 
-    public static IntegerArgumentType shareDurationArgument() {
-        return IntegerArgumentType.integer(
+    public static TimeArgumentType shareDurationArgument() {
+        return TimeArgumentType.time(
                 ModConfigManager.getShareLinkMinExpiry(),
                 ModConfigManager.getShareLinkDefaultExpiry()
         );
@@ -111,7 +112,7 @@ public class ShareCommandExecutor {
                     .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, null, null))
                     .then(argument(RECEIVERS_ARG, EntityArgumentType.players())
                             .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, getReceivers(ctx), null))
-                            .then(argument(DURATION_ARG, IntegerArgumentType.integer())
+                            .then(argument(DURATION_ARG, shareDurationArgument())
                                     .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, getReceivers(ctx), getValidatedDuration(ctx)))
                                     .then(argument(DESCRIPTION_ARG, greedyString())
                                             .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), getDescription(ctx), getReceivers(ctx), getValidatedDuration(ctx)))
@@ -355,7 +356,7 @@ public class ShareCommandExecutor {
     }
 
     private static int getValidatedDuration(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
-        int requested = IntegerArgumentType.getInteger(ctx, DURATION_ARG);
+        int requested = TimeArgumentType.getTime(ctx, DURATION_ARG);
         int min = ModConfigManager.getShareLinkMinExpiry();
         int max = ModConfigManager.getShareLinkDefaultExpiry();
 
