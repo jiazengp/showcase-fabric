@@ -1,6 +1,6 @@
 ---
 title: PlaceholderAPI Integration
-description: Integrate Showcase with other mods using PlaceholderAPI placeholders
+description: Integrate Showcase with other mods using essential PlaceholderAPI placeholders
 category: developers
 ---
 
@@ -8,219 +8,80 @@ category: developers
 
 <MinecraftVersion auto />
 
-Showcase provides comprehensive PlaceholderAPI integration, allowing other mods and plugins to access player share data through standardized placeholders.
+Showcase provides essential PlaceholderAPI integration, allowing other mods and plugins to access core player share data through standardized placeholders.
 
-## Available Placeholders
+## Core Placeholders
 
-### Player Share Information
-
-<Tabs items={["Current Shares", "Share Statistics", "Permissions"]}>
-  <Tab value="Current Shares">
-    **Active Share Placeholders**:
-    ```
-    %showcase:shares_count%          # Number of active shares
-    %showcase:shares_remaining%      # Shares until limit
-    %showcase:last_share_type%       # Type of last share created
-    %showcase:last_share_time%       # Time since last share
-    %showcase:next_share_expires%    # When next share expires
-    ```
-
-    **Usage Examples**:
-    ```
-    Player has %showcase:shares_count% active shares
-    Can create %showcase:shares_remaining% more shares
-    Last shared: %showcase:last_share_type%
-    ```
-  </Tab>
-
-  <Tab value="Share Statistics">
-    **Lifetime Statistics**:
-    ```
-    %showcase:total_shares_created%  # Total shares ever created
-    %showcase:total_shares_viewed%   # Total views received
-    %showcase:most_shared_type%      # Most frequently shared type
-    ```
-
-    **Time-based Statistics**:
-    ```
-    %showcase:shares_today%          # Shares created today
-    %showcase:shares_this_week%      # Shares created this week
-    %showcase:average_share_duration% # Average duration of shares
-    ```
-  </Tab>
-
-  <Tab value="Permissions">
-    **Permission Check Placeholders**:
-    ```
-    %showcase:can_share_item%        # true/false
-    %showcase:can_share_inventory%   # true/false
-    %showcase:can_share_stats%       # true/false
-    %showcase:can_use_chat_keywords% # true/false
-    %showcase:has_admin_perms%       # true/false
-    ```
-
-    **Cooldown Information**:
-    ```
-    %showcase:item_cooldown%         # Seconds until can share item
-    %showcase:inventory_cooldown%    # Seconds until can share inventory
-    %showcase:chat_cooldown%         # Seconds until can use keywords
-    ```
-  </Tab>
-</Tabs>
-
-## Server-wide Placeholders
-
-### System Statistics
+### Basic Sharing Placeholders
 
 ```
-%showcase:server_total_shares%       # Total shares on server
-%showcase:server_active_shares%      # Currently active shares
-%showcase:server_most_active_user%   # Player with most shares
-%showcase:server_uptime%             # Showcase mod uptime
+%showcase:item%              # Share held item
+%showcase:inventory%         # Share inventory
+%showcase:hotbar%            # Share hotbar
+%showcase:ender_chest%       # Share ender chest
+%showcase:stats%             # Share statistics
 ```
 
-### Performance Metrics
+### Player Statistics
 
 ```
-%showcase:average_response_time%     # Average command response time
-%showcase:success_rate%              # Percentage of successful shares
-%showcase:cache_hit_rate%            # Cache efficiency percentage
+%showcase:shares_count%      # Number of active shares
+%showcase:total_views%       # Total views received by player
 ```
 
-## Integration Examples
+### Permission Checks
 
-### Fabric Mod Integration
+```
+%showcase:can_share_item%    # true/false - Can share items
+%showcase:has_admin_perms%   # true/false - Has admin permissions
+```
+
+## Usage Examples
+
+### Basic Integration
 
 ```java
 public class ShowcasePlaceholderIntegration {
 
-    public void getPlayerShareInfo(ServerPlayerEntity player) {
-        // Use PlaceholderContext for Fabric placeholder API
+    public void displayPlayerInfo(ServerPlayerEntity player) {
         PlaceholderContext context = PlaceholderContext.of(player);
 
         // Parse placeholders in text
         Text shareCountText = Placeholders.parseText(
-            Text.literal("You have %showcase:shares_count% active shares"),
+            Text.literal("Active shares: %showcase:shares_count%"),
             context
         );
 
-        Text cooldownText = Placeholders.parseText(
-            Text.literal("Item cooldown: %showcase:item_cooldown% seconds"),
+        Text viewsText = Placeholders.parseText(
+            Text.literal("Total views: %showcase:total_views%"),
             context
         );
 
-        // Send messages to player
         player.sendMessage(shareCountText);
-        player.sendMessage(cooldownText);
+        player.sendMessage(viewsText);
     }
 
-    public void displayServerStats(ServerPlayerEntity player) {
+    public void checkPermissions(ServerPlayerEntity player) {
         PlaceholderContext context = PlaceholderContext.of(player);
 
-        Text serverStatsText = Placeholders.parseText(
-            Text.literal("Server: %showcase:server_active_shares% active, %showcase:server_uptime% uptime"),
+        Text permissionText = Placeholders.parseText(
+            Text.literal("Can share items: %showcase:can_share_item%"),
             context
         );
 
-        player.sendMessage(serverStatsText);
+        player.sendMessage(permissionText);
     }
 }
 ```
 
-### Configuration
+### Chat Integration
 
-```properties
-# Enable placeholder extensions
-placeholder-extensions-enabled=true
-
-# Enable specific placeholder categories
-statistics-tracking-enabled=true
-server-statistics-enabled=true
-performance-metrics-enabled=true
-conditional-placeholders-enabled=true
-```
-
-### Scoreboard Integration
-
-```java
-public class ShowcaseScoreboard {
-
-    public void updateScoreboard(Player player, Scoreboard scoreboard) {
-        Objective objective = scoreboard.getObjective("showcase");
-
-        // Display share statistics
-        String totalShares = PlaceholderAPI.setPlaceholders(player, "%showcase:total_shares_created%");
-        String reputation = PlaceholderAPI.setPlaceholders(player, "%showcase:sharing_reputation%");
-
-        Score shareScore = objective.getScore("§6Shares: §f" + totalShares);
-        shareScore.setScore(15);
-
-        Score repScore = objective.getScore("§6Reputation: §f" + reputation);
-        repScore.setScore(14);
-    }
-}
-```
-
-## Advanced Placeholder Features
-
-### Conditional Placeholders
-
-<Tabs items={["Permission-based", "Time-based", "Share-based"]}>
-  <Tab value="Permission-based">
-    **Permission-conditional placeholders**:
-    ```
-    %showcase:if_can_share_item_yes_no%      # Returns "yes" or "no"
-    %showcase:if_admin_admin_player%         # Returns "admin" or "player"
-    %showcase:permission_level%              # Numeric permission level
-    ```
-
-    **Usage in messages**:
-    ```
-    You are currently a %showcase:if_admin_admin_player% user
-    Item sharing: %showcase:if_can_share_item_enabled_disabled%
-    ```
-  </Tab>
-
-  <Tab value="Time-based">
-    **Time-conditional placeholders**:
-    ```
-    %showcase:if_cooldown_ready_waiting%     # "ready" or "waiting"
-    %showcase:time_until_next_share%         # Formatted time string
-    %showcase:shares_per_hour_limit%         # Rate limiting info
-    ```
-
-    **Formatted time outputs**:
-    ```
-    Next share available: %showcase:time_until_next_share%
-    Status: %showcase:if_cooldown_ready_waiting%
-    ```
-  </Tab>
-
-  <Tab value="Share-based">
-    **Share-conditional placeholders**:
-    ```
-    %showcase:if_has_shares_active_none%     # "active" or "none"
-    %showcase:most_viewed_share_type%        # Type with most views
-    %showcase:longest_active_share%          # Duration of oldest share
-    ```
-
-    **Context-aware information**:
-    ```
-    Share status: %showcase:if_has_shares_active_none%
-    Popular content: %showcase:most_viewed_share_type%
-    ```
-  </Tab>
-</Tabs>
-
-### Custom Placeholder Arguments
-
-Some placeholders accept arguments for customization:
+Use placeholders directly in chat for dynamic sharing:
 
 ```
-%showcase:cooldown:item%                 # Specific type cooldown
-%showcase:shares_by_type:inventory%      # Count of specific type
-%showcase:stats:today%                   # Statistics for specific period
-%showcase:permission:showcase.admin%     # Check specific permission
+Check out my %showcase:item%!
+My inventory: %showcase:inventory%
+Current stats: %showcase:stats%
 ```
 
 ## Configuration
@@ -232,160 +93,85 @@ integrations:
   placeholderapi:
     enabled: true
 
-    # Update frequency for dynamic placeholders
-    updateInterval: 30  # seconds
-
-    # Cache placeholder results
-    cacheResults: true
-    cacheExpiration: 60  # seconds
-
-    # Custom placeholder prefix (default: showcase)
-    prefix: "showcase"
+    # Enable extended placeholder features
+    placeholder-extensions-enabled: true
 ```
 
-### Performance Settings
-
-```yaml
-placeholderapi:
-  performance:
-    # Async placeholder evaluation
-    asyncEvaluation: true
-
-    # Maximum concurrent evaluations
-    maxConcurrentEvaluations: 10
-
-    # Timeout for complex placeholders
-    evaluationTimeout: 5000  # milliseconds
-```
-
-## Mod Integration Examples
+## Integration Examples
 
 ### Economy Integration
 
 ```java
-public class EconomyShowcaseIntegration {
+public class EconomyIntegration {
 
-    public void setupEconomyPlaceholders() {
-        // Register custom placeholders
-        PlaceholderAPI.registerPlaceholderHook("showcase_economy", new PlaceholderHook() {
-            @Override
-            public String onRequest(Player player, String params) {
-                if (params.equals("sharing_earnings")) {
-                    // Calculate earnings from sharing
-                    int shares = Integer.parseInt(PlaceholderAPI.setPlaceholders(player, "%showcase:total_shares_created%"));
-                    return String.valueOf(shares * 10); // 10 coins per share
-                }
-                return null;
-            }
-        });
+    public void rewardForSharing(ServerPlayerEntity player) {
+        PlaceholderContext context = PlaceholderContext.of(player);
+
+        String shareCount = Placeholders.parseText(
+            Text.literal("%showcase:shares_count%"),
+            context
+        ).getString();
+
+        int shares = Integer.parseInt(shareCount);
+        int reward = shares * 10; // 10 coins per active share
+
+        // Give reward to player
+        giveCoins(player, reward);
     }
 }
 ```
 
-### Rank Integration
-
-```java
-public class RankIntegration {
-
-    public String getPlayerRank(Player player) {
-        String reputation = PlaceholderAPI.setPlaceholders(player, "%showcase:sharing_reputation%");
-        int repScore = Integer.parseInt(reputation);
-
-        if (repScore >= 1000) return "§6Master Sharer";
-        if (repScore >= 500) return "§eExpert Sharer";
-        if (repScore >= 100) return "§aActive Sharer";
-        return "§7New Sharer";
-    }
-}
-```
-
-### Quest Integration
+### Quest System
 
 ```java
 public class QuestIntegration {
 
-    public boolean checkQuestProgress(Player player, String questType) {
-        switch (questType) {
-            case "share_10_items":
-                String itemShares = PlaceholderAPI.setPlaceholders(player, "%showcase:shares_by_type:item%");
-                return Integer.parseInt(itemShares) >= 10;
+    public boolean checkSharingQuest(ServerPlayerEntity player) {
+        PlaceholderContext context = PlaceholderContext.of(player);
 
-            case "reach_reputation_100":
-                String reputation = PlaceholderAPI.setPlaceholders(player, "%showcase:sharing_reputation%");
-                return Integer.parseInt(reputation) >= 100;
+        String viewsText = Placeholders.parseText(
+            Text.literal("%showcase:total_views%"),
+            context
+        ).getString();
 
-            default:
-                return false;
-        }
+        int views = Integer.parseInt(viewsText);
+        return views >= 100; // Quest: Get 100 total views
     }
 }
 ```
+
+## Migration from Extended Placeholders
+
+If you were using advanced placeholders from previous versions, here's the migration guide:
+
+**Removed placeholders:**
+- Performance metrics (`%showcase:cache_hit_rate%`, etc.)
+- Server statistics (`%showcase:server_total_shares%`, etc.)
+- Detailed time tracking (`%showcase:shares_today%`, etc.)
+- Cooldown placeholders (`%showcase:item_cooldown%`, etc.)
+
+**Recommended alternatives:**
+- Use mod APIs directly for detailed statistics
+- Implement custom tracking in your integration
+- Use the remaining essential placeholders for core functionality
 
 ## Troubleshooting
 
+<Callout type="info">
+**Reduced Complexity**: The simplified placeholder system focuses on essential features only, improving performance and maintainability.
+</Callout>
+
 ### Common Issues
 
-<Callout type="error">
-**Placeholders not updating**: Check if PlaceholderAPI is installed and Showcase integration is enabled
-</Callout>
+**Placeholders not working:**
+1. Verify PlaceholderAPI is installed
+2. Check that `placeholder-extensions-enabled: true` in config
+3. Restart server after configuration changes
 
-**Solutions**:
-1. Verify PlaceholderAPI is installed: `/papi version`
-2. Check Showcase integration: `/showcase-manage status`
-3. Reload PlaceholderAPI: `/papi reload`
-
-<Callout type="error">
-**Performance issues**: Too many placeholder evaluations causing lag
-</Callout>
-
-**Solutions**:
-1. Enable caching in Showcase config
-2. Reduce update intervals
-3. Use async evaluation
-4. Limit concurrent evaluations
-
-### Debug Information
-
-Enable debug logging for placeholder evaluation:
-
-```yaml
-debug:
-  enabled: true
-  logPlaceholders: true
-  logPlaceholderPerformance: true
-```
-
-**Debug Output Example**:
-```
-[DEBUG] [Showcase] Placeholder evaluated: %showcase:shares_count% = 3 (took 2ms)
-[DEBUG] [Showcase] Placeholder cached: %showcase:sharing_reputation% = 150 (cached for 60s)
-```
-
-## API Reference
-
-### Custom Placeholder Registration
-
-```java
-public class CustomPlaceholders {
-
-    public void registerCustomPlaceholders() {
-        ShowcaseAPI.getInstance().registerPlaceholder("my_custom_placeholder", (player, args) -> {
-            // Custom logic here
-            return "custom_value";
-        });
-    }
-}
-```
-
-### Placeholder Expansion Interface
-
-```java
-public interface PlaceholderExpansion {
-    String expand(Player player, String[] args);
-    boolean requiresPlayer();
-    int getCacheDuration();
-}
-```
+**Migration from complex placeholders:**
+1. Update your integrations to use core placeholders
+2. Implement custom statistics tracking if needed
+3. Use the Showcase mod API for advanced features
 
 <RelatedLinks
   links={[
@@ -402,28 +188,10 @@ public interface PlaceholderExpansion {
       icon: <Code />
     },
     {
-      title: "Events",
-      href: "/developers/events",
-      description: "Event system for custom integrations",
-      icon: <Activity />
-    },
-    {
-      title: "Data API",
-      href: "/developers/data-api",
-      description: "Data storage and retrieval systems",
-      icon: <Database />
-    },
-    {
       title: "Configuration File",
       href: "/configuration/config-file",
       description: "Placeholder settings and integration configuration",
       icon: <Settings />
-    },
-    {
-      title: "Troubleshooting",
-      href: "/support/troubleshooting",
-      description: "Performance optimization and common issues",
-      icon: <HelpCircle />
     }
   ]}
 />

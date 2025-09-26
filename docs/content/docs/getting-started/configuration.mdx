@@ -8,422 +8,115 @@ category: getting-started
 
 <MinecraftVersion auto />
 
-After installing Showcase, follow this guide to configure the mod for your server's needs.
+Configure Showcase for your server's needs with essential settings only.
 
 ## First Startup
 
-When Showcase starts for the first time, it automatically:
+When Showcase starts, it automatically:
 
-1. **Creates Configuration Directory**:
-   ```
-   config/showcase/
-   ├── config.yml          # Main configuration
-   ├── backups/            # Automatic backups
-   └── data/               # Share data storage
-   ```
-
-2. **Generates Default Config**:
-   - Safe defaults for all settings
-   - Optimized for small to medium servers
-   - All features enabled
-
-3. **Sets Up Data Storage**:
-   - Creates internal database
-   - Initializes cleanup routines
-   - Prepares caching system
+1. Creates `config/showcase/config.yml` with default settings
+2. Sets up data storage directories
+3. Initializes with safe defaults for all server sizes
 
 <Callout type="info">
-**First Boot**: Allow 5-10 seconds for initial setup. Check console for "Showcase mod loaded successfully" message.
+**First Boot**: Look for "Showcase mod loaded successfully" in console.
 </Callout>
 
 ## Essential Settings
 
-### Basic Server Configuration
+### Basic Configuration
 
-<Tabs items={["Small Server", "Medium Server", "Large Server"]}>
-  <Tab value="Small Server">
-    **For 5-20 players**:
-    ```yaml title="config/showcase/config.yml"
-    general:
-      defaultDuration: 60       # 1 hour default
-      maxDuration: 240         # 4 hours max
-      maxSharesPerPlayer: 10   # Generous limits
-      cleanupInterval: 10      # Less frequent cleanup
+```yaml title="config/showcase/config.yml"
+general:
+  defaultDuration: 1800        # 30 minutes default
+  maxDuration: 7200           # 2 hours maximum
+  maxSharesPerPlayer: 5       # Active shares per player
 
-    shares:
-      item:
-        cooldown: 3            # Short cooldowns
-      inventory:
-        cooldown: 5
-      container:
-        cooldown: 10
-    ```
-  </Tab>
+shares:
+  item:
+    enabled: true
+    cooldown: 5               # 5 seconds between item shares
+  inventory:
+    enabled: true
+    cooldown: 30              # 30 seconds for inventory
+  hotbar:
+    enabled: true
+    cooldown: 15
+  container:
+    enabled: true
+    cooldown: 10
 
-  <Tab value="Medium Server">
-    **For 20-100 players**:
-    ```yaml title="config/showcase/config.yml"
-    general:
-      defaultDuration: 30       # 30 minutes default
-      maxDuration: 120         # 2 hours max
-      maxSharesPerPlayer: 5    # Moderate limits
-      cleanupInterval: 5       # Standard cleanup
-
-    shares:
-      item:
-        cooldown: 5            # Standard cooldowns
-      inventory:
-        cooldown: 10
-      container:
-        cooldown: 15
-    ```
-  </Tab>
-
-  <Tab value="Large Server">
-    **For 100+ players**:
-    ```yaml title="config/showcase/config.yml"
-    general:
-      defaultDuration: 15       # 15 minutes default
-      maxDuration: 60          # 1 hour max
-      maxSharesPerPlayer: 3    # Strict limits
-      cleanupInterval: 2       # Frequent cleanup
-
-    shares:
-      item:
-        cooldown: 10           # Longer cooldowns
-      inventory:
-        cooldown: 20
-      container:
-        cooldown: 30
-
-    performance:
-      cacheSize: 2000          # Larger cache
-      cacheExpiration: 120     # Shorter cache life
-    ```
-  </Tab>
-</Tabs>
-
-### Chat Keywords Setup
-
-Enable quick sharing through chat:
-
-```yaml title="Chat Keywords Configuration"
 chatKeywords:
   enabled: true
-  caseSensitive: false
-
-  # Rate limiting (adjust for server size)
-  rateLimitPerMinute: 5
-  rateLimitPerHour: 30
-
-  # Enable/disable specific keywords
-  keywords:
-    item:
-      enabled: true
-      aliases: ["i", "hand"]
-    inventory:
-      enabled: true
-      aliases: ["inv"]
-    stats:
-      enabled: true           # May want to disable for large servers
-      aliases: ["stat"]
+  aliases:
+    item: ["i"]
+    inventory: ["inv"]
+    hotbar: ["hb", "hot"]
 ```
 
-### Language Settings
+### Server Size Adjustments
 
-Configure multi-language support:
+**Small Server (5-20 players)**:
+```yaml
+general:
+  maxSharesPerPlayer: 10      # More generous limits
+shares:
+  item:
+    cooldown: 3               # Shorter cooldowns
+```
 
-```yaml title="Language Configuration"
-language:
-  defaultLanguage: "en"      # Default for new players
-
-  # Available languages for your server
-  availableLanguages:
-    - "en"                   # English
-    - "zh_cn"               # Chinese (if needed)
-    - "es_es"               # Spanish (if needed)
-    - "fr_fr"               # French (if needed)
+**Large Server (100+ players)**:
+```yaml
+general:
+  maxSharesPerPlayer: 3       # Stricter limits
+shares:
+  item:
+    cooldown: 10              # Longer cooldowns
 ```
 
 ## Permission Setup
 
-### Without LuckPerms
-
-For simple operator-based permissions:
-
-```yaml title="Basic Permissions"
-permissions:
-  defaultPermissions:
-    # Grant these to all players
-    - "showcase.command.item"
-    - "showcase.command.hotbar"
-    - "showcase.chat.item"
-
-  operatorPermissions:
-    level4:                  # Full admin
-      - "showcase.admin"
-    level3:                  # Management only
-      - "showcase.admin.manage"
-    level2:                  # Advanced sharing
-      - "showcase.command.*"
-    level1:                  # Basic sharing
-      - "showcase.command.item"
-      - "showcase.command.inventory"
-```
-
 ### With LuckPerms
 
-<CommandSyntax>/lp group default permission set showcase.command.item true</CommandSyntax>
-
-**Basic Player Group**:
+Give basic permissions to all players:
 ```bash
-# Essential permissions for all players
 /lp group default permission set showcase.command.item true
 /lp group default permission set showcase.command.hotbar true
 /lp group default permission set showcase.chat.item true
 ```
 
-**Trusted Player Group**:
-```bash
-# Create trusted group with more features
-/lp creategroup trusted
-/lp group trusted permission set showcase.command.inventory true
-/lp group trusted permission set showcase.command.container true
-/lp group trusted permission set showcase.command.*.receivers true
-/lp group trusted permission set showcase.chat true
-```
+### Without LuckPerms
 
-**Staff Group**:
-```bash
-# Create staff group with admin features
-/lp creategroup staff
-/lp group staff permission set showcase.admin.manage true
-/lp group staff permission set showcase.admin.others true
-```
+Showcase uses Minecraft's operator permissions by default.
 
-## Feature Configuration
+## Testing Your Setup
 
-### Enable/Disable Features
-
-<Callout type="warn">
-**Performance Tip**: Disable unused features on large servers to improve performance.
-</Callout>
-
-```yaml title="Feature Toggles"
-shares:
-  # Core features (usually keep enabled)
-  item:
-    enabled: true
-  inventory:
-    enabled: true
-  hotbar:
-    enabled: true
-
-  # Resource-intensive features
-  container:
-    enabled: true          # Disable if not needed
-  merchant:
-    enabled: true          # Disable if no villager trading
-  stats:
-    enabled: false         # Disable for large servers
-
-# Experimental features
-itemIcons:
-  enabled: false           # Keep disabled unless needed
-```
-
-### Performance Optimization
-
-```yaml title="Performance Settings"
-performance:
-  # Cache settings (adjust based on RAM)
-  cacheSize: 1000          # Reduce for less RAM
-  cacheExpiration: 300     # Cache lifetime in seconds
-
-  # Database optimization
-  databaseCleanup: true    # Enable automatic cleanup
-  compactInterval: 60      # Database compaction frequency
-
-  # Statistics (can impact performance)
-  collectDetailedStats: true    # Set false for large servers
-  statsUpdateInterval: 30       # How often to update stats
-```
-
-## Testing Your Configuration
-
-### Verify Installation
-
-<CommandSyntax>/showcase-manage reload</CommandSyntax>
-
-1. **Check Mod Status**:
-   ```bash
-   /mods | grep showcase
-   # Should show Showcase with version
-   ```
-
-2. **Test Basic Functionality**:
-   ```bash
-   # Hold an item and test
-   /showcase item
-   # Should create a share link
-   ```
-
-3. **Test Permissions**:
-   ```bash
-   # Check player permissions
-   /showcase-manage perms YourName
-   ```
-
-4. **Test Chat Keywords**:
-   ```
-   Hold an item and type in chat: "Check my [item]!"
-   Should replace [item] with item link
-   ```
-
-### Verify Settings
-
-<CommandSyntax>/showcase-manage list</CommandSyntax>
-
-Check that your configuration is working:
-
-```
-Active Shares: 0
-Cleanup Status: Running (next in 4m)
-Cache Status: 15 entries, 234MB used
-Performance: Normal
-```
-
-## Common Configuration Patterns
-
-### Creative Server
-
-```yaml title="Creative Server Settings"
-general:
-  defaultDuration: 120     # Longer durations for showcasing builds
-  maxDuration: 480        # Up to 8 hours
-  maxSharesPerPlayer: 15  # More shares for creative projects
-
-shares:
-  container:
-    enabled: true         # Important for build showcasing
-    cooldown: 5          # Quick sharing for demos
-  stats:
-    enabled: false       # Usually not needed in creative
-
-chatKeywords:
-  rateLimitPerMinute: 10 # More frequent sharing
-```
-
-### Survival Server
-
-```yaml title="Survival Server Settings"
-general:
-  defaultDuration: 30      # Standard durations
-  maxDuration: 120
-  maxSharesPerPlayer: 5    # Conservative limits
-
-shares:
-  item:
-    cooldown: 10          # Prevent spam
-  inventory:
-    cooldown: 30          # Longer cooldown for full inventory
-  stats:
-    enabled: true         # Players like comparing progress
-
-performance:
-  collectDetailedStats: true  # Good for survival progression
-```
-
-### PvP Server
-
-```yaml title="PvP Server Settings"
-general:
-  defaultDuration: 15      # Short durations
-  maxDuration: 60
-  maxSharesPerPlayer: 3    # Strict limits
-
-shares:
-  item:
-    cooldown: 15          # Prevent tactical spam
-  inventory:
-    enabled: false        # May reveal too much
-  container:
-    cooldown: 60          # Long cooldown for strategic items
-
-chatKeywords:
-  rateLimitPerMinute: 3   # Strict rate limiting
-```
-
-## Advanced Configuration
-
-### Custom Share Types
-
-```yaml title="Custom Configurations"
-shares:
-  # Custom duration for different item types
-  item:
-    defaultDuration: 30
-    # Could add item-specific rules here in future versions
-
-  # Different settings for different container types
-  container:
-    defaultDuration: 45
-    detectionTimeout: 15   # Longer timeout for slow interactions
-```
-
-### Debug and Monitoring
-
-```yaml title="Debug Configuration"
-debug:
-  enabled: false           # Only enable for troubleshooting
-  logLevel: "INFO"        # INFO, WARN, ERROR, DEBUG
-  logCommands: false      # Log all commands (for auditing)
-  logPermissions: false   # Debug permission issues
-  logChatKeywords: false  # Debug chat keyword processing
-```
-
-## Configuration Validation
-
-### Check for Errors
-
-After making changes, always reload and check for errors:
-
-<CommandSyntax>/showcase-manage reload</CommandSyntax>
-
-**Look for these messages**:
-```
-✅ [Showcase] Configuration reloaded successfully
-❌ [Showcase] Configuration error: Invalid duration value
-❌ [Showcase] Configuration warning: Unknown setting 'badkey'
-```
-
-### Backup Your Config
+1. **Reload config**: `/showcase-manage reload`
+2. **Test sharing**: Hold an item and run `/showcase item`
+3. **Test keywords**: Type `Check my [item]!` in chat
 
 <Callout type="tip">
-**Backup Reminder**: Showcase automatically backs up your config, but manual backups are recommended before major changes.
+**Keep It Simple**: Default settings work well for most servers. Only adjust if you experience issues.
 </Callout>
 
-```bash
-# Manual backup
-cp config/showcase/config.yml config/showcase/config.yml.backup
+## Common Adjustments
 
-# Restore if needed
-cp config/showcase/config.yml.backup config/showcase/config.yml
+**Disable unused features**:
+```yaml
+shares:
+  container:
+    enabled: false    # If players don't use containers
+  stats:
+    enabled: false    # If statistics aren't needed
 ```
+
+**Adjust cooldowns for your server type**:
+- **Creative servers**: Lower cooldowns (3-5 seconds)
+- **Survival servers**: Standard cooldowns (5-15 seconds)
+- **PvP servers**: Higher cooldowns (15-30 seconds)
 
 ## Next Steps
 
-After basic configuration:
-
-1. **Set Up Permissions**: Configure LuckPerms groups for your server
-2. **Customize Features**: Enable/disable specific sharing types
-3. **Monitor Performance**: Watch server performance and adjust settings
-4. **Train Staff**: Ensure admins know management commands
-5. **Educate Players**: Share documentation or create tutorials
-
-## Related Topics
-
-- [Permissions Setup](/configuration/permissions) - Detailed permission configuration
-- [Configuration Reference](/configuration/config-file) - Complete configuration options
-- [Admin Commands](/commands/admin-commands) - Management commands
-- [Troubleshooting](/support/troubleshooting) - Common configuration issues
+- [Permissions Setup](/configuration/permissions) - Detailed permissions
+- [Commands Reference](/commands/player-commands) - Available commands
+- [Troubleshooting](/support/troubleshooting) - Common issues

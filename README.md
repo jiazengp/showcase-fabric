@@ -59,9 +59,7 @@ itemIcons:
 ```
 **Types**: `item`, `inventory`, `hotbar`, `enderchest`, `container`, `merchant`, `stats`
 
-- `container` - Share a container opened within 10 seconds
-- `merchant` - Share a villager trade interface opened within 10 seconds
-- `stats` - Share player statistics with categorized data
+**Duration formats**: `30s`, `5m`, `1h`, `1h30m` or raw seconds (e.g. `300`)
 
 **Other Commands**:
 - `/showcase cancel <id>` - Cancel your share
@@ -94,6 +92,7 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 
 ### PlaceholdersAPI Integration
 
+**Basic Sharing**:
 ```
 %showcase:item%        - Share held item
 %showcase:inventory%   - Share inventory
@@ -102,10 +101,13 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 %showcase:stats%       - Share statistics
 ```
 
-**Extended Placeholders**:
-
-- Player statistics: `%showcase:shares_count%`, `%showcase:total_views%`
-- Permission checks: `%showcase:can_share_item%`, `%showcase:has_admin_perms%`
+**Essential Statistics**:
+```
+%showcase:shares_count% - Number of active shares
+%showcase:total_views%  - Total views received
+%showcase:can_share_item% - Permission check (true/false)
+%showcase:has_admin_perms% - Admin check (true/false)
+```
 
 📚 **[View all placeholders](https://showcase-fabric.vercel.app/docs/developers/placeholderapi)**
 

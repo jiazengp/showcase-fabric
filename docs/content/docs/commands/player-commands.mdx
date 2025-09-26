@@ -130,17 +130,17 @@ You can specify custom durations using these formats:
 
 | Format | Description | Example |
 |--------|-------------|---------|
-| `30s` | Seconds | 30 seconds |
-| `5m` | Minutes | 5 minutes |
-| `2h` | Hours | 2 hours |
-| `1d` | Days | 1 day |
-| `permanent` | Never expires | Until server restart |
+| `30s` | Seconds | Share for 30 seconds |
+| `5m` | Minutes | Share for 5 minutes |
+| `1h` | Hours | Share for 1 hour |
+| `1h30m` | Combined | Share for 1 hour 30 minutes |
+| `300` | Raw seconds | Share for 300 seconds (legacy) |
 
 **Examples:**
 ```
 /showcase item Steve 30s
-/showcase inventory @a 2h "My base supplies"
-/showcase stats Alex 1d
+/showcase inventory @a 1h "My base supplies"
+/showcase stats Alex 1h30m
 ```
 
 ## Target Player Formats
