@@ -103,11 +103,11 @@ jobs:
 
           Compatible Minecraft versions: ${{ steps.version-props.outputs.compatible-versions }}
 
-          For detailed changelog, please visit: [Changelog](https://showcase-fabric.vercel.app/docs/support/changelog)
+          For detailed changelog, please visit: [Changelog](https://showcase-fabric.vercel.app/docs/changelog)
 
           ### Quick Links
           - [GitHub Repository](https://github.com/${{ github.repository }})
-          - [Full Changelog](https://showcase-fabric.vercel.app/docs/support/changelog)
+          - [Full Changelog](https://showcase-fabric.vercel.app/docs/changelog)
           - [Documentation](https://showcase-fabric.vercel.app)
           - [Issues & Bug Reports](https://github.com/${{ github.repository }}/issues)
           EOF
