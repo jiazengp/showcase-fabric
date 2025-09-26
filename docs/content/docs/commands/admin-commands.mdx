@@ -1,0 +1,367 @@
+---
+title: Admin Commands
+description: Administrative commands for server management and player oversight
+category: commands
+---
+
+# Admin Commands
+
+<MinecraftVersion auto />
+
+Administrative commands provide server staff with tools to manage shares, monitor usage, and maintain the Showcase system.
+
+## Administrative Sharing
+
+### Create Shares for Other Players
+
+<CommandSyntax>/admin-showcase [type]</CommandSyntax>
+
+Create shares on behalf of other players using your current context:
+
+<Tabs items={["Available Types", "Usage Examples", "Permission Notes"]}>
+  <Tab value="Available Types">
+    **Share Types Available**:
+    - `item` - Your held item (default if no type specified)
+    - `inventory` - Your full inventory
+    - `hotbar` - Your hotbar only
+    - `enderchest` - Your ender chest contents
+    - `stats` - Your player statistics
+
+    ```bash
+    # Share your held item (default)
+    /admin-showcase
+    /admin-showcase item
+
+    # Share your inventory
+    /admin-showcase inventory
+
+    # Share your hotbar
+    /admin-showcase hotbar
+
+    # Share your ender chest
+    /admin-showcase enderchest
+
+    # Share your statistics
+    /admin-showcase stats
+    ```
+  </Tab>
+
+  <Tab value="Usage Examples">
+    **Educational Demonstrations**:
+    ```bash
+    # Prepare example items in your inventory, then:
+    /admin-showcase inventory
+    # Creates a public share of your inventory
+
+    # Hold an enchanted item, then:
+    /admin-showcase item
+    # Shares the item you're holding
+    ```
+
+    **Event Management**:
+    ```bash
+    # Hold a prize item, then:
+    /admin-showcase item
+    # Creates a public showcase of the prize
+
+    # Prepare contest items, then:
+    /admin-showcase hotbar
+    # Shows your prepared hotbar layout
+    ```
+
+    <Callout type="info">
+    **Note**: Admin shares use your current player state (items you're holding, your inventory, etc.) and create public shares for all players to view.
+    </Callout>
+  </Tab>
+
+  <Tab value="Permission Notes">
+    **Required Permission**:
+    - Operator level 4 (server operator)
+    - No specific permission nodes required
+
+    **Admin Share Behavior**:
+    - Creates public shares (visible to all players)
+    - Uses standard share duration from config
+    - Bypasses your personal cooldowns
+    - Uses your current player state (inventory, held items, etc.)
+
+    **Limitations**:
+    - Cannot specify custom receivers, duration, or description
+    - Cannot share other players' content directly
+    - Must have the content to share in your own inventory/state
+  </Tab>
+</Tabs>
+
+## System Management
+
+### Configuration Management
+
+<CommandSyntax>/showcase-manage reload</CommandSyntax>
+
+Reload configuration without server restart:
+
+```bash
+# Reload all configuration
+/showcase-manage reload
+```
+
+**What Gets Reloaded**:
+- ✅ Share durations and cooldowns
+- ✅ Chat keyword settings
+- ✅ Permission defaults
+- ✅ Performance settings
+- ❌ Database settings (requires restart)
+- ❌ Language files (requires restart)
+
+**Required Permission**: `showcase.manage.reload` (default: level 4)
+
+### Share Management
+
+<CommandSyntax>/showcase-manage list [page]</CommandSyntax>
+
+View all active shares:
+
+```bash
+# View first page of shares
+/showcase-manage list
+
+# View specific page
+/showcase-manage list 2
+```
+
+**Output Example**:
+```
+Active Shares (Page 1/2):
+[abc123] Steve | ITEM | Diamond Sword | 25m remaining
+[def456] Alex | INVENTORY | Full Inventory | 1h 15m remaining
+[ghi789] Sarah | STATS | Player Statistics | 45m remaining
+
+Page 1 of 2 | Total: 8 shares
+```
+
+**Required Permission**: `showcase.manage.list` (default: level 4)
+
+### Cancel Shares
+
+<CommandSyntax>/showcase-manage cancel &lt;id|player&gt;</CommandSyntax>
+
+Cancel specific shares or all shares by a player:
+
+<Tabs items={["By Share ID", "By Player"]}>
+  <Tab value="By Share ID">
+    ```bash
+    # Cancel specific share
+    /showcase-manage cancel abc123
+    ```
+
+    **Share ID Sources**:
+    - `/showcase-manage list` command
+    - Share creation notifications (if enabled)
+    - Server logs with debug enabled
+
+    **Success Message**:
+    ```
+    Share abc123 cancelled successfully
+    ```
+  </Tab>
+
+  <Tab value="By Player">
+    ```bash
+    # Cancel all shares by a player
+    /showcase-manage cancel Steve
+    ```
+
+    **Success Message**:
+    ```
+    Cancelled 3 shares by Steve
+    ```
+
+    **Use Cases**:
+    - Player leaving server
+    - Resolving sharing conflicts
+    - Moderation actions
+  </Tab>
+</Tabs>
+
+**Required Permission**: `showcase.manage.cancel` (default: level 4)
+
+### About Information
+
+<CommandSyntax>/showcase-manage about</CommandSyntax>
+
+Display detailed mod information:
+
+```bash
+/showcase-manage about
+```
+
+**Output Example**:
+```
+=== Showcase Mod About ===
+Mod ID: showcase
+Name: Showcase
+Author: jiazengp
+Version: 2.3.1+mc1.21.6
+Source Code: github.com/jiazengp/showcase-fabric
+Issues: github.com/jiazengp/showcase-fabric/issues
+Homepage (CN): showcase.example.com
+License: MIT
+===========================
+```
+
+**Required Permission**: `showcase.manage.about` (default: none - available to all players)
+
+## Permission Management
+
+### Administrative Permissions
+
+<PermissionNode
+  node="showcase.manage.reload"
+  description="Reload configuration files"
+/>
+
+<PermissionNode
+  node="showcase.manage.list"
+  description="View all active shares"
+/>
+
+<PermissionNode
+  node="showcase.manage.cancel"
+  description="Cancel any player's shares"
+/>
+
+<PermissionNode
+  node="showcase.manage.about"
+  description="View mod information (default: available to all)"
+/>
+
+### Permission Setup Examples
+
+```bash
+# Give moderators basic management permissions
+/lp group moderator permission set showcase.manage.list true
+/lp group moderator permission set showcase.manage.cancel true
+
+# Give admins full management access
+/lp group admin permission set showcase.manage.reload true
+/lp group admin permission set showcase.manage.list true
+/lp group admin permission set showcase.manage.cancel true
+
+# Admin showcase requires operator level 4 (no specific permission)
+/op YourAdminName
+```
+
+## Best Practices for Administrators
+
+### Regular Maintenance
+
+<Callout type="tip">
+**Daily Checks**: Use `/showcase-manage list` to monitor active shares and system usage.
+</Callout>
+
+**Daily Tasks**:
+```bash
+# Check active shares
+/showcase-manage list
+
+# Review system information
+/showcase-manage about
+```
+
+**Weekly Tasks**:
+```bash
+# Reload configuration after updates
+/showcase-manage reload
+
+# Backup configuration files
+# (Outside of game - backup config/showcase/config.yml)
+```
+
+### Monitoring Guidelines
+
+**Active Share Management**:
+- Monitor share count trends with `/showcase-manage list`
+- Look for unusually long-running shares
+- Check for abandoned shares from offline players
+
+**Configuration Management**:
+- Test config changes with `/showcase-manage reload`
+- Monitor server logs for configuration errors
+- Keep backup copies of working configurations
+
+### Security Considerations
+
+**Access Control**:
+- Limit management permissions to trusted staff only
+- Use specific permissions rather than full operator access
+- Regularly audit permission assignments
+
+**Share Moderation**:
+- Monitor shares for inappropriate content
+- Use `/showcase-manage cancel` for problematic shares
+- Check sharing patterns for potential abuse
+
+## Troubleshooting
+
+### Common Issues
+
+<Callout type="error">
+**Config reload fails**: Check server logs for syntax errors in configuration files.
+</Callout>
+
+**Solutions**:
+1. Verify YAML syntax in config files
+2. Check file permissions
+3. Restart server if reload continues to fail
+
+<Callout type="error">
+**Cannot cancel shares**: Verify you have the correct permission level.
+</Callout>
+
+**Solutions**:
+1. Check permission with `/lp user <your-name> permission check showcase.manage.cancel`
+2. Verify share ID exists with `/showcase-manage list`
+3. Ensure player name is spelled correctly
+
+### Emergency Procedures
+
+**Server Performance Issues**:
+```bash
+# 1. Check active share count
+/showcase-manage list
+
+# 2. Cancel problematic shares if needed
+/showcase-manage cancel ProblematicPlayer
+
+# 3. Reload config with reduced limits
+/showcase-manage reload
+```
+
+<RelatedLinks
+  links={[
+    {
+      title: "Player Commands",
+      href: "/commands/player-commands",
+      description: "Standard player command reference",
+      icon: <Command />
+    },
+    {
+      title: "Configuration File",
+      href: "/configuration/config-file",
+      description: "Complete reference for config.yml settings",
+      icon: <Settings />
+    },
+    {
+      title: "Permissions",
+      href: "/configuration/permissions",
+      description: "Permission system configuration with LuckPerms",
+      icon: <Shield />
+    },
+    {
+      title: "Troubleshooting",
+      href: "/support/troubleshooting",
+      description: "Common administrative issues and solutions",
+      icon: <HelpCircle />
+    }
+  ]}
+/>

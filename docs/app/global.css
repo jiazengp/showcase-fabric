@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* Custom theming for Showcase Mod documentation */
+:root {
+  /* Custom color variables for mod branding */
+  --showcase-primary: #3b82f6;
+  --showcase-primary-dark: #1d4ed8;
+  --showcase-secondary: #10b981;
+  --showcase-accent: #f59e0b;
+}
+
+/* Custom styling for mod-specific components */
+.command-syntax {
+  @apply rounded-lg border border-gray-200 bg-gray-50 p-4 my-4 dark:border-gray-700 dark:bg-gray-900;
+}
+
+.permission-node {
+  @apply rounded border-l-4 border-blue-500 bg-blue-50 p-3 my-2 dark:bg-blue-950;
+}
+
+.minecraft-version {
+  @apply inline-flex items-center gap-1;
+}
+
+.minecraft-version span {
+  @apply rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+/* Enhanced code block styling */
+pre[data-rehype-pretty-code-figure] {
+  @apply relative rounded-lg border border-gray-200 bg-gray-100 p-4 dark:border-gray-700 dark:bg-gray-800;
+}
+
+/* Better table styling for documentation */
+.fumadocs-ui table {
+  @apply w-full border-collapse;
+}
+
+.fumadocs-ui th {
+  @apply border-b border-gray-300 bg-gray-100 px-4 py-2 text-left font-semibold dark:border-gray-600 dark:bg-gray-800;
+}
+
+.fumadocs-ui td {
+  @apply border-b border-gray-200 px-4 py-2 dark:border-gray-700;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
+
+/* Improved focus states for accessibility */
+.fumadocs-ui a:focus-visible,
+.fumadocs-ui button:focus-visible {
+  @apply outline-2 outline-offset-2 outline-blue-500;
+}
+
+/* Enhanced search dialog styling */
+.fumadocs-ui [data-search-dialog] {
+  @apply max-w-2xl;
+}
+
+/* Better mobile responsiveness */
+@media (max-width: 768px) {
+  .fumadocs-ui .fd-docs-layout {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .command-syntax {
+    @apply px-3 py-3 text-sm;
+  }
+}

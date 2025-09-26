@@ -1,0 +1,10 @@
+{
+  "title": "Commands",
+  "description": "Complete command reference",
+  "icon": "⌨️",
+  "pages": [
+    "player-commands",
+    "admin-commands",
+    "management"
+  ]
+}

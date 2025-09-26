@@ -1,0 +1,512 @@
+---
+title: Configuration File
+description: Complete reference for config.yml settings and customization options
+category: configuration
+---
+
+# Configuration File Reference
+
+<MinecraftVersion auto />
+
+Showcase uses a YAML configuration file located at `config/showcase/config.yml` to customize mod behavior, permissions, and features.
+
+## Default Configuration
+
+The configuration file is automatically generated on first startup with sensible defaults:
+
+```yaml title="config/showcase/config.yml"
+# Map view mode configuration:
+# -1: Disable map preview functionality
+# 0: Use map preview with no time limit
+# >0: Use map preview with specified duration in seconds
+mapViewDuration: 10
+
+# Item view mode configuration:
+# -1: Use traditional container view (no time limit)
+# 0: Use hotbar preview with no time limit
+# >0: Use hotbar preview with specified duration in seconds
+itemViewDuration: -1
+
+# The maximum number of placeholders that can be replaced in a single chat message
+maxPlaceholdersPerMessage: 2
+
+# Per-share type settings
+shareSettings:
+  ITEM:
+    # Cooldown time in seconds
+    cooldown: 10
+    # Default permission level (0-4)
+    defaultPermission: 0
+    # Trigger keywords for this share type
+    keywords:
+      - "item"
+      - "i"
+    # Listening duration in seconds (-1 if not applicable)
+    listeningDuration: -1
+
+  INVENTORY:
+    cooldown: 10
+    defaultPermission: 0
+    keywords:
+      - "inventory"
+      - "inv"
+    listeningDuration: -1
+
+  HOTBAR:
+    cooldown: 10
+    defaultPermission: 0
+    keywords:
+      - "hotbar"
+      - "hb"
+    listeningDuration: -1
+
+  ENDER_CHEST:
+    cooldown: 10
+    defaultPermission: 0
+    keywords:
+      - "ender_chest"
+      - "ec"
+    listeningDuration: -1
+
+  STATS:
+    cooldown: 10
+    defaultPermission: 0
+    keywords:
+      - "stats"
+      - "statistical"
+      - "stat"
+    listeningDuration: -1
+
+  CONTAINER:
+    cooldown: 10
+    defaultPermission: 0
+    keywords: []
+    # Listening duration for container detection
+    listeningDuration: 10
+
+  MERCHANT:
+    cooldown: 10
+    defaultPermission: 0
+    keywords: []
+    # Listening duration for villager trade detection
+    listeningDuration: 10
+
+# Share link related configuration
+shareLink:
+  # Minimum expiry time in seconds for share links
+  minExpiryTime: 60
+  # Default expiry time in seconds for share links
+  defaultExpiryTime: 300
+  # Enable underline for clickable text messages
+  enableClickableTextUnderline: false
+
+# Settings related to how player statistics are displayed
+statsDisplay:
+  # Whether to show time-related statistics (play time, death time, rest time, etc.)
+  showTimeStats: true
+  # Whether to show movement-related statistics (walking, running, swimming, etc.)
+  showMovementStats: true
+  # Whether to show combat-related statistics (damage dealt/taken, kills, deaths, etc.)
+  showCombatStats: true
+  # Whether to show interaction statistics (trading, breeding, container interactions, etc.)
+  showInteractionStats: true
+  # Whether to show miscellaneous statistics (drops, cauldron usage, note blocks, etc.)
+  showMiscStats: true
+  # Maximum number of statistics to display per category in the book
+  maxStatsPerCategory: 15
+  # Whether to sort statistics by value (highest first) within each category
+  sortStatsByValue: true
+  # Whether to hide statistics with zero values
+  hideZeroStats: true
+  # Whether to show only the top statistics in each category
+  showOnlyTopStats: false
+  # Number of top statistics to show when showOnlyTopStats is enabled
+  topStatsCount: 10
+
+  # Custom formatting settings for time display
+  timeFormat:
+    # Whether to use compact time format (e.g., '1h 30m' instead of '1 hour 30 minutes')
+    useCompactFormat: true
+    # Whether to show seconds when displaying time under 1 minute
+    showSecondsUnderMinute: true
+    # Whether to hide zero components (e.g., show '1h 5s' instead of '1h 0m 5s')
+    hideZeroComponents: true
+
+  # Custom formatting settings for distance display
+  distanceFormat:
+    # Whether to automatically convert centimeters to meters/kilometers
+    autoConvert: true
+    # Threshold in centimeters above which to convert to meters (default: 100cm = 1m)
+    meterThreshold: 100
+    # Threshold in centimeters above which to convert to kilometers (default: 100000cm = 1km)
+    kilometerThreshold: 100000
+    # Number of decimal places for meter display
+    meterDecimalPlaces: 1
+    # Number of decimal places for kilometer display
+    kilometerDecimalPlaces: 2
+
+  # Custom formatting settings for damage display
+  damageFormat:
+    # Whether to show damage as hearts (♥) instead of raw damage points
+    showAsHearts: true
+    # Number of decimal places for heart display
+    heartDecimalPlaces: 1
+    # Whether to show both hearts and raw damage (e.g., '5.0♥ (50)')
+    showBothFormats: false
+
+# Settings for item icons in showcase messages
+itemIcons:
+  # Enable item icons in showcase messages
+  enabled: true
+  # Font namespace for item icons (e.g., 'custom', 'showcase')
+  fontNamespace: "iconifycraft"
+  # Include item icons in item names
+  includeInItemNames: true
+
+# Settings for extended placeholder functionality
+placeholders:
+  # Enable extended placeholder functionality
+  enabled: true
+  # Maximum number of active shares per player
+  maxSharesPerPlayer: 10
+  # Cache duration for placeholder results in seconds
+  cacheDuration: 30
+  # Enable player statistics tracking for placeholders
+  enableStatisticsTracking: true
+  # Enable server-wide statistics for placeholders
+  enableServerStatistics: true
+  # Enable performance metrics tracking
+  enablePerformanceMetrics: true
+  # How often to update statistics cache in seconds
+  statisticsUpdateInterval: 60
+  # Enable conditional placeholders (if_xxx_yes_no style)
+  enableConditionalPlaceholders: true
+```
+
+## Configuration Sections
+
+### Map and Item View Settings
+
+<Callout type="info">
+These settings control how shared content is displayed to viewers.
+</Callout>
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `mapViewDuration` | 10 | Map preview duration in seconds (-1=disable, 0=unlimited, >0=timed) |
+| `itemViewDuration` | -1 | Item view mode (-1=traditional, 0=unlimited hotbar, >0=timed hotbar) |
+| `maxPlaceholdersPerMessage` | 2 | Maximum placeholders replaced per chat message |
+
+### Share Type Settings
+
+Each share type can be configured independently with these settings:
+
+<Tabs items={["Item Shares", "Inventory Shares", "Container Shares", "Statistics"]}>
+  <Tab value="Item Shares">
+    ```yaml
+    ITEM:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: ["item", "i"]
+      listeningDuration: -1
+    ```
+
+    - **cooldown**: Seconds between shares
+    - **defaultPermission**: Required permission level (0-4)
+    - **keywords**: Chat keywords that trigger sharing
+    - **listeningDuration**: Not applicable for items (-1)
+  </Tab>
+
+  <Tab value="Inventory Shares">
+    ```yaml
+    INVENTORY:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: ["inventory", "inv"]
+      listeningDuration: -1
+
+    HOTBAR:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: ["hotbar", "hb"]
+      listeningDuration: -1
+
+    ENDER_CHEST:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: ["ender_chest", "ec"]
+      listeningDuration: -1
+    ```
+
+    Similar structure for hotbar and ender chest sharing.
+  </Tab>
+
+  <Tab value="Container Shares">
+    ```yaml
+    CONTAINER:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: []
+      listeningDuration: 10
+
+    MERCHANT:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: []
+      listeningDuration: 10
+    ```
+
+    - **listeningDuration**: Time to wait for container/villager interaction
+    - **keywords**: Empty for containers (triggered by interaction)
+  </Tab>
+
+  <Tab value="Statistics">
+    ```yaml
+    STATS:
+      cooldown: 10
+      defaultPermission: 0
+      keywords: ["stats", "statistical", "stat"]
+      listeningDuration: -1
+    ```
+
+    Statistics sharing with customizable display options in `statsDisplay` section.
+  </Tab>
+</Tabs>
+
+### Share Link Settings
+
+Control how share links behave:
+
+```yaml
+shareLink:
+  minExpiryTime: 60          # Minimum 1 minute expiry
+  defaultExpiryTime: 300     # Default 5 minute expiry
+  enableClickableTextUnderline: false  # Underline clickable text
+```
+
+### Statistics Display
+
+Customize how player statistics are shown:
+
+<Tabs items={["Content Filters", "Display Options", "Formatting"]}>
+  <Tab value="Content Filters">
+    ```yaml
+    statsDisplay:
+      showTimeStats: true        # Play time, death time, etc.
+      showMovementStats: true    # Walking, running, swimming
+      showCombatStats: true      # Damage, kills, deaths
+      showInteractionStats: true # Trading, breeding, etc.
+      showMiscStats: true        # Drops, cauldron usage
+    ```
+
+    Control which categories of statistics are displayed.
+  </Tab>
+
+  <Tab value="Display Options">
+    ```yaml
+    statsDisplay:
+      maxStatsPerCategory: 15    # Limit per category
+      sortStatsByValue: true     # Sort by highest value
+      hideZeroStats: true        # Hide zero values
+      showOnlyTopStats: false    # Show only top stats
+      topStatsCount: 10          # Number of top stats
+    ```
+
+    Configure how statistics are organized and limited.
+  </Tab>
+
+  <Tab value="Formatting">
+    ```yaml
+    timeFormat:
+      useCompactFormat: true           # "1h 30m" vs "1 hour 30 minutes"
+      showSecondsUnderMinute: true     # Show seconds < 1 minute
+      hideZeroComponents: true         # "1h 5s" vs "1h 0m 5s"
+
+    distanceFormat:
+      autoConvert: true                # Auto cm→m→km conversion
+      meterThreshold: 100              # 100cm = 1m
+      kilometerThreshold: 100000       # 100000cm = 1km
+      meterDecimalPlaces: 1            # 1.5m
+      kilometerDecimalPlaces: 2        # 1.25km
+
+    damageFormat:
+      showAsHearts: true               # Hearts (♥) vs raw damage
+      heartDecimalPlaces: 1            # 5.0♥
+      showBothFormats: false           # "5.0♥ (50)" format
+    ```
+  </Tab>
+</Tabs>
+
+### Item Icons
+
+Configure item icon display in chat:
+
+```yaml
+itemIcons:
+  enabled: true                    # Enable item icons
+  fontNamespace: "iconifycraft"    # Font namespace for icons
+  includeInItemNames: true         # Show icons in item names
+```
+
+<Callout type="warning">
+**Item Icons**: Requires compatible resource pack or mod like IconifyCraft for proper display.
+</Callout>
+
+### Placeholder Settings
+
+Extended placeholder functionality configuration:
+
+```yaml
+placeholders:
+  enabled: true                        # Enable placeholder system
+  maxSharesPerPlayer: 10               # Max active shares per player
+  cacheDuration: 30                    # Cache results for 30 seconds
+  enableStatisticsTracking: true       # Track player statistics
+  enableServerStatistics: true        # Server-wide statistics
+  enablePerformanceMetrics: true      # Performance tracking
+  statisticsUpdateInterval: 60        # Update statistics every 60s
+  enableConditionalPlaceholders: true # Enable if_xxx_yes_no placeholders
+```
+
+## Configuration Examples
+
+### High-Performance Server
+
+For servers with many players, optimize performance:
+
+```yaml
+# Reduce placeholder processing
+maxPlaceholdersPerMessage: 1
+
+# Increase cooldowns
+shareSettings:
+  ITEM:
+    cooldown: 30
+  INVENTORY:
+    cooldown: 60
+
+# Optimize statistics
+statsDisplay:
+  maxStatsPerCategory: 10
+  showOnlyTopStats: true
+  topStatsCount: 5
+
+# Cache settings
+placeholders:
+  cacheDuration: 60
+  statisticsUpdateInterval: 120
+```
+
+### Creative/Educational Server
+
+For demonstration and teaching:
+
+```yaml
+# Shorter cooldowns for demonstrations
+shareSettings:
+  ITEM:
+    cooldown: 2
+  INVENTORY:
+    cooldown: 5
+
+# Longer view durations
+mapViewDuration: 30
+itemViewDuration: 0  # Unlimited
+
+# More detailed statistics
+statsDisplay:
+  showOnlyTopStats: false
+  maxStatsPerCategory: 25
+  hideZeroStats: false
+```
+
+### Survival Server
+
+Balanced settings for survival gameplay:
+
+```yaml
+# Moderate cooldowns
+shareSettings:
+  ITEM:
+    cooldown: 15
+  INVENTORY:
+    cooldown: 30
+  STATS:
+    cooldown: 60
+
+# Limit shares per player
+placeholders:
+  maxSharesPerPlayer: 5
+
+# Standard view durations
+mapViewDuration: 10
+itemViewDuration: -1
+```
+
+## Configuration Validation
+
+### Reload Configuration
+
+Use the reload command to apply changes without restarting:
+
+```bash
+/showcase-manage reload
+```
+
+### Common Validation Errors
+
+<Callout type="error">
+**YAML Syntax Error**: Check indentation and special characters.
+</Callout>
+
+**Solutions**:
+- Use spaces, not tabs for indentation
+- Quote strings with special characters
+- Validate YAML syntax online
+
+<Callout type="error">
+**Invalid Share Type**: Unknown share type in shareSettings.
+</Callout>
+
+**Valid Share Types**: `ITEM`, `INVENTORY`, `HOTBAR`, `ENDER_CHEST`, `STATS`, `CONTAINER`, `MERCHANT`
+
+### Performance Considerations
+
+**Memory Usage**:
+- Lower `maxSharesPerPlayer` for high-population servers
+- Increase `cacheDuration` to reduce processing
+- Limit `maxStatsPerCategory` for large statistic datasets
+
+**Processing Load**:
+- Reduce `maxPlaceholdersPerMessage` on busy chat servers
+- Increase cooldowns for resource-intensive shares
+- Set reasonable `statisticsUpdateInterval`
+
+<RelatedLinks
+  links={[
+    {
+      title: "Permissions",
+      href: "/configuration/permissions",
+      description: "Permission system configuration with LuckPerms",
+      icon: <Shield />
+    },
+    {
+      title: "Admin Commands",
+      href: "/commands/admin-commands",
+      description: "Managing configuration and system administration",
+      icon: <Shield />
+    },
+    {
+      title: "PlaceholderAPI",
+      href: "/developers/placeholderapi",
+      description: "Placeholder configuration and integration",
+      icon: <Layers />
+    },
+    {
+      title: "Troubleshooting",
+      href: "/support/troubleshooting",
+      description: "Configuration issues and solutions",
+      icon: <HelpCircle />
+    }
+  ]}
+/>

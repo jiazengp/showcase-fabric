@@ -1,0 +1,163 @@
+---
+title: Installation
+description: Download and install Showcase mod on your Minecraft server
+category: getting-started
+---
+
+# Installation Guide
+
+<MinecraftVersion auto />
+
+Showcase is a server-side mod that requires no client installation. Players can join your server without needing to download anything!
+
+## Requirements
+
+<VersionRequirements showAllVersions />
+
+### Required Dependencies
+
+1. **Fabric Loader** - [Download from FabricMC](https://fabricmc.net/use/installer/)
+2. **Fabric API** - [Download from Modrinth](https://modrinth.com/mod/fabric-api) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/fabric-api)
+
+### Optional Dependencies
+
+- **LuckPerms** - For advanced permission management
+  - [Fabric version](https://luckperms.net/download)
+  - Required for fine-grained permission control
+
+## Download Showcase
+
+<Tabs items={["Modrinth", "CurseForge", "GitHub Releases"]}>
+  <Tab value="Modrinth">
+    Download the latest version from [Modrinth](https://modrinth.com/mod/showcase).
+
+    1. Visit the Showcase mod page
+    2. Select your Minecraft version
+    3. Download the appropriate `.jar` file
+  </Tab>
+  <Tab value="CurseForge">
+    Download from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/showcasemod).
+
+    1. Navigate to the Files tab
+    2. Filter by your Minecraft version
+    3. Download the latest release
+  </Tab>
+  <Tab value="GitHub Releases">
+    Download directly from [GitHub Releases](https://github.com/jiazengp/showcase-fabric/releases).
+
+    1. Go to the latest release
+    2. Download the version-specific JAR file
+    3. Each Minecraft version has its own release artifact
+  </Tab>
+</Tabs>
+
+## Installation Steps
+
+### 1. Stop Your Server
+
+Make sure your Minecraft server is completely stopped before installing any mods.
+
+### 2. Install Dependencies
+
+<Files>
+  <Folder name="server" defaultOpen>
+    <Folder name="mods" defaultOpen>
+      <File name="fabric-api-[version].jar" />
+      <File name="showcase-[version].jar" />
+      <File name="luckperms-fabric-[version].jar" />
+    </Folder>
+    <File name="server.jar" />
+    <File name="server.properties" />
+  </Folder>
+</Files>
+
+1. **Fabric API**: Place the Fabric API JAR in your `mods/` folder
+2. **Showcase**: Place the downloaded Showcase JAR in your `mods/` folder
+3. **LuckPerms** (Optional): Place LuckPerms JAR in your `mods/` folder
+
+### 3. Start Your Server
+
+Start your server normally. Showcase will:
+
+1. Generate default configuration files
+2. Create the necessary directories
+3. Set up default permissions (if LuckPerms is installed)
+
+### 4. Verify Installation
+
+Check your server console for these messages:
+
+```log
+[INFO] [showcase]: Showcase mod loaded successfully
+[INFO] [showcase]: Configuration files generated
+[INFO] [showcase]: LuckPerms integration enabled
+```
+
+## First-Time Setup
+
+### Basic Configuration
+
+Showcase works out of the box with sensible defaults, but you may want to customize:
+
+<CommandSyntax>/showcase-manage reload</CommandSyntax>
+
+This command reloads the configuration after making changes.
+
+### Test the Installation
+
+Try these commands to ensure everything is working:
+
+<Tabs items={["In-Game Test", "Console Test"]}>
+  <Tab value="In-Game Test">
+    1. Join your server as an operator
+    2. Hold any item
+    3. Run: `/showcase item`
+    4. You should see a clickable link in chat
+  </Tab>
+  <Tab value="Console Test">
+    1. From the server console, run: `/showcase-manage list`
+    2. This should show "No active shares" if working correctly
+    3. Check for any error messages
+  </Tab>
+</Tabs>
+
+## Multi-Version Support
+
+<Callout type="note">
+Each Minecraft version requires its own specific build of Showcase. Make sure you download the correct version for your server.
+</Callout>
+
+<VersionTable />
+
+## Troubleshooting
+
+<Callout type="warn">
+**Common Issues:**
+- Make sure you have the correct Minecraft version
+- Verify Fabric Loader is properly installed
+- Check that Fabric API version matches your Minecraft version
+</Callout>
+
+### Installation Problems
+
+If you encounter issues:
+
+1. **Check Dependencies**: Ensure Fabric API is installed and matches your MC version
+2. **Log Files**: Check `logs/latest.log` for error messages
+3. **Permission Issues**: Make sure the server has write access to create config files
+4. **Version Mismatch**: Verify all mods are for the same Minecraft version
+
+### Getting Help
+
+If you need assistance:
+
+- **Documentation**: Check our [Troubleshooting Guide](/support/troubleshooting)
+- **GitHub Issues**: Report bugs on [GitHub](https://github.com/jiazengp/showcase-fabric/issues)
+
+## Next Steps
+
+Once installed, continue with:
+
+1. [Configuration](/getting-started/configuration) - Set up basic mod settings
+2. [Permissions](/getting-started/permissions) - Configure LuckPerms integration
+3. [Commands](/commands/player-commands) - Learn available commands

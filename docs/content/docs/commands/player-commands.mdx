@@ -1,0 +1,273 @@
+---
+title: Player Commands
+description: Complete reference for all player-facing Showcase commands
+category: commands
+---
+
+# Player Commands
+
+<MinecraftVersion auto />
+
+All commands players can use to share content with others. These commands respect server permissions and configuration settings.
+
+## Primary Sharing Command
+
+<CommandSyntax>/showcase &lt;type&gt; [player] [duration] [description]</CommandSyntax>
+
+The main command for sharing various types of content.
+
+### Parameters
+
+| Parameter | Required | Description | Default |
+|-----------|----------|-------------|---------|
+| `type` | ✅ | Type of content to share | - |
+| `player` | ❌ | Specific player to share with | All players |
+| `duration` | ❌ | How long the share lasts | Server default |
+| `description` | ❌ | Custom description for the share | Auto-generated |
+
+### Share Types
+
+<Tabs items={["Items & Inventories", "Containers", "Statistics"]}>
+  <Tab value="Items & Inventories">
+
+    **Item Sharing**
+    <CommandSyntax>/showcase item [player] [duration] [description]</CommandSyntax>
+    Share your currently held item.
+
+    **Examples:**
+    ```
+    /showcase item
+    /showcase item Steve 5m "Check out my new sword!"
+    /showcase item @a 1h
+    ```
+
+    **Inventory Sharing**
+    <CommandSyntax>/showcase inventory [player] [duration] [description]</CommandSyntax>
+    Share your entire inventory (36 slots).
+
+    **Hotbar Sharing**
+    <CommandSyntax>/showcase hotbar [player] [duration] [description]</CommandSyntax>
+    Share only your hotbar (9 slots).
+
+    **Ender Chest Sharing**
+    <CommandSyntax>/showcase enderchest [player] [duration] [description]</CommandSyntax>
+    Share your personal ender chest contents.
+
+  </Tab>
+  <Tab value="Containers">
+
+    **Container Sharing**
+    <CommandSyntax>/showcase container [player] [duration] [description]</CommandSyntax>
+    Share a container you recently opened (within 10 seconds).
+
+    **Supported Containers:**
+    - Chests (single & double)
+    - Barrels
+    - Shulker boxes
+    - Dispensers & Droppers
+    - Hoppers
+    - And more!
+
+    **Villager Trades**
+    <CommandSyntax>/showcase merchant [player] [duration] [description]</CommandSyntax>
+    Share villager trading interface you recently opened.
+
+    <Callout type="info">
+    Container and merchant sharing requires you to have opened the interface within the last 10 seconds.
+    </Callout>
+
+  </Tab>
+  <Tab value="Statistics">
+
+    **Player Statistics**
+    <CommandSyntax>/showcase stats [player] [duration] [description]</CommandSyntax>
+    Share your detailed player statistics.
+
+    **Included Statistics:**
+    - General gameplay stats
+    - Block breaking/placing
+    - Item usage and crafting
+    - Mob kills and deaths
+    - Movement and exploration
+    - And much more!
+
+    Statistics are automatically categorized for easy reading.
+
+  </Tab>
+</Tabs>
+
+## Share Management
+
+### Cancel Your Shares
+
+<CommandSyntax>/showcase cancel &lt;id&gt;</CommandSyntax>
+
+Cancel one of your active shares by ID.
+
+**Example:**
+```
+/showcase cancel abc123
+```
+
+<Callout type="note">
+You can only cancel shares that you created. Use `/showcase-view list` to see your share IDs.
+</Callout>
+
+### View Shared Content
+
+<CommandSyntax>/showcase-view &lt;id&gt;</CommandSyntax>
+
+View any public share by its ID. This opens the interactive GUI.
+
+**Example:**
+```
+/showcase-view abc123
+```
+
+## Duration Formats
+
+You can specify custom durations using these formats:
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `30s` | Seconds | 30 seconds |
+| `5m` | Minutes | 5 minutes |
+| `2h` | Hours | 2 hours |
+| `1d` | Days | 1 day |
+| `permanent` | Never expires | Until server restart |
+
+**Examples:**
+```
+/showcase item Steve 30s
+/showcase inventory @a 2h "My base supplies"
+/showcase stats Alex 1d
+```
+
+## Target Player Formats
+
+Specify who can view your shares:
+
+| Format | Description |
+|--------|-------------|
+| `Steve` | Specific player name |
+| `@a` | All players |
+| `@p` | Nearest player |
+| `@r` | Random player |
+| (empty) | All players (default) |
+
+## Permission Requirements
+
+Each command requires specific permissions:
+
+<PermissionNode
+  node="showcase.command.item"
+  description="Basic item sharing permission"
+/>
+
+<PermissionNode
+  node="showcase.command.item.receivers"
+  description="Can specify who receives the share"
+/>
+
+<PermissionNode
+  node="showcase.command.item.duration"
+  description="Can set custom share duration"
+/>
+
+<PermissionNode
+  node="showcase.command.item.description"
+  description="Can add custom descriptions"
+/>
+
+<Callout type="info">
+Similar permission nodes exist for `inventory`, `hotbar`, `enderchest`, `container`, `merchant`, and `stats`.
+</Callout>
+
+## Examples & Use Cases
+
+### Quick Item Sharing
+
+Share your held item with everyone:
+```
+/showcase item
+```
+
+### Private Inventory Share
+
+Share your inventory with a specific player for 30 minutes:
+```
+/showcase inventory Steve 30m "My current gear setup"
+```
+
+### Container Documentation
+
+Share a chest setup with a custom description:
+```
+/showcase container @a 1h "Storage room organization system"
+```
+
+### Statistics Comparison
+
+Share your stats with friends:
+```
+/showcase stats @a 2h "My survival world progress"
+```
+
+## Interactive Features
+
+### GUI Navigation
+
+When viewing shares, you can:
+
+- **Left-click**: View item details and properties
+- **Right-click**: Quick-stack similar items (for containers)
+- **Scroll**: Navigate through large inventories
+- **Hover**: See detailed tooltips
+
+### Book & Map Support
+
+Special handling for:
+
+- **Written Books**: Full text content displayed
+- **Maps**: Interactive map viewer with zoom
+- **Enchanted Items**: All enchantments clearly shown
+- **Custom Items**: NBT data and custom properties
+
+### Container Auto-Unpacking
+
+When sharing containers:
+
+- **Shulker Boxes**: Contents automatically displayed
+- **Bundles**: Individual items shown separately
+- **Nested Containers**: Multi-level expansion
+
+## Tips & Best Practices
+
+<Callout type="tip">
+**Pro Tips:**
+- Use descriptive titles for better organization
+- Set appropriate durations to avoid cluttering
+- Check permissions before sharing sensitive items
+- Use private shares for personal documentation
+</Callout>
+
+### Organizing Shares
+
+1. **Use Clear Descriptions**: Help others understand what you're sharing
+2. **Set Appropriate Durations**: Match duration to content importance
+3. **Target Specific Players**: Use private shares when needed
+4. **Regular Cleanup**: Cancel old shares you no longer need
+
+### Performance Considerations
+
+- Large inventories may take a moment to load
+- Complex enchanted items require more processing
+- Statistics generation may have a brief delay
+- Network lag affects GUI responsiveness
+
+## Related Topics
+
+- [Admin Commands](/commands/admin-commands) - Administrative commands
+- [Chat Keywords](/features/chat-keywords) - Quick sharing shortcuts
+- [Permissions](/configuration/permissions) - Detailed permission setup
+- [Configuration](/configuration/config-file) - Customize command behavior

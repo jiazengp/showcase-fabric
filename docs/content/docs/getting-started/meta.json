@@ -1,0 +1,10 @@
+{
+  "title": "Getting Started",
+  "description": "Installation and setup guide",
+  "icon": "🚀",
+  "pages": [
+    "installation",
+    "configuration",
+    "permissions"
+  ]
+}

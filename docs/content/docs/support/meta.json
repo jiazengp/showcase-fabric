@@ -1,0 +1,11 @@
+{
+  "title": "Support",
+  "description": "Help and troubleshooting",
+  "icon": "🛠️",
+  "pages": [
+    "troubleshooting",
+    "faq",
+    "sponsor",
+    "changelog"
+  ]
+}

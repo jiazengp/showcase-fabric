@@ -1,0 +1,760 @@
+---
+title: Java API Reference
+description: Direct integration with Showcase's Java classes and methods
+category: developers
+---
+
+# Java API Reference
+
+<MinecraftVersion auto />
+
+The Showcase Java API provides direct access to all mod functionality, allowing developers to create shares programmatically, manage player data, and integrate deeply with the mod's core systems.
+
+## Getting Started
+
+<DependencyVersions />
+
+### API Access
+
+```java
+import com.showcase.api.ShowcaseAPI;
+
+public class MyShowcaseIntegration {
+
+    public void initialize() {
+        // Get the API instance
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        // Check if Showcase is available
+        if (api == null) {
+            throw new IllegalStateException("Showcase API not available");
+        }
+
+        // Verify API version compatibility
+        String version = api.getModVersion();
+        if (!isCompatibleVersion(version)) {
+            throw new IllegalStateException("Incompatible Showcase version: " + version);
+        }
+    }
+}
+```
+
+### Maven Dependency
+
+<MavenDependency />
+
+### Gradle Dependency
+
+<GradleDependency />
+
+## Core API Classes
+
+### ShowcaseAPI - Main Entry Point
+
+<Tabs items={["Share Management", "Player Data", "Configuration", "Statistics"]}>
+  <Tab value="Share Management">
+    **Share Management**:
+    ```java
+    public class ShareManagement {
+
+        public void getActiveShares() {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+            // Get all active shares
+            Map<String, ShareEntry> allShares = api.getAllActiveShares();
+            System.out.println("Total active shares: " + allShares.size());
+
+            // Get shares for specific player
+            List<ShareEntry> playerShares = api.getPlayerShares("player-uuid");
+            System.out.println("Player has " + playerShares.size() + " shares");
+        }
+
+        public void manageShare(String shareId) {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+            // Check if share is valid
+            if (api.isValidShare(shareId)) {
+                // Get share details
+                ShareEntry share = api.getShareEntry(shareId);
+                if (share != null) {
+                    System.out.println("Share type: " + share.getType());
+                    System.out.println("Share owner: " + share.getOwnerUuid());
+                }
+
+                // Cancel the share
+                boolean cancelled = api.cancelShare(shareId);
+                System.out.println("Share cancelled: " + cancelled);
+            }
+        }
+    }
+    ```
+
+    **Using ShowcaseManagerWrapper**:
+    ```java
+    public class AdvancedShareManagement {
+
+        public void manageShares(ServerPlayerEntity player) {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+            ShowcaseManagerWrapper manager = api.getShowcaseManager();
+
+            // Check cooldown status
+            if (manager.isOnCooldown(player, ShowcaseManager.ShareType.ITEM)) {
+                long remaining = manager.getRemainingCooldown(player, ShowcaseManager.ShareType.ITEM);
+                System.out.println("Player on cooldown for " + remaining + " seconds");
+                return;
+            }
+
+            // Get player statistics
+            int playerShareCount = manager.getPlayerShareCount(player.getUuidAsString());
+            int totalActiveShares = manager.getActiveShareCount();
+
+            System.out.println("Player has " + playerShareCount + " shares");
+            System.out.println("Server has " + totalActiveShares + " total shares");
+        }
+
+        public void openShare(ServerPlayerEntity viewer, String shareId) {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+            ShowcaseManagerWrapper manager = api.getShowcaseManager();
+
+            // Validate share before opening
+            if (manager.isValidShare(shareId)) {
+                boolean success = manager.openSharedContent(viewer, shareId);
+                if (success) {
+                    System.out.println("Share opened successfully");
+                } else {
+                    System.out.println("Failed to open share");
+                }
+            }
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab value="Player Data">
+    **Working with Player Shares**:
+    ```java
+    public class PlayerDataAPI {
+
+        public void getPlayerData(ServerPlayerEntity player) {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+            ShowcaseManagerWrapper manager = api.getShowcaseManager();
+
+            String playerUuid = player.getUuidAsString();
+
+            // Get player's shares
+            List<ShareEntry> playerShares = api.getPlayerShares(playerUuid);
+            System.out.println("Player has " + playerShares.size() + " active shares");
+
+            // Check cooldown status for different share types
+            for (ShowcaseManager.ShareType type : ShowcaseManager.ShareType.values()) {
+                if (manager.isOnCooldown(player, type)) {
+                    long remaining = manager.getRemainingCooldown(player, type);
+                    System.out.println(type + " cooldown: " + remaining + " seconds");
+                }
+            }
+
+            // Display share details
+            for (ShareEntry share : playerShares) {
+                System.out.println("Share ID: " + share.getId());
+                System.out.println("Type: " + share.getType());
+                System.out.println("Created: " + new Date(share.getTimestamp()));
+                System.out.println("Duration: " + share.getDuration() + " seconds");
+                System.out.println("Views: " + share.getViewCount());
+            }
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab value="Configuration">
+    **Configuration Access**:
+    ```java
+    public class ConfigurationAPI {
+
+        public void accessConfiguration() {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+            ModConfig config = api.getConfig();
+
+            // Access main configuration sections
+            System.out.println("Share link min expiry: " + config.shareLinkMinExpiry);
+            System.out.println("Share link max expiry: " + config.shareLinkMaxExpiry);
+            System.out.println("Chat keywords enabled: " + config.chatKeywordDetection);
+
+            // Access share settings for different types
+            ModConfig.ShareSettings itemSettings = config.shareSettings.get("item");
+            if (itemSettings != null) {
+                System.out.println("Item share cooldown: " + itemSettings.cooldown);
+                System.out.println("Item share default expiry: " + itemSettings.defaultExpiry);
+            }
+
+            // Check placeholder settings
+            if (config.placeholderSettings != null) {
+                System.out.println("Max shares per player: " + config.placeholderSettings.maxSharesPerPlayer);
+                System.out.println("Statistics tracking: " + config.placeholderSettings.enableStatisticsTracking);
+            }
+        }
+    }
+  </Tab>
+
+  <Tab value="Statistics">
+    **Event Handling**:
+    ```java
+    public class EventHandling {
+
+        public void registerEventListeners() {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+            // Listen for showcase creation events
+            api.onShowcaseCreated((sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration) -> {
+                System.out.println("Showcase created by " + sender.getName().getString());
+                System.out.println("Share ID: " + shareId);
+                System.out.println("Share Type: " + shareType);
+
+                // You can return ActionResult.FAIL to cancel the creation
+                // or ActionResult.SUCCESS/PASS to allow it
+                return ActionResult.PASS;
+            });
+
+            // Listen for showcase viewing events
+            api.onShowcaseViewed((viewer, shareEntry, shareId, originalOwner) -> {
+                System.out.println("Showcase viewed by " + viewer.getName().getString());
+                System.out.println("Original owner: " + originalOwner.getName().getString());
+                System.out.println("Share ID: " + shareId);
+
+                // You can return ActionResult.FAIL to prevent viewing
+                return ActionResult.PASS;
+            });
+        }
+    }
+    ```
+
+    **Version Information**:
+    ```java
+    public class ModInformation {
+
+        public void getModInfo() {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+            // Get mod version
+            String version = api.getModVersion();
+            System.out.println("Showcase mod version: " + version);
+
+            // Check if API is available
+            if (api != null) {
+                System.out.println("Showcase API is available");
+            }
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab value="Statistics">
+    **Server Statistics**:
+    ```java
+    public class ServerStatsAPI {
+
+        public void getServerStatistics() {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+            // Get server-wide statistics
+            ServerStats stats = api.getServerStats();
+
+            System.out.println("Total active shares: " + stats.getActiveShareCount());
+            System.out.println("Total shares created: " + stats.getTotalSharesCreated());
+            System.out.println("Average response time: " + stats.getAverageResponseTime() + "ms");
+            System.out.println("Cache hit rate: " + stats.getCacheHitRate() + "%");
+
+            // Get performance metrics
+            PerformanceMetrics performance = stats.getPerformanceMetrics();
+            System.out.println("Memory usage: " + performance.getMemoryUsage() + "MB");
+            System.out.println("CPU usage: " + performance.getCpuUsage() + "%");
+        }
+
+        public void getUsageAnalytics(Duration period) {
+            ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+            // Get analytics for specific time period
+            AnalyticsData analytics = api.getAnalytics(period);
+
+            Map<ShareType, Integer> sharesByType = analytics.getSharesByType();
+            Map<UUID, Integer> sharesByPlayer = analytics.getSharesByPlayer();
+            List<String> topSharedItems = analytics.getTopSharedItems();
+
+            System.out.println("Shares by type: " + sharesByType);
+            System.out.println("Top shared items: " + topSharedItems);
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### ShareData - Share Information
+
+```java
+public class ShareDataUsage {
+
+    public void examineShareData(ShareData share) {
+        // Basic information
+        String id = share.getId();
+        ServerPlayerEntity creator = share.getCreator();
+        ShareType type = share.getType();
+        Instant createdAt = share.getCreatedAt();
+        Instant expiresAt = share.getExpiresAt();
+        String description = share.getDescription();
+
+        // Receiver information
+        Set<UUID> receivers = share.getReceivers();
+        boolean isPublic = share.isPublic(); // true if receivers is empty/contains @a
+
+        // Content access
+        switch (type) {
+            case ITEM:
+                ItemStack item = share.getItem();
+                System.out.println("Shared item: " + item.getName().getString());
+                break;
+
+            case INVENTORY:
+            case HOTBAR:
+            case ENDERCHEST:
+                ItemStack[] items = share.getItems();
+                System.out.println("Shared " + items.length + " items");
+                break;
+
+            case STATS:
+                PlayerStats stats = share.getStats();
+                System.out.println("Shared stats for: " + creator.getName());
+                break;
+
+            case CONTAINER:
+                ContainerData container = share.getContainer();
+                System.out.println("Container type: " + container.getType());
+                break;
+        }
+
+        // Utility methods
+        boolean expired = share.isExpired();
+        Duration timeRemaining = share.getTimeRemaining();
+        boolean canView = share.canView(somePlayer);
+
+        // View tracking
+        int viewCount = share.getViewCount();
+        List<UUID> viewers = share.getViewers();
+        Instant lastViewed = share.getLastViewedAt();
+    }
+}
+```
+
+### ShareType Enum
+
+```java
+public class ShareTypeUsage {
+
+    public void workWithShareTypes() {
+        // All available share types
+        for (ShareType type : ShareType.values()) {
+            System.out.println("Type: " + type.name());
+            System.out.println("Permission: " + type.getPermissionNode());
+            System.out.println("Default duration: " + type.getDefaultDuration());
+            System.out.println("Requires container: " + type.requiresContainer());
+        }
+
+        // Type-specific operations
+        if (ShareType.ITEM.isItemBased()) {
+            System.out.println("Item type requires held item");
+        }
+
+        if (ShareType.CONTAINER.requiresContainer()) {
+            System.out.println("Container type requires recent container interaction");
+        }
+
+        // Permission checks
+        String itemPermission = ShareType.ITEM.getPermissionNode(); // "showcase.command.item"
+        String statsPermission = ShareType.STATS.getPermissionNode(); // "showcase.command.stats"
+    }
+}
+```
+
+## Async Operations
+
+### Async Share Creation
+
+```java
+public class AsyncOperations {
+
+    public void createShareAsync(ServerPlayerEntity player) {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        // Create share asynchronously
+        CompletableFuture<ShareData> future = api.createShareAsync(
+            player,
+            ShareType.STATS,
+            Duration.ofMinutes(30),
+            "Async stats share"
+        );
+
+        future.thenAccept(share -> {
+            // Handle success on main thread
+            if (share != null) {
+                player.sendMessage(Text.literal("Stats share created: " + share.getId()));
+            } else {
+                player.sendMessage(Text.literal("Failed to create stats share"));
+            }
+        }).exceptionally(throwable -> {
+            // Handle errors
+            player.sendMessage(Text.literal("Error: " + throwable.getMessage()));
+            return null;
+        });
+    }
+
+    public void getStatsAsync(ServerPlayerEntity player) {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        CompletableFuture<PlayerStats> future = api.getPlayerStatsAsync(player);
+
+        future.thenAccept(stats -> {
+            // Process stats on main thread
+            displayStatsToPlayer(player, stats);
+        });
+    }
+}
+```
+
+### Batch Operations
+
+```java
+public class BatchOperations {
+
+    public void batchCreateShares(List<ServerPlayerEntity> players) {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        List<CompletableFuture<ShareData>> futures = players.stream()
+            .map(player -> api.createShareAsync(player, ShareType.ITEM, Duration.ofMinutes(15), null))
+            .collect(Collectors.toList());
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+            .thenRun(() -> {
+                System.out.println("All shares created successfully");
+            });
+    }
+
+    public void batchCancelShares(List<String> shareIds) {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        List<CompletableFuture<Boolean>> futures = shareIds.stream()
+            .map(api::cancelShareAsync)
+            .collect(Collectors.toList());
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+            .thenRun(() -> {
+                System.out.println("Batch cancellation completed");
+            });
+    }
+}
+```
+
+## Custom Data Storage
+
+### Data Providers
+
+```java
+public class CustomDataProvider implements DataProvider {
+
+    @Override
+    public void saveShare(ShareData share) {
+        // Custom storage implementation
+        try (Connection conn = getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(
+                "INSERT INTO shares (id, creator, type, data, expires_at) VALUES (?, ?, ?, ?, ?)"
+            );
+            stmt.setString(1, share.getId());
+            stmt.setString(2, share.getCreator().getUuidAsString());
+            stmt.setString(3, share.getType().name());
+            stmt.setString(4, serializeShareData(share));
+            stmt.setTimestamp(5, Timestamp.from(share.getExpiresAt()));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataStorageException("Failed to save share", e);
+        }
+    }
+
+    @Override
+    public Optional<ShareData> loadShare(String id) {
+        try (Connection conn = getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM shares WHERE id = ?"
+            );
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(deserializeShareData(rs));
+            }
+        } catch (SQLException e) {
+            throw new DataStorageException("Failed to load share", e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<ShareData> getPlayerShares(UUID playerId) {
+        // Implementation for loading player shares
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void cleanup() {
+        // Remove expired shares
+        try (Connection conn = getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(
+                "DELETE FROM shares WHERE expires_at < ?"
+            );
+            stmt.setTimestamp(1, Timestamp.from(Instant.now()));
+            int deleted = stmt.executeUpdate();
+            System.out.println("Cleaned up " + deleted + " expired shares");
+        } catch (SQLException e) {
+            throw new DataStorageException("Failed to cleanup shares", e);
+        }
+    }
+}
+
+// Register the custom provider
+ShowcaseAPI.getInstance().registerDataProvider(new CustomDataProvider());
+```
+
+### Caching Integration
+
+```java
+public class CacheIntegration {
+
+    public void useCaching() {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+        CacheManager cache = api.getCacheManager();
+
+        // Store custom data in cache
+        cache.put("my-key", myData, Duration.ofMinutes(5));
+
+        // Retrieve cached data
+        Optional<MyData> cached = cache.get("my-key", MyData.class);
+        if (cached.isPresent()) {
+            System.out.println("Found cached data: " + cached.get());
+        }
+
+        // Compute if absent
+        MyData data = cache.computeIfAbsent("expensive-key", key -> {
+            return computeExpensiveData();
+        }, Duration.ofMinutes(10));
+
+        // Invalidate cache entries
+        cache.invalidate("my-key");
+        cache.invalidateAll();
+    }
+}
+```
+
+## Error Handling
+
+### Exception Types
+
+```java
+public class ErrorHandling {
+
+    public void handleExceptions(ServerPlayerEntity player) {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        try {
+            ShareData share = api.createShare(
+                player,
+                ShareType.ITEM,
+                Duration.ofMinutes(30),
+                "Test share"
+            );
+        } catch (ShareCreationException e) {
+            // Handle share creation failure
+            switch (e.getErrorType()) {
+                case NO_ITEM_IN_HAND:
+                    player.sendMessage(Text.literal("No item to share"));
+                    break;
+                case PERMISSION_DENIED:
+                    player.sendMessage(Text.literal("No permission to share"));
+                    break;
+                case COOLDOWN_ACTIVE:
+                    player.sendMessage(Text.literal("Please wait before sharing again"));
+                    break;
+                case SHARE_LIMIT_REACHED:
+                    player.sendMessage(Text.literal("Too many active shares"));
+                    break;
+                case INVALID_DURATION:
+                    player.sendMessage(Text.literal("Invalid share duration"));
+                    break;
+                default:
+                    player.sendMessage(Text.literal("Unknown error occurred"));
+                    break;
+            }
+        } catch (PermissionException e) {
+            player.sendMessage(Text.literal("Permission error: " + e.getMessage()));
+        } catch (RateLimitException e) {
+            player.sendMessage(Text.literal("Rate limited: " + e.getMessage()));
+        } catch (ConfigurationException e) {
+            // Log configuration errors
+            System.err.println("Configuration error: " + e.getMessage());
+        }
+    }
+}
+```
+
+### Validation
+
+```java
+public class ValidationHelpers {
+
+    public boolean validateShareCreation(ServerPlayerEntity player, ShareType type) {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        // Check basic permission
+        if (!api.hasPermission(player, type.getPermissionNode())) {
+            return false;
+        }
+
+        // Check cooldown
+        Duration cooldown = api.getCooldown(player, type);
+        if (!cooldown.isZero()) {
+            return false;
+        }
+
+        // Check share limit
+        List<ShareData> existing = api.getPlayerShares(player);
+        ShowcaseConfig config = api.getConfig();
+        if (existing.size() >= config.getMaxSharesPerPlayer()) {
+            return false;
+        }
+
+        // Type-specific validation
+        switch (type) {
+            case ITEM:
+                return player.getMainHandStack() != null && !player.getMainHandStack().isEmpty();
+            case STATS:
+                return config.isShareTypeEnabled(ShareType.STATS);
+            case CONTAINER:
+                return hasRecentContainerInteraction(player);
+            default:
+                return true;
+        }
+    }
+}
+```
+
+## Performance Optimization
+
+### Best Practices
+
+```java
+public class PerformanceOptimization {
+
+    public void optimizedOperations() {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        // Use async operations for expensive tasks
+        CompletableFuture<PlayerStats> statsFuture = api.getPlayerStatsAsync(player);
+
+        // Batch operations when possible
+        List<String> shareIds = getShareIds();
+        api.batchCancelShares(shareIds);
+
+        // Cache frequently accessed data
+        CacheManager cache = api.getCacheManager();
+        PlayerStats stats = cache.computeIfAbsent("stats-" + player.getUuid(),
+            key -> api.getPlayerStats(player), Duration.ofMinutes(5));
+
+        // Use pagination for large datasets
+        List<ShareData> shares = api.getPlayerShares(player, 0, 10); // page 0, size 10
+    }
+
+    public void monitorPerformance() {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+        PerformanceMonitor monitor = api.getPerformanceMonitor();
+
+        // Track operation timing
+        try (PerformanceTimer timer = monitor.startTimer("custom-operation")) {
+            // Your expensive operation here
+            performExpensiveOperation();
+        }
+
+        // Get performance metrics
+        PerformanceMetrics metrics = monitor.getMetrics();
+        System.out.println("Average operation time: " + metrics.getAverageTime("custom-operation"));
+    }
+}
+```
+
+## Integration Examples
+
+### Command Integration
+
+```java
+public class CustomShowcaseCommand {
+
+    @Command("myshare")
+    @Permission("mymod.share")
+    public void myShareCommand(ServerPlayerEntity player,
+                              @Argument("type") ShareType type,
+                              @Argument("duration") @Optional Duration duration) {
+
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        Duration shareDuration = duration != null ? duration : Duration.ofMinutes(30);
+
+        try {
+            ShareData share = api.createShare(player, type, shareDuration, "Custom share");
+            player.sendMessage(Text.literal("Custom share created: " + share.getId()));
+        } catch (ShareCreationException e) {
+            player.sendMessage(Text.literal("Failed to create share: " + e.getMessage()));
+        }
+    }
+}
+```
+
+### GUI Integration
+
+```java
+public class ShowcaseGUI extends SimpleGui {
+
+    public ShowcaseGUI(ServerPlayerEntity player) {
+        super(ScreenHandlerType.GENERIC_9X6, player, false);
+        this.setTitle(Text.literal("My Shares"));
+
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+        List<ShareData> shares = api.getPlayerShares(player);
+
+        int slot = 0;
+        for (ShareData share : shares) {
+            ItemStack displayItem = createDisplayItem(share);
+            this.setSlot(slot++, displayItem, (type, action) -> {
+                // Handle click - open share or show details
+                openShareDetails(share);
+            });
+        }
+    }
+
+    private ItemStack createDisplayItem(ShareData share) {
+        ItemStack item = new ItemStack(Material.PAPER);
+        ItemMeta meta = item.getItemMeta();
+
+        meta.setDisplayName(Text.literal("§6Share: " + share.getType().name()));
+        meta.setLore(Arrays.asList(
+            Text.literal("§7Created: " + formatTime(share.getCreatedAt())),
+            Text.literal("§7Expires: " + formatTime(share.getExpiresAt())),
+            Text.literal("§7Views: " + share.getViewCount())
+        ));
+
+        item.setItemMeta(meta);
+        return item;
+    }
+}
+```
+
+## Related Topics
+
+- [Events](/developers/events) - Event system integration
+- [PlaceholderAPI](/developers/placeholderapi) - Placeholder integration
+- [Data API](/developers/data-api) - Data storage and retrieval
+- [API Overview](/developers/api-overview) - Complete developer guide

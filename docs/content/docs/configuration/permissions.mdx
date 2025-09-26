@@ -1,0 +1,424 @@
+---
+title: Permissions
+description: Detailed permission system configuration with LuckPerms integration
+category: configuration
+---
+
+# Permission System
+
+<MinecraftVersion auto />
+
+Showcase provides a comprehensive permission system that integrates with LuckPerms for fine-grained access control. Players can be granted specific permissions for different sharing types and features.
+
+## Permission Hierarchy
+
+<Callout type="info">
+Showcase uses a hierarchical permission system where higher-level permissions automatically grant access to sub-permissions.
+</Callout>
+
+### Base Structure
+
+```
+showcase.command.<type>                    # Base permission
+├── showcase.command.<type>.receivers      # Can specify recipients
+├── showcase.command.<type>.duration       # Can set custom durations
+├── showcase.command.<type>.description    # Can add descriptions
+└── showcase.command.<type>.cooldown       # Bypass cooldowns
+```
+
+## Command Permissions
+
+### Player Commands
+
+<Tabs items={["Item Sharing", "Inventory Sharing", "Container Sharing", "Statistics"]}>
+  <Tab value="Item Sharing">
+    <PermissionNode
+      node="showcase.command.item"
+      description="Basic item sharing permission"
+    />
+
+    <PermissionNode
+      node="showcase.command.item.receivers"
+      description="Can specify who receives the share (@a, player names)"
+    />
+
+    <PermissionNode
+      node="showcase.command.item.duration"
+      description="Can set custom share duration (5m, 1h, etc.)"
+    />
+
+    <PermissionNode
+      node="showcase.command.item.description"
+      description="Can add custom descriptions to shares"
+    />
+
+    <PermissionNode
+      node="showcase.command.item.cooldown"
+      description="Bypass cooldowns for item sharing"
+    />
+  </Tab>
+
+  <Tab value="Inventory Sharing">
+    **Full Inventory**
+    <PermissionNode
+      node="showcase.command.inventory"
+      description="Share entire inventory (36 slots)"
+    />
+
+    **Hotbar Only**
+    <PermissionNode
+      node="showcase.command.hotbar"
+      description="Share hotbar items (9 slots)"
+    />
+
+    **Ender Chest**
+    <PermissionNode
+      node="showcase.command.enderchest"
+      description="Share ender chest contents"
+    />
+
+    Each type supports the same sub-permissions as item sharing:
+    - `.receivers` - Specify recipients
+    - `.duration` - Custom duration
+    - `.description` - Add descriptions
+    - `.cooldown` - Bypass cooldowns
+  </Tab>
+
+  <Tab value="Container Sharing">
+    <PermissionNode
+      node="showcase.command.container"
+      description="Share recently opened containers"
+    />
+
+    <PermissionNode
+      node="showcase.command.merchant"
+      description="Share villager trade interfaces"
+    />
+
+    Both container types support sub-permissions:
+    - `.receivers` - Specify recipients
+    - `.duration` - Custom duration
+    - `.description` - Add descriptions
+    - `.cooldown` - Bypass cooldowns
+  </Tab>
+
+  <Tab value="Statistics">
+    <PermissionNode
+      node="showcase.command.stats"
+      description="Share player statistics"
+    />
+
+    **Sub-permissions:**
+    - `showcase.command.stats.receivers` - Specify recipients
+    - `showcase.command.stats.duration` - Custom duration
+    - `showcase.command.stats.description` - Add descriptions
+    - `showcase.command.stats.cooldown` - Bypass cooldowns
+  </Tab>
+</Tabs>
+
+### Utility Commands
+
+<PermissionNode
+  node="showcase.command.view"
+  description="View shared content via /showcase-view command"
+/>
+
+<PermissionNode
+  node="showcase.command.cancel"
+  description="Cancel your own active shares"
+/>
+
+## Administrative Permissions
+
+### Management Commands
+
+<PermissionNode
+  node="showcase.manage.about"
+  description="View mod information (default: available to all players)"
+/>
+
+<PermissionNode
+  node="showcase.manage.reload"
+  description="Reload configuration files (default: level 4)"
+/>
+
+<PermissionNode
+  node="showcase.manage.list"
+  description="View all active shares (default: level 4)"
+/>
+
+<PermissionNode
+  node="showcase.manage.cancel"
+  description="Cancel any player's shares (default: level 4)"
+/>
+
+### Global Admin Access
+
+<PermissionNode
+  node="showcase.admin"
+  description="Full administrative access to all features"
+/>
+
+<PermissionNode
+  node="showcase.manage"
+  description="Access to all management commands (default: level 4)"
+/>
+
+## Chat Placeholder Permissions
+
+### Basic Placeholder Access
+
+<PermissionNode
+  node="showcase.chat.placeholder"
+  description="Basic chat placeholder functionality"
+/>
+
+### Specific Share Type Placeholders
+
+<PermissionNode
+  node="showcase.chat.placeholder.item"
+  description="Use [item] keyword in chat"
+/>
+
+<PermissionNode
+  node="showcase.chat.placeholder.inventory"
+  description="Use [inventory] keyword in chat"
+/>
+
+<PermissionNode
+  node="showcase.chat.placeholder.hotbar"
+  description="Use [hotbar] keyword in chat"
+/>
+
+<PermissionNode
+  node="showcase.chat.placeholder.enderchest"
+  description="Use [enderchest] keyword in chat"
+/>
+
+<PermissionNode
+  node="showcase.chat.placeholder.stats"
+  description="Use [stats] keyword in chat"
+/>
+
+## Permission Examples
+
+### Basic Player Setup
+
+Grant basic sharing permissions to default players:
+
+```bash
+# Basic item and inventory sharing
+/lp group default permission set showcase.command.item true
+/lp group default permission set showcase.command.inventory true
+/lp group default permission set showcase.command.hotbar true
+
+# Basic chat placeholders
+/lp group default permission set showcase.chat.placeholder.item true
+/lp group default permission set showcase.chat.placeholder.inventory true
+
+# View and cancel own shares
+/lp group default permission set showcase.command.view true
+/lp group default permission set showcase.command.cancel true
+```
+
+### Trusted Player Setup
+
+Grant advanced permissions to trusted players:
+
+```bash
+# All sharing types
+/lp group trusted permission set showcase.command.item true
+/lp group trusted permission set showcase.command.inventory true
+/lp group trusted permission set showcase.command.hotbar true
+/lp group trusted permission set showcase.command.enderchest true
+/lp group trusted permission set showcase.command.stats true
+/lp group trusted permission set showcase.command.container true
+
+# Advanced features
+/lp group trusted permission set showcase.command.item.receivers true
+/lp group trusted permission set showcase.command.inventory.receivers true
+/lp group trusted permission set showcase.command.item.duration true
+/lp group trusted permission set showcase.command.inventory.duration true
+
+# All chat placeholders
+/lp group trusted permission set showcase.chat.placeholder true
+```
+
+### Staff/Moderator Setup
+
+Grant management permissions to staff:
+
+```bash
+# All player permissions
+/lp group staff parent add trusted
+
+# Management commands
+/lp group staff permission set showcase.manage.list true
+/lp group staff permission set showcase.manage.cancel true
+
+# Bypass some restrictions
+/lp group staff permission set showcase.command.item.cooldown true
+/lp group staff permission set showcase.command.inventory.cooldown true
+```
+
+### Administrator Setup
+
+Grant full access to administrators:
+
+```bash
+# Full admin access
+/lp group admin permission set showcase.admin true
+
+# Or specific management permissions
+/lp group admin permission set showcase.manage true
+/lp group admin permission set showcase.manage.reload true
+
+# Plus all player permissions
+/lp group admin parent add trusted
+```
+
+## Permission Defaults
+
+### Configuration-Based Defaults
+
+The mod uses configuration to set default permission levels for each share type:
+
+```yaml
+shareSettings:
+  ITEM:
+    defaultPermission: 0  # Level 0 = all players
+  INVENTORY:
+    defaultPermission: 0  # Level 0 = all players
+  HOTBAR:
+    defaultPermission: 0  # Level 0 = all players
+  ENDERCHEST:
+    defaultPermission: 0  # Level 0 = all players
+  STATS:
+    defaultPermission: 0  # Level 0 = all players
+  CONTAINER:
+    defaultPermission: 0  # Level 0 = all players
+  MERCHANT:
+    defaultPermission: 0  # Level 0 = all players
+```
+
+### Fallback Behavior
+
+When LuckPerms is not available, the mod falls back to:
+- Permission level 0: All players
+- Permission level 1: Players with level 1+ operator status
+- Permission level 2: Players with level 2+ operator status
+- Permission level 3: Players with level 3+ operator status
+- Permission level 4: Players with level 4 operator status
+
+## Permission Testing
+
+### Check Player Permissions
+
+Use LuckPerms commands to verify permissions:
+
+```bash
+# Check specific permission
+/lp user <player> permission check showcase.command.item
+
+# List all showcase permissions for a player
+/lp user <player> permission list | grep showcase
+
+# Check effective permissions (including inheritance)
+/lp user <player> permission check showcase.command.item.receivers
+```
+
+### Debug Permission Issues
+
+<Callout type="tip">
+Use `/showcase-manage about` to verify the mod is loaded correctly, then check permissions systematically.
+</Callout>
+
+**Common Issues:**
+1. **Player can't share**: Check base permission (`showcase.command.item`)
+2. **Can't specify receivers**: Check sub-permission (`showcase.command.item.receivers`)
+3. **Chat keywords don't work**: Check chat placeholder permissions
+4. **Admin commands fail**: Verify management permissions or operator level
+
+### Permission Wildcards
+
+LuckPerms supports wildcard permissions:
+
+```bash
+# Grant all command permissions
+/lp group trusted permission set showcase.command.* true
+
+# Grant all item-related permissions
+/lp group trusted permission set showcase.command.item.* true
+
+# Grant all management permissions
+/lp group admin permission set showcase.manage.* true
+
+# Grant all showcase permissions
+/lp group admin permission set showcase.* true
+```
+
+## Migration from Other Permission Plugins
+
+### From PermissionsEx (PEX)
+
+```bash
+# Convert PEX groups to LuckPerms
+/lp migration permissionsex
+
+# Then apply showcase permissions as shown above
+```
+
+### From GroupManager
+
+```bash
+# Convert GroupManager to LuckPerms
+/lp migration groupmanager
+
+# Apply showcase permissions to converted groups
+```
+
+## Integration with Other Mods
+
+### Compatibility Notes
+
+<Callout type="info">
+Showcase permissions work alongside other mod permission systems without conflicts.
+</Callout>
+
+**Tested Compatibility:**
+- ✅ LuckPerms (recommended)
+- ✅ Fabric Permissions API
+- ✅ Server operator levels (fallback)
+
+**Known Issues:**
+- Some permission plugins may not support deep permission hierarchies
+- Wildcard permissions may not work with all permission plugins
+
+<RelatedLinks
+  links={[
+    {
+      title: "Configuration File",
+      href: "/configuration/config-file",
+      description: "Complete reference for config.yml settings",
+      icon: <Settings />
+    },
+    {
+      title: "Player Commands",
+      href: "/commands/player-commands",
+      description: "Standard player command reference",
+      icon: <Command />
+    },
+    {
+      title: "Admin Commands",
+      href: "/commands/admin-commands",
+      description: "Administrative commands for server management",
+      icon: <Shield />
+    },
+    {
+      title: "Troubleshooting",
+      href: "/support/troubleshooting",
+      description: "Permission troubleshooting and common issues",
+      icon: <HelpCircle />
+    }
+  ]}
+/>

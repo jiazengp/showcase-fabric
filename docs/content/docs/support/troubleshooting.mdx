@@ -1,0 +1,529 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for Showcase mod
+category: support
+---
+
+# Troubleshooting Guide
+
+<MinecraftVersion auto />
+
+This guide covers common issues and their solutions when using Showcase mod. Most problems can be resolved by following these troubleshooting steps.
+
+## Installation Issues
+
+### Mod Not Loading
+
+<Callout type="error">
+**Problem**: Showcase mod doesn't appear in mod list or `/mods` command
+</Callout>
+
+**Solutions**:
+
+1. **Check Minecraft Version**:
+   ```
+   Showcase 2.3.1+mc1.21.6 requires Minecraft 1.21.6
+   Use the correct version for your server
+   ```
+
+2. **Verify Dependencies**:
+   - ✅ Fabric Loader installed
+   - ✅ Fabric API (correct version)
+   - ✅ Java 21+ for MC 1.21.x
+
+3. **Check Installation Path**:
+   ```
+   server/
+   ├── mods/
+   │   ├── fabric-api-[version].jar     ✅
+   │   ├── showcase-[version].jar       ✅
+   │   └── other-mods.jar
+   └── server.jar
+   ```
+
+4. **Review Server Logs**:
+   ```bash
+   grep -i "showcase" logs/latest.log
+   grep -i "error" logs/latest.log
+   ```
+
+### Fabric API Conflicts
+
+<Callout type="warn">
+**Problem**: "Incompatible Fabric API version" error
+</Callout>
+
+| Minecraft Version | Required Fabric API |
+|-------------------|-------------------|
+| 1.21.6 | 0.110.0+ |
+| 1.21.5 | 0.109.0+ |
+| 1.21.4 | 0.108.0+ |
+| 1.21.2 | 0.107.0+ |
+
+**Fix**: Download the correct Fabric API version from [Modrinth](https://modrinth.com/mod/fabric-api).
+
+## Permission Issues
+
+### Commands Not Working
+
+<Callout type="error">
+**Problem**: "You do not have permission to use this command"
+</Callout>
+
+<Tabs items={["LuckPerms Setup", "Operator Setup", "Debug Steps"]}>
+  <Tab value="LuckPerms Setup">
+    **Check LuckPerms Installation**:
+    ```bash
+    /lp info
+    ```
+
+    **Grant Basic Permissions**:
+    ```bash
+    # For all players
+    /lp group default permission set showcase.command.item true
+
+    # For specific player
+    /lp user PlayerName permission set showcase.command.inventory true
+    ```
+
+    **Verify Permissions**:
+    ```bash
+    /lp user PlayerName permission check showcase.command.item
+    ```
+  </Tab>
+
+  <Tab value="Operator Setup">
+    **Without LuckPerms** (fallback system):
+    ```bash
+    # Grant OP status
+    /op PlayerName
+
+    # Check OP level
+    /list ops
+    ```
+
+    **OP Level Requirements**:
+    - Level 4: Full admin access
+    - Level 3: Management commands
+    - Level 2: Advanced sharing
+    - Level 1: Basic sharing only
+  </Tab>
+
+  <Tab value="Debug Steps">
+    **Enable Permission Debugging**:
+    ```yaml
+    # config/showcase/config.yml
+    debug:
+      enabled: true
+      logPermissions: true
+    ```
+
+    **Check Player Permissions**:
+    ```bash
+    /showcase-manage perms PlayerName
+    ```
+
+    **Review Permission Logs**:
+    ```bash
+    grep "PERMISSION" logs/latest.log
+    ```
+  </Tab>
+</Tabs>
+
+### Chat Keywords Not Working
+
+<Callout type="error">
+**Problem**: `[item]` keywords are ignored in chat
+</Callout>
+
+**Diagnostic Steps**:
+
+1. **Check Configuration**:
+   ```yaml
+   chatKeywords:
+     enabled: true  # Must be true
+   ```
+
+2. **Verify Permissions**:
+   <PermissionNode
+     node="showcase.chat.item"
+     description="Required for [item] keyword"
+   />
+
+3. **Check Rate Limits**:
+   ```yaml
+   chatKeywords:
+     rateLimitPerMinute: 5
+     rateLimitPerHour: 30
+   ```
+
+4. **Test with Debug**:
+   ```yaml
+   debug:
+     logChatKeywords: true
+   ```
+
+## Configuration Problems
+
+### Config File Not Loading
+
+<Callout type="error">
+**Problem**: Changes to config.yml don't take effect
+</Callout>
+
+**Solutions**:
+
+1. **Check YAML Syntax**:
+   ```bash
+   # Use a YAML validator
+   yamllint config/showcase/config.yml
+   ```
+
+2. **Verify File Permissions**:
+   ```bash
+   ls -la config/showcase/
+   # Server must have read/write access
+   ```
+
+3. **Reload Configuration**:
+   <CommandSyntax>/showcase-manage reload</CommandSyntax>
+
+4. **Restart if Needed**:
+   Some settings require server restart:
+   - Database settings
+   - Item icon configuration
+   - Language changes
+
+### Invalid Configuration Values
+
+<Callout type="warn">
+**Common YAML Errors**:
+- Incorrect indentation (use spaces, not tabs)
+- Missing colons after keys
+- Invalid boolean values (use `true`/`false`)
+- Negative duration values
+</Callout>
+
+**Example Valid Configuration**:
+```yaml
+# ✅ Correct format
+shares:
+  item:
+    enabled: true
+    defaultDuration: 30
+    maxDuration: 60
+
+# ❌ Common mistakes
+shares:
+item:  # Missing indentation
+  enabled: yes  # Use 'true' instead
+  defaultDuration: -10  # Negative value
+```
+
+## Share Creation Issues
+
+### Shares Not Creating
+
+<Callout type="error">
+**Problem**: `/showcase item` command succeeds but no share appears
+</Callout>
+
+**Debugging Steps**:
+
+1. **Check Item in Hand**:
+   ```
+   Must be holding an item for /showcase item
+   Empty hand = no share created
+   ```
+
+2. **Verify Cooldowns**:
+   ```yaml
+   shares:
+     item:
+       cooldown: 5  # seconds between shares
+   ```
+
+3. **Check Share Limits**:
+   ```yaml
+   general:
+     maxSharesPerPlayer: 10  # Max active shares
+   ```
+
+4. **Review Expiration**:
+   ```yaml
+   shares:
+     item:
+       defaultDuration: 30  # minutes
+   ```
+
+### Container Sharing Problems
+
+<Callout type="error">
+**Problem**: `/showcase container` says "No recent container opened"
+</Callout>
+
+**Requirements for Container Sharing**:
+
+1. **Open Container First**:
+   - Open chest/barrel within 10 seconds
+   - Don't close the container too quickly
+
+2. **Check Detection Timeout**:
+   ```yaml
+   shares:
+     container:
+       detectionTimeout: 10  # seconds
+   ```
+
+3. **Supported Containers**:
+   - ✅ Chests (single/double)
+   - ✅ Barrels
+   - ✅ Shulker boxes
+   - ✅ Dispensers/Droppers
+   - ❌ Player inventories
+   - ❌ Crafting tables
+
+## Performance Issues
+
+### Server Lag
+
+<Callout type="warn">
+**Problem**: Server lag when players create shares
+</Callout>
+
+**Optimization Steps**:
+
+1. **Adjust Cache Settings**:
+   ```yaml
+   performance:
+     cacheSize: 2000  # Increase for more players
+     cacheExpiration: 180  # Reduce for less memory usage
+   ```
+
+2. **Reduce Share Durations**:
+   ```yaml
+   shares:
+     item:
+       defaultDuration: 15  # Shorter duration
+       maxDuration: 30
+   ```
+
+3. **Increase Cleanup Frequency**:
+   ```yaml
+   general:
+     cleanupInterval: 2  # Clean expired shares more often
+   ```
+
+4. **Disable Detailed Stats**:
+   ```yaml
+   performance:
+     collectDetailedStats: false  # Reduces processing
+   ```
+
+### Memory Usage
+
+**Monitor Memory Usage**:
+```bash
+# Check JVM memory
+jps -v | grep minecraft
+
+# Monitor share count
+/showcase-manage list
+```
+
+**Memory Optimization**:
+```yaml
+performance:
+  cacheSize: 500  # Reduce for less RAM usage
+  databaseCleanup: true  # Enable auto-cleanup
+  compactInterval: 30  # More frequent compaction
+```
+
+## Search and Display Issues
+
+### GUI Not Opening
+
+<Callout type="error">
+**Problem**: `/showcase-view ID` doesn't open GUI
+</Callout>
+
+**Solutions**:
+
+1. **Check Share ID**:
+   ```bash
+   # Get valid share IDs
+   /showcase-manage list
+   ```
+
+2. **Verify Share Exists**:
+   ```
+   Share may have expired or been cancelled
+   Check expiration time
+   ```
+
+3. **Test with Different Share**:
+   ```bash
+   # Create test share
+   /showcase item
+   # Note the ID and try viewing immediately
+   ```
+
+### Statistics Not Displaying
+
+<Callout type="error">
+**Problem**: `/showcase stats` creates empty or incomplete statistics
+</Callout>
+
+**Debugging**:
+
+1. **Check Statistics Collection**:
+   ```yaml
+   performance:
+     collectDetailedStats: true
+     statsUpdateInterval: 30
+   ```
+
+2. **Verify Player Data**:
+   ```
+   New players may have limited statistics
+   Play for a while to generate data
+   ```
+
+3. **Enable Debug Logging**:
+   ```yaml
+   debug:
+     enabled: true
+     logLevel: "DEBUG"
+   ```
+
+## Mod Compatibility
+
+### Conflicting Mods
+
+<Callout type="warn">
+**Known Compatibility Issues**:
+- Some chat mods may interfere with keywords
+- Inventory mods may cause GUI conflicts
+- Permission mods other than LuckPerms need testing
+</Callout>
+
+**Testing Compatibility**:
+
+1. **Isolate Showcase**:
+   ```
+   Test with only Showcase + dependencies
+   Add other mods one by one
+   ```
+
+2. **Check for Errors**:
+   ```bash
+   grep -i "showcase\|error" logs/latest.log
+   ```
+
+3. **Report Conflicts**:
+   Include mod list when reporting issues
+
+### Version Mismatches
+
+**Ensure All Components Match**:
+```
+Minecraft 1.21.6:
+├── Fabric Loader 0.16.0+
+├── Fabric API 0.110.0+
+└── Showcase 2.3.1+mc1.21.6
+
+❌ Don't mix versions:
+Showcase 2.3.1+mc1.21.4 on MC 1.21.6 server
+```
+
+## Getting Help
+
+### Log Collection
+
+**Essential Information for Support**:
+
+1. **Server Information**:
+   ```bash
+   # Minecraft version
+   cat server.properties | grep level-name
+
+   # Mod versions
+   /mods | grep -E "(showcase|fabric)"
+   ```
+
+2. **Error Logs**:
+   ```bash
+   # Recent errors
+   tail -100 logs/latest.log | grep -i error
+
+   # Showcase-specific logs
+   grep -i showcase logs/latest.log
+   ```
+
+3. **Configuration**:
+   ```bash
+   # Include your config (remove sensitive data)
+   cat config/showcase/config.yml
+   ```
+
+### Debug Mode
+
+**Enable Full Debugging**:
+```yaml
+debug:
+  enabled: true
+  logLevel: "DEBUG"
+  logCommands: true
+  logPermissions: true
+  logChatKeywords: true
+```
+
+**Understanding Debug Output**:
+```
+[DEBUG] [Showcase] Permission check: player=Steve, permission=showcase.command.item, result=true
+[DEBUG] [Showcase] Share created: id=abc123, type=ITEM, duration=PT30M
+[DEBUG] [Showcase] Chat keyword processed: [item] -> [Diamond Sword]
+```
+
+### Support Channels
+
+<Cards>
+  <Card
+    title="GitHub Issues"
+    description="Report bugs and request features"
+    href="https://github.com/jiazengp/showcase-fabric/issues"
+  />
+  <Card
+    title="Documentation"
+    description="Browse complete documentation"
+    href="/docs"
+  />
+  <Card
+    title="FAQ"
+    description="Frequently asked questions"
+    href="/support/faq"
+  />
+</Cards>
+
+### Before Reporting Issues
+
+**Checklist**:
+- [ ] Updated to latest Showcase version
+- [ ] Checked this troubleshooting guide
+- [ ] Tested with minimal mod setup
+- [ ] Collected relevant logs and config
+- [ ] Searched existing GitHub issues
+
+**Information to Include**:
+1. Exact error message or behavior
+2. Steps to reproduce the issue
+3. Server/client versions and mod list
+4. Relevant configuration sections
+5. Log excerpts (no full logs unless requested)
+
+## Related Topics
+
+- [Configuration File](/configuration/config-file) - Complete configuration reference
+- [Permissions](/configuration/permissions) - Permission setup guide
+- [FAQ](/support/faq) - Frequently asked questions
+- [Installation](/getting-started/installation) - Installation guide

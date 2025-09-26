@@ -1,0 +1,12 @@
+{
+  "title": "Sharing",
+  "description": "Content sharing features",
+  "icon": "📤",
+  "pages": [
+    "items",
+    "inventories",
+    "containers",
+    "villager-trades",
+    "statistics"
+  ]
+}

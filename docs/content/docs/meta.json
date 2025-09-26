@@ -1,0 +1,13 @@
+{
+  "title": "Showcase Mod Documentation",
+  "pages": [
+    "index",
+    "getting-started",
+    "features",
+    "commands",
+    "configuration",
+    "developers",
+    "support",
+    "changelog"
+  ]
+}

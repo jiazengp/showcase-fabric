@@ -1,0 +1,11 @@
+{
+  "title": "Features",
+  "description": "Core functionality and capabilities",
+  "icon": "✨",
+  "pages": [
+    "sharing",
+    "chat-keywords",
+    "item-icons",
+    "multi-language"
+  ]
+}

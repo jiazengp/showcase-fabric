@@ -1,0 +1,248 @@
+---
+title: Event System
+description: Listen to and handle Showcase events for custom integrations
+category: developers
+---
+
+# Event System
+
+<MinecraftVersion auto />
+
+Showcase provides a comprehensive event system that allows mods to listen for and respond to various sharing-related events, enabling deep integration and custom functionality.
+
+## Event Registration
+
+### Fabric Event API Usage
+
+```java
+public class ShowcaseEventHandler {
+
+    public void registerEvents() {
+        // Register showcase creation event
+        ShowcaseEvents.SHOWCASE_CREATED.register((sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration) -> {
+            // Handle showcase creation
+            sender.sendMessage(Text.literal("Showcase created: " + shareType.name()));
+
+            // Log the event
+            System.out.println("Player " + sender.getName().getString() + " created a " + shareType + " showcase");
+
+            // Return PASS to allow the creation, FAIL to cancel it
+            return ActionResult.PASS;
+        });
+
+        // Register showcase viewing event
+        ShowcaseEvents.SHOWCASE_VIEWED.register((viewer, shareEntry, shareId, originalOwner) -> {
+            // Handle showcase viewing
+            viewer.sendMessage(Text.literal("You are viewing " + originalOwner.getName().getString() + "'s showcase"));
+
+            // Log the view
+            System.out.println("Player " + viewer.getName().getString() + " viewed showcase " + shareId);
+
+            // Return PASS to allow viewing, FAIL to prevent it
+            return ActionResult.PASS;
+        });
+    }
+}
+```
+
+### Using ShowcaseAPI Event Methods
+
+```java
+public class ShowcaseAPIEventHandler {
+
+    public void setupEventListeners() {
+        ShowcaseAPI api = ShowcaseAPI.getInstance();
+
+        // Using API convenience methods
+        api.onShowcaseCreated((sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration) -> {
+            // Custom creation logic
+            if (shareType == ShowcaseManager.ShareType.STATS) {
+                sender.sendMessage(Text.literal("Statistics shared successfully!"));
+            }
+
+            return ActionResult.PASS;
+        });
+
+        api.onShowcaseViewed((viewer, shareEntry, shareId, originalOwner) -> {
+            // Custom viewing logic
+            if (viewer.hasPermissionLevel(4)) {
+                viewer.sendMessage(Text.literal("Admin view logged for audit"));
+            }
+
+            return ActionResult.PASS;
+        });
+    }
+}
+```
+
+## Available Events
+
+### ShowcaseCreatedCallback
+
+**Event Details:**
+- **Package:** `com.showcase.event.ShowcaseCreatedCallback`
+- **When fired:** After a showcase is successfully created and stored
+- **Can be cancelled:** Yes (return `ActionResult.FAIL`)
+
+**Event Parameters:**
+```java
+ActionResult onShowcaseCreated(
+    @NotNull ServerPlayerEntity sender,        // Player who initiated the command
+    @NotNull ServerPlayerEntity sourcePlayer,  // Player whose content is showcased
+    @Nullable Collection<ServerPlayerEntity> receivers, // Target players (null = public)
+    @NotNull ShowcaseManager.ShareType shareType,      // Type of share (ITEM, INVENTORY, etc.)
+    @NotNull ShareEntry shareEntry,           // The share entry with the content
+    @NotNull String shareId,                  // Unique identifier for the share
+    @Nullable String description,             // Custom description (optional)
+    @Nullable Integer duration                // Duration in seconds (optional)
+);
+```
+
+**Usage Example:**
+```java
+ShowcaseEvents.SHOWCASE_CREATED.register((sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration) -> {
+    // Anti-spam: limit shares per minute
+    if (getSharesInLastMinute(sender) > 5) {
+        sender.sendMessage(Text.literal("Too many shares! Please wait."));
+        return ActionResult.FAIL; // Cancel the share
+    }
+
+    // Log special shares
+    if (shareType == ShowcaseManager.ShareType.INVENTORY) {
+        System.out.println("Full inventory shared by " + sender.getName().getString());
+    }
+
+    return ActionResult.PASS; // Allow the share
+});
+```
+
+### ShowcaseViewedCallback
+
+**Event Details:**
+- **Package:** `com.showcase.event.ShowcaseViewedCallback`
+- **When fired:** Before the showcase GUI is opened to the viewer
+- **Can be cancelled:** Yes (return `ActionResult.FAIL`)
+
+**Event Parameters:**
+```java
+ActionResult onShowcaseViewed(
+    @NotNull ServerPlayerEntity viewer,        // Player viewing the showcase
+    @NotNull ShareEntry shareEntry,           // The share being viewed
+    @NotNull String shareId,                  // Share identifier
+    @NotNull ServerPlayerEntity originalOwner // Original owner of the content
+);
+```
+
+**Usage Example:**
+```java
+ShowcaseEvents.SHOWCASE_VIEWED.register((viewer, shareEntry, shareId, originalOwner) -> {
+    // Privacy check: prevent viewing if blocked
+    if (isPlayerBlocked(viewer, originalOwner)) {
+        viewer.sendMessage(Text.literal("You cannot view this player's shares"));
+        return ActionResult.FAIL; // Prevent viewing
+    }
+
+    // Analytics: track view count
+    incrementViewCount(shareEntry.getType());
+
+    // Notification: tell owner about view
+    if (originalOwner.isOnline()) {
+        originalOwner.sendMessage(Text.literal(viewer.getName().getString() + " viewed your " + shareEntry.getType()));
+    }
+
+    return ActionResult.PASS; // Allow viewing
+});
+```
+
+## Event Return Values
+
+| Return Value | Effect |
+|--------------|--------|
+| `ActionResult.SUCCESS` | Allow the action and stop processing other listeners |
+| `ActionResult.PASS` | Allow the action and continue with other listeners |
+| `ActionResult.FAIL` | Cancel the action and stop processing |
+
+## Integration Patterns
+
+### Mod Integration Example
+
+```java
+public class MyModIntegration implements ModInitializer {
+
+    @Override
+    public void onInitialize() {
+        // Register events during mod initialization
+        registerShowcaseEvents();
+    }
+
+    private void registerShowcaseEvents() {
+        ShowcaseEvents.SHOWCASE_CREATED.register(this::onShowcaseCreated);
+        ShowcaseEvents.SHOWCASE_VIEWED.register(this::onShowcaseViewed);
+    }
+
+    private ActionResult onShowcaseCreated(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,
+                                          Collection<ServerPlayerEntity> receivers, ShowcaseManager.ShareType shareType,
+                                          ShareEntry shareEntry, String shareId, String description, Integer duration) {
+        // Your custom logic here
+        return ActionResult.PASS;
+    }
+
+    private ActionResult onShowcaseViewed(ServerPlayerEntity viewer, ShareEntry shareEntry,
+                                         String shareId, ServerPlayerEntity originalOwner) {
+        // Your custom logic here
+        return ActionResult.PASS;
+    }
+}
+```
+
+## Common Use Cases
+
+### Anti-Spam Protection
+```java
+ShowcaseEvents.SHOWCASE_CREATED.register((sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration) -> {
+    if (getRecentShareCount(sender) > 3) {
+        sender.sendMessage(Text.literal("Please wait before creating another share"));
+        return ActionResult.FAIL;
+    }
+    return ActionResult.PASS;
+});
+```
+
+### Custom Notifications
+```java
+ShowcaseEvents.SHOWCASE_VIEWED.register((viewer, shareEntry, shareId, originalOwner) -> {
+    // Notify owner of rare item views
+    if (isRareItem(shareEntry) && originalOwner.isOnline()) {
+        originalOwner.sendMessage(Text.literal("Someone viewed your rare item!"));
+    }
+    return ActionResult.PASS;
+});
+```
+
+## Best Practices
+
+### Performance Considerations
+- Keep event handlers lightweight and fast
+- Avoid blocking operations in event callbacks
+- Use `ActionResult.PASS` unless you need to cancel the event
+
+### Error Handling
+```java
+ShowcaseEvents.SHOWCASE_CREATED.register((sender, sourcePlayer, receivers, shareType, shareEntry, shareId, description, duration) -> {
+    try {
+        // Your custom logic
+        return ActionResult.PASS;
+    } catch (Exception e) {
+        // Log error but don't break the event chain
+        System.err.println("Error in showcase event handler: " + e.getMessage());
+        return ActionResult.PASS;
+    }
+});
+```
+
+## Related Topics
+
+- [Java API](/developers/java-api) - Direct API integration
+- [PlaceholderAPI](/developers/placeholderapi) - Placeholder integration
+- [Configuration](/configuration/config-file) - Event-related settings
+- [API Overview](/developers/api-overview) - Complete developer guide

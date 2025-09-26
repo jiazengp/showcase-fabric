@@ -1,0 +1,303 @@
+---
+title: Chat Keywords
+description: Quick sharing with automatic chat keyword replacement
+category: features
+tags: ["chat", "keywords", "sharing", "shortcuts"]
+---
+
+# Chat Keywords
+
+<MinecraftVersion auto />
+
+Chat keywords allow players to quickly share content by typing special keywords in square brackets during normal chat conversation. These keywords are automatically replaced with clickable share links.
+
+## How It Works
+
+When a player types a chat keyword in square brackets, Showcase automatically:
+
+1. **Detects** the keyword in the chat message
+2. **Creates** a temporary share of the specified content
+3. **Replaces** the keyword with a clickable link
+4. **Preserves** the rest of the chat message
+
+<Callout type="info">
+**Example:** Typing `Check out my [item]!` becomes `Check out my` `[🗡️ Diamond Sword]` `!` where the item name is a clickable link.
+</Callout>
+
+## Default Keywords
+
+<Tabs items={["Basic Keywords", "Advanced Keywords", "Aliases"]}>
+  <Tab value="Basic Keywords">
+
+    ### Item Keywords
+    - `[item]` - Share your currently held item
+    - `[i]` - Short alias for `[item]`
+
+    ### Inventory Keywords
+    - `[inventory]` - Share your full inventory
+    - `[inv]` - Short alias for `[inventory]`
+    - `[hotbar]` - Share only your hotbar
+    - `[hb]` - Short alias for `[hotbar]`
+
+    ### Storage Keywords
+    - `[ender_chest]` - Share your ender chest contents
+    - `[ec]` - Short alias for `[ender_chest]`
+
+  </Tab>
+  <Tab value="Advanced Keywords">
+
+    ### Statistics Keywords
+    - `[stats]` - Share your player statistics
+    - `[stat]` - Short alias for `[stats]`
+
+    ### Container Keywords
+    - `[container]` - Share recently opened container
+    - `[chest]` - Alias for `[container]`
+
+    ### Trading Keywords
+    - `[merchant]` - Share recently opened villager trades
+    - `[villager]` - Alias for `[merchant]`
+    - `[trades]` - Alias for `[merchant]`
+
+  </Tab>
+  <Tab value="Aliases">
+
+    Most keywords have multiple aliases for convenience:
+
+    | Primary Keyword | Aliases |
+    |----------------|---------|
+    | `[item]` | `[i]`, `[hand]`, `[held]` |
+    | `[inventory]` | `[inv]`, `[items]` |
+    | `[hotbar]` | `[hb]`, `[bar]` |
+    | `[ender_chest]` | `[ec]`, `[enderchest]` |
+    | `[stats]` | `[stat]`, `[statistics]` |
+    | `[container]` | `[chest]`, `[box]` |
+    | `[merchant]` | `[villager]`, `[trades]` |
+
+  </Tab>
+</Tabs>
+
+## Usage Examples
+
+### Basic Usage
+
+Simple keyword replacement:
+
+```
+Player: Look at my [item]!
+Output: Look at my [🗡️ Diamond Sword]!
+
+Player: My [inv] is full of diamonds!
+Output: My [📦 Steve's Inventory] is full of diamonds!
+```
+
+### Multiple Keywords
+
+Use multiple keywords in one message:
+
+```
+Player: Compare my [item] with my [hotbar] setup!
+Output: Compare my [🗡️ Diamond Sword] with my [📦 Steve's Hotbar] setup!
+```
+
+### Mixed Content
+
+Keywords work alongside normal chat:
+
+```
+Player: Hey @everyone check this [item] I found in the [chest] upstairs!
+Output: Hey @everyone check this [⚔️ Netherite Sword] I found in the [📦 Double Chest] upstairs!
+```
+
+## Advanced Features
+
+### Context-Aware Sharing
+
+Keywords automatically adapt to your current situation:
+
+<Callout type="info">
+**Smart Detection:**
+- `[item]` only works if you're holding an item
+- `[container]` only works if you recently opened a container
+- `[merchant]` only works if you recently opened a villager interface
+</Callout>
+
+### Permission Integration
+
+Keywords respect the same permissions as manual commands:
+
+<PermissionNode
+  node="showcase.chat.item"
+  description="Use [item] keyword in chat"
+/>
+
+<PermissionNode
+  node="showcase.chat.inventory"
+  description="Use [inventory] and [inv] keywords"
+/>
+
+<PermissionNode
+  node="showcase.chat.stats"
+  description="Use [stats] and [stat] keywords"
+/>
+
+### Failure Handling
+
+When a keyword can't be processed:
+
+- **No Item Held**: `[item]` keywords are ignored
+- **No Recent Container**: `[container]` keywords are ignored
+- **No Permissions**: Keywords are silently ignored
+- **Invalid Context**: Keywords remain as plain text
+
+## Configuration
+
+### Enable/Disable Keywords
+
+In `config/showcase/config.yml`:
+
+```yaml
+chatKeywords:
+  enabled: true
+  caseSensitive: false
+
+  # Individual keyword control
+  keywords:
+    item:
+      enabled: true
+      aliases: ["i", "hand", "held"]
+    inventory:
+      enabled: true
+      aliases: ["inv", "items"]
+    stats:
+      enabled: true
+      aliases: ["stat", "statistics"]
+```
+
+### Custom Keywords
+
+Add your own keywords:
+
+```yaml
+chatKeywords:
+  keywords:
+    # Custom keyword for sharing ender chest
+    ec:
+      enabled: true
+      command: "enderchest"
+      aliases: ["enderchest", "ender"]
+
+    # Custom keyword for sharing with specific duration
+    quickitem:
+      enabled: true
+      command: "item"
+      duration: "5m"
+      aliases: ["qi"]
+```
+
+### Default Durations
+
+Set different durations for different keywords:
+
+```yaml
+chatKeywords:
+  defaultDurations:
+    item: "10m"
+    inventory: "30m"
+    stats: "1h"
+    container: "20m"
+```
+
+## Performance & Limits
+
+### Rate Limiting
+
+To prevent spam, keywords have built-in rate limiting:
+
+- **Per-Player Limit**: 5 keywords per minute by default
+- **Global Limit**: Configurable server-wide limits
+- **Cooldown**: Brief cooldown between identical keywords
+
+### Message Processing
+
+<Callout type="warn">
+**Performance Notes:**
+- Keywords are processed after chat event
+- Complex inventories may cause brief delays
+- Large statistics take more time to generate
+- Network lag affects link generation
+</Callout>
+
+### Memory Management
+
+- Keyword shares use same expiration as manual shares
+- Automatic cleanup prevents memory buildup
+- Failed keywords don't create database entries
+
+## Troubleshooting
+
+### Common Issues
+
+**Keywords Not Working**
+1. Check if chat keywords are enabled in config
+2. Verify player has required permissions
+3. Ensure proper keyword syntax `[keyword]`
+4. Check server logs for error messages
+
+**Keywords Ignored**
+1. Make sure you're holding an item for `[item]`
+2. Open a container recently for `[container]`
+3. Check case sensitivity settings
+4. Verify keyword is properly spelled
+
+**Performance Issues**
+1. Reduce keyword rate limits
+2. Increase share expiration times
+3. Monitor server resource usage
+4. Check for conflicting chat plugins
+
+### Debug Mode
+
+Enable debug logging in config:
+
+```yaml
+debug:
+  chatKeywords: true
+  logFailedKeywords: true
+  showProcessingTime: true
+```
+
+## Best Practices
+
+### For Players
+
+<Callout type="tip">
+**Player Tips:**
+- Use keywords naturally in conversation
+- Don't spam keywords to avoid rate limits
+- Check permissions before using advanced keywords
+- Use descriptive context around keywords
+</Callout>
+
+### For Server Admins
+
+1. **Set Reasonable Limits**: Balance functionality with performance
+2. **Monitor Usage**: Watch for keyword spam or abuse
+3. **Configure Permissions**: Grant appropriate access levels
+4. **Regular Maintenance**: Clean up expired shares periodically
+
+### Integration with Other Features
+
+Keywords work seamlessly with:
+
+- **Manual Commands**: Can be used alongside `/showcase` commands
+- **Permissions**: Same permission system as commands
+- **Multi-Language**: Respects player language settings
+- **Statistics**: Keyword usage tracked in mod statistics
+
+## Related Topics
+
+- [Player Commands](/commands/player-commands) - Manual sharing commands
+- [Configuration](/configuration/customization) - Customize keyword behavior
+- [Permissions](/configuration/permissions) - Set up keyword permissions
+- [Features Overview](/features) - Other mod features

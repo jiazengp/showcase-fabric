@@ -1,0 +1,12 @@
+{
+  "title": "Developers",
+  "description": "API and development resources",
+  "icon": "🔌",
+  "pages": [
+    "api-overview",
+    "java-api",
+    "events",
+    "data-api",
+    "placeholderapi"
+  ]
+}

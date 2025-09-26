@@ -1,0 +1,424 @@
+---
+title: Frequently Asked Questions
+description: Common questions and answers about Showcase mod
+category: support
+---
+
+# Frequently Asked Questions (FAQ)
+
+<MinecraftVersion auto />
+
+Quick answers to the most commonly asked questions about Showcase mod.
+
+## General Questions
+
+### What is Showcase mod?
+
+Showcase is a server-side Minecraft mod that allows players to share items, inventories, containers, and statistics through interactive chat links. Players can create temporary shares that others can view in a GUI interface.
+
+### Do players need to install anything?
+
+**No!** Showcase is completely server-side. Players join your server normally without downloading any client-side mods or resource packs (unless you want to use the experimental item icons feature).
+
+### Which Minecraft versions are supported?
+
+<Tabs items={["Current Versions", "Legacy Support", "Version Notes"]}>
+  <Tab value="Current Versions">
+    **Fully Supported**:
+    - Minecraft 1.21.6 (Latest)
+    - Minecraft 1.21.5
+    - Minecraft 1.21.4
+    - Minecraft 1.21.2
+
+    Each version has its own release build optimized for that specific Minecraft version.
+  </Tab>
+
+  <Tab value="Legacy Support">
+    **Previous Versions**:
+    - Minecraft 1.21.1 (Limited support)
+    - Minecraft 1.21.0 (Limited support)
+    - Minecraft 1.20.x (Legacy - use Showcase v1.x)
+
+    <Callout type="warn">
+    Legacy versions receive security updates only. Upgrade to supported versions for new features.
+    </Callout>
+  </Tab>
+
+  <Tab value="Version Notes">
+    **Version Differences**:
+    - Each Minecraft version requires its specific Showcase build
+    - Features are consistent across supported versions
+    - Performance optimizations may vary by version
+    - Always use the exact version match
+  </Tab>
+</Tabs>
+
+### Is Showcase compatible with Forge?
+
+**No**, Showcase is built for Fabric only. There are no plans for a Forge version due to architectural differences between the platforms.
+
+**Alternatives for Forge servers**:
+- Look for similar inventory/item sharing mods on CurseForge
+- Consider migrating to Fabric for Showcase support
+
+## Installation and Setup
+
+### How do I install Showcase?
+
+<Callout type="info">
+**Quick Install Steps**:
+1. Install Fabric Loader on your server
+2. Download Fabric API for your MC version
+3. Download Showcase for your MC version
+4. Place both JARs in the `mods/` folder
+5. Start your server
+</Callout>
+
+See the complete [Installation Guide](/getting-started/installation) for detailed instructions.
+
+### Why isn't Showcase loading?
+
+**Most common causes**:
+1. **Wrong Minecraft version** - Use exact version match
+2. **Missing Fabric API** - Required dependency
+3. **Outdated Java** - Java 21+ required for MC 1.21.x
+4. **File corruption** - Re-download the JAR file
+
+Check the [Troubleshooting Guide](/support/troubleshooting) for detailed solutions.
+
+### Do I need LuckPerms?
+
+**LuckPerms is optional but recommended**:
+- ✅ **Without LuckPerms**: Basic operator-based permissions
+- ✅ **With LuckPerms**: Fine-grained permission control, player groups, temporary permissions
+
+For servers with multiple player groups or complex permission needs, LuckPerms provides much better control.
+
+## Features and Usage
+
+### What can players share?
+
+<Cards>
+  <Card title="Items" description="Currently held item with all enchantments and NBT data" />
+  <Card title="Inventories" description="Full inventory (36 slots) or just hotbar (9 slots)" />
+  <Card title="Ender Chests" description="Personal ender chest contents" />
+  <Card title="Containers" description="Chests, barrels, shulker boxes, and more" />
+  <Card title="Villager Trades" description="Trading interfaces with pricing" />
+  <Card title="Statistics" description="Player stats with detailed categorization" />
+</Cards>
+
+### How long do shares last?
+
+**Default Durations** (configurable):
+- Items: 30 minutes
+- Inventories: 60 minutes
+- Containers: 45 minutes
+- Statistics: 120 minutes
+
+**Custom Durations**:
+Players with permission can set custom durations:
+<CommandSyntax>/showcase item Steve 5m "Check this out!"</CommandSyntax>
+
+### What are chat keywords?
+
+Chat keywords allow quick sharing by typing special words in square brackets:
+
+```
+Player types: "Check out my [item]!"
+Chat shows:  "Check out my [🗡️ Diamond Sword]!"
+```
+
+**Default Keywords**:
+- `[item]` or `[i]` - Share held item
+- `[inventory]` or `[inv]` - Share inventory
+- `[hotbar]` or `[hb]` - Share hotbar
+- `[stats]` - Share statistics
+
+## Permissions and Security
+
+### How do permissions work?
+
+Showcase uses a hierarchical permission system:
+
+```
+showcase.command.item              # Basic item sharing
+├── showcase.command.item.receivers    # Can specify who sees it
+├── showcase.command.item.duration     # Can set custom duration
+└── showcase.command.item.description  # Can add descriptions
+```
+
+See the [Permissions Guide](/configuration/permissions) for complete details.
+
+### Can players share private information?
+
+**Security Features**:
+- Shares expire automatically
+- Players control who can view their shares
+- Sensitive items can be filtered via configuration
+- Rate limiting prevents spam
+- Admin commands for monitoring and cleanup
+
+**Best Practices**:
+- Set reasonable share durations
+- Use permissions to limit features
+- Monitor shares with `/showcase-manage list`
+- Educate players about sharing responsibly
+
+### How do I prevent sharing in certain areas?
+
+Use permission contexts with LuckPerms:
+
+```bash
+# Disable sharing in spawn world
+/lp group default permission unset showcase.command.* world=spawn
+
+# Allow only in creative world
+/lp group builder permission set showcase.command.container true world=creative
+```
+
+## Performance and Limits
+
+### Will Showcase cause lag?
+
+**Performance Impact**: Minimal when properly configured
+
+**Optimization Tips**:
+1. **Adjust share limits**:
+   ```yaml
+   general:
+     maxSharesPerPlayer: 5  # Reduce for large servers
+   ```
+
+2. **Shorter durations**:
+   ```yaml
+   shares:
+     item:
+       defaultDuration: 15  # Reduces memory usage
+   ```
+
+3. **Frequent cleanup**:
+   ```yaml
+   general:
+     cleanupInterval: 2  # Clean expired shares more often
+   ```
+
+### How many shares can be active?
+
+**Default Limits** (configurable):
+- 10 shares per player
+- No global limit (memory dependent)
+- Automatic cleanup of expired shares
+
+**For Large Servers**:
+- Reduce per-player limits
+- Shorter default durations
+- More frequent cleanup intervals
+
+### Does it work with other mods?
+
+**Generally Compatible** with most mods:
+- ✅ Chat enhancement mods
+- ✅ Economy mods
+- ✅ World management mods
+- ✅ Most Fabric mods
+
+**Potential Conflicts**:
+- Chat filtering mods (may interfere with keywords)
+- Inventory management mods (GUI conflicts possible)
+- Custom permission mods (test compatibility)
+
+Report compatibility issues on [GitHub](https://github.com/jiazengp/showcase-fabric/issues).
+
+## Advanced Features
+
+### What are item icons?
+
+**Experimental Feature**: Display item icons in chat instead of text links.
+
+**Requirements**:
+- Custom resource pack (generated with [IconifyCraft](https://iconifycraft.vercel.app/))
+- Server resource pack configuration
+- Player resource pack acceptance
+
+**Current Limitations**:
+- Not all items supported
+- Requires resource pack distribution
+- Still in experimental stage
+
+See [Item Icons Setup](/configuration/item-icons-setup) for details.
+
+### Can I integrate with external services?
+
+**Yes**, through the [Developer API](/developers/api-overview):
+- Webhook integrations for external services
+- Chat bridge mods that forward share links
+- Custom plugins using Showcase events
+- Database logging and analytics
+
+### Does it support multiple languages?
+
+**Built-in Language Support**:
+- English (default)
+- Chinese (Simplified)
+- Spanish
+- French
+- German
+- Japanese
+- Korean
+- And more...
+
+**Player Language Selection**:
+Players can set their preferred language for all UI text and messages.
+
+## Troubleshooting Common Issues
+
+### "No permission" errors
+
+<Callout type="error">
+**Problem**: Commands return "You do not have permission"
+</Callout>
+
+**Quick Fixes**:
+1. Check if LuckPerms is installed and working
+2. Grant basic permissions: `/lp group default permission set showcase.command.item true`
+3. For ops: Ensure OP level 2+ for basic features
+4. Test with: `/showcase-manage perms <player>`
+
+### Chat keywords not working
+
+<Callout type="error">
+**Problem**: `[item]` in chat doesn't create links
+</Callout>
+
+**Solutions**:
+1. Check configuration: `chatKeywords.enabled: true`
+2. Verify permissions: `showcase.chat.item`
+3. Check rate limits (may be temporarily blocked)
+4. Ensure proper syntax: `[item]` not `(item)` or `{item}`
+
+### Shares not appearing
+
+<Callout type="error">
+**Problem**: Commands succeed but shares don't show
+</Callout>
+
+**Debugging**:
+1. Check if holding item for `/showcase item`
+2. Verify share isn't expired immediately
+3. Check share limits: `/showcase-manage list`
+4. Test with different share types
+
+## Getting Help
+
+### Where can I get support?
+
+<Cards>
+  <Card
+    title="Documentation"
+    description="Complete guides and references"
+    href="/docs"
+  />
+  <Card
+    title="Troubleshooting"
+    description="Common issues and solutions"
+    href="/support/troubleshooting"
+  />
+  <Card
+    title="GitHub Issues"
+    description="Bug reports and feature requests"
+    href="https://github.com/jiazengp/showcase-fabric/issues"
+  />
+</Cards>
+
+### How do I report bugs?
+
+**Before Reporting**:
+1. Check this FAQ and troubleshooting guide
+2. Test with minimal mod setup
+3. Update to latest version
+
+**Bug Report Should Include**:
+- Exact error message or unexpected behavior
+- Steps to reproduce
+- Minecraft and mod versions
+- Relevant configuration sections
+- Server logs (use pastebin for long logs)
+
+### Can I contribute to development?
+
+**Yes!** Showcase welcomes contributions:
+
+- **Code Contributions**: Fork on GitHub and submit pull requests
+- **Translations**: Help translate to new languages
+- **Documentation**: Improve guides and examples
+- **Testing**: Test beta versions and report issues
+- **Community**: Help others on GitHub Discussions
+
+See the [Building Guide](/developers/building) for development setup.
+
+### Feature requests
+
+**Requesting Features**:
+1. Check existing GitHub issues for duplicates
+2. Provide detailed use case description
+3. Consider implementation complexity
+4. Be open to alternative solutions
+
+**Popular Requested Features**:
+- Cross-server sharing (planned)
+- Item filtering/blacklists (under consideration)
+- Share history/logs (under consideration)
+- GUI customization (being evaluated)
+
+## Migration and Updates
+
+### How do I update Showcase?
+
+**Update Process**:
+1. Stop your server
+2. Backup your config and data
+3. Replace the old JAR with the new version
+4. Check for configuration changes in changelog
+5. Start server and test functionality
+
+**Version-Specific Notes**:
+- Always read the changelog for breaking changes
+- Some updates may require config migration
+- Test on a backup server first for major updates
+
+### Can I downgrade versions?
+
+**Generally not recommended**:
+- Data formats may be incompatible
+- Features may be missing in older versions
+- Always backup before attempting
+
+**If downgrade needed**:
+1. Backup everything
+2. Check version compatibility notes
+3. May need to reset share data
+4. Test thoroughly
+
+### Migrating from v1 to v2
+
+**Major Changes in v2**:
+- New GUI system
+- Enhanced statistics
+- Improved chat keywords
+- Better permission system
+
+**Migration Steps**:
+1. Backup v1 data
+2. Install v2
+3. Migrate configuration (manual)
+4. Test all features
+5. Update permissions if using LuckPerms
+
+See migration guide in the changelog for detailed steps.
+
+## Related Topics
+
+- [Installation Guide](/getting-started/installation) - Complete setup instructions
+- [Configuration](/configuration/config-file) - Detailed configuration options
+- [Commands Reference](/commands/player-commands) - All available commands
+- [Troubleshooting](/support/troubleshooting) - Detailed problem solving
