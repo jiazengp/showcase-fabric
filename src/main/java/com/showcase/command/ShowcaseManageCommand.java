@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.showcase.ShowcaseMod;
+import com.showcase.config.ModConfig;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ChatMessageListener;
@@ -44,6 +45,7 @@ public class ShowcaseManageCommand {
                         .then(createListCommand())
                         .then(createCancelCommand())
                         .then(createAboutCommand())
+                        .then(createConfigCommands())
         );
     }
 
@@ -172,6 +174,106 @@ public class ShowcaseManageCommand {
 
                             admin.sendMessage(TextUtils.error(Text.translatable("showcase.message.manage.cancel.not_found")));
                             return 0;
+                        }));
+    }
+
+    private static LiteralArgumentBuilder<ServerCommandSource> createConfigCommands() {
+        return literal("config")
+                .requires(src -> hasPermission(src, Permissions.MANAGE, 4))
+                .then(literal("validate")
+                        .executes(ctx -> {
+                            ServerPlayerEntity admin = ctx.getSource().getPlayerOrThrow();
+
+                            boolean isValid = ModConfigManager.isCurrentConfigValid();
+                            if (isValid) {
+                                admin.sendMessage(TextUtils.success(Text.literal("Configuration is valid")));
+                            } else {
+                                admin.sendMessage(TextUtils.error(Text.literal("Configuration validation failed")));
+                            }
+
+                            return isValid ? Command.SINGLE_SUCCESS : 0;
+                        }))
+                .then(literal("backup")
+                        .executes(ctx -> {
+                            ServerPlayerEntity admin = ctx.getSource().getPlayerOrThrow();
+
+                            boolean success = ModConfigManager.createConfigBackup("manual");
+                            if (success) {
+                                admin.sendMessage(TextUtils.success(Text.literal("Configuration backed up successfully")));
+                                return Command.SINGLE_SUCCESS;
+                            } else {
+                                admin.sendMessage(TextUtils.error(Text.literal("Failed to create configuration backup")));
+                                return 0;
+                            }
+                        }))
+                .then(literal("reset")
+                        .executes(ctx -> {
+                            ServerPlayerEntity admin = ctx.getSource().getPlayerOrThrow();
+
+                            boolean success = ModConfigManager.resetConfigToDefaults();
+                            if (success) {
+                                admin.sendMessage(TextUtils.success(Text.literal("Configuration reset to defaults. Previous config backed up.")));
+                                return Command.SINGLE_SUCCESS;
+                            } else {
+                                admin.sendMessage(TextUtils.error(Text.literal("Failed to reset configuration")));
+                                return 0;
+                            }
+                        }))
+                .then(literal("status")
+                        .executes(ctx -> {
+                            ServerPlayerEntity admin = ctx.getSource().getPlayerOrThrow();
+
+                            // Configuration status information
+                            boolean isValid = ModConfigManager.isCurrentConfigValid();
+
+                            admin.sendMessage(Text.literal("=== Configuration Status ===").formatted(Formatting.GOLD));
+
+                            Text validationStatus = isValid
+                                ? Text.literal("✓ Valid").formatted(Formatting.GREEN)
+                                : Text.literal("✗ Invalid").formatted(Formatting.RED);
+                            admin.sendMessage(Text.literal("Validation: ").append(validationStatus));
+
+                            // Config file info
+                            String configPath = ModConfigManager.getConfigPath().toString();
+                            admin.sendMessage(Text.literal("Config File: ").formatted(Formatting.YELLOW)
+                                .append(Text.literal(configPath).formatted(Formatting.WHITE)));
+
+                            // Backup directory info
+                            String backupPath = ModConfigManager.getBackupDirectory().toString();
+                            admin.sendMessage(Text.literal("Backup Directory: ").formatted(Formatting.YELLOW)
+                                .append(Text.literal(backupPath).formatted(Formatting.WHITE)));
+
+                            // Basic config info
+                            ModConfig config = ModConfigManager.getConfig();
+                            admin.sendMessage(Text.literal("Share Types: ").formatted(Formatting.YELLOW)
+                                .append(Text.literal(String.valueOf(config.shareSettings.size())).formatted(Formatting.WHITE)));
+
+                            admin.sendMessage(Text.literal("Max Shares/Player: ").formatted(Formatting.YELLOW)
+                                .append(Text.literal(String.valueOf(config.placeholders.maxSharesPerPlayer)).formatted(Formatting.WHITE)));
+
+                            admin.sendMessage(Text.literal("==============================").formatted(Formatting.GOLD));
+
+                            return Command.SINGLE_SUCCESS;
+                        }))
+                .then(literal("info")
+                        .executes(ctx -> {
+                            ServerPlayerEntity admin = ctx.getSource().getPlayerOrThrow();
+
+                            admin.sendMessage(Text.literal("=== Configuration Management ===").formatted(Formatting.GOLD));
+                            admin.sendMessage(Text.literal("Available Commands:").formatted(Formatting.YELLOW));
+                            admin.sendMessage(Text.literal("• /showcase-manage config validate").formatted(Formatting.WHITE)
+                                .append(Text.literal(" - Check configuration validity").formatted(Formatting.GRAY)));
+                            admin.sendMessage(Text.literal("• /showcase-manage config backup").formatted(Formatting.WHITE)
+                                .append(Text.literal(" - Create manual backup").formatted(Formatting.GRAY)));
+                            admin.sendMessage(Text.literal("• /showcase-manage config reset").formatted(Formatting.WHITE)
+                                .append(Text.literal(" - Reset to defaults (creates backup)").formatted(Formatting.GRAY)));
+                            admin.sendMessage(Text.literal("• /showcase-manage config status").formatted(Formatting.WHITE)
+                                .append(Text.literal(" - Show configuration status").formatted(Formatting.GRAY)));
+                            admin.sendMessage(Text.literal("• /showcase-manage reload").formatted(Formatting.WHITE)
+                                .append(Text.literal(" - Reload configuration").formatted(Formatting.GRAY)));
+                            admin.sendMessage(Text.literal("=================================").formatted(Formatting.GOLD));
+
+                            return Command.SINGLE_SUCCESS;
                         }));
     }
 }

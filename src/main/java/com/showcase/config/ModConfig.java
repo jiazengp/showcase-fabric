@@ -74,6 +74,9 @@ public class ModConfig {
     @Comment("Settings for item icons in showcase messages")
     public ItemIconSettings itemIcons = new ItemIconSettings();
 
+    @Comment("Settings for extended placeholder functionality")
+    public PlaceholderSettings placeholders = new PlaceholderSettings();
+
     @Configuration
     public static class StatsDisplaySettings {
         @Comment("Whether to show time-related statistics (play time, death time, rest time, etc.)")
@@ -178,6 +181,36 @@ public class ModConfig {
         public boolean includeInItemNames = true;
 
         public ItemIconSettings() {}
+    }
+
+    @Configuration
+    public static class PlaceholderSettings {
+        @Comment("Enable extended placeholder functionality")
+        public boolean enabled = true;
+
+        @Comment("Maximum number of active shares per player")
+        public int maxSharesPerPlayer = 10;
+
+        @Comment("Cache duration for placeholder results in seconds")
+        public int cacheDuration = 30;
+
+        @Comment("Enable player statistics tracking for placeholders")
+        public boolean enableStatisticsTracking = true;
+
+        @Comment("Enable server-wide statistics for placeholders")
+        public boolean enableServerStatistics = true;
+
+        @Comment("Enable performance metrics tracking")
+        public boolean enablePerformanceMetrics = true;
+
+        @Comment("How often to update statistics cache in seconds")
+        public int statisticsUpdateInterval = 60;
+
+
+        @Comment("Enable conditional placeholders (if_xxx_yes_no style)")
+        public boolean enableConditionalPlaceholders = true;
+
+        public PlaceholderSettings() {}
     }
 
     private static Map<ShowcaseManager.ShareType, ShareSettings> defaultShareSettings() {

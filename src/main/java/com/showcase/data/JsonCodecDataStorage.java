@@ -63,6 +63,15 @@ public record JsonCodecDataStorage<T>(String path, Codec<T> codec) {
 
             if (decoded.result().isEmpty()) {
                 ShowcaseMod.LOGGER.error("Decoding failed or returned empty for global data at path {}", this.path);
+
+                // Log more detailed error information
+                if (decoded.error().isPresent()) {
+                    ShowcaseMod.LOGGER.error("Decoding error details: {}", decoded.error().get());
+                }
+
+                // Create backup of corrupted file
+                createCorruptedBackup(filePath, jsonString);
+
                 return null;
             }
 
@@ -73,6 +82,20 @@ public record JsonCodecDataStorage<T>(String path, Codec<T> codec) {
         } catch (Exception e) {
             ShowcaseMod.LOGGER.error("Unexpected error while loading global data for path {}", this.path, e);
             return null;
+        }
+    }
+
+    private void createCorruptedBackup(Path originalPath, String jsonContent) {
+        try {
+            Path backupPath = originalPath.getParent().resolve(originalPath.getFileName().toString() + ".corrupted." + System.currentTimeMillis());
+            Files.writeString(backupPath, jsonContent, StandardCharsets.UTF_8);
+            ShowcaseMod.LOGGER.info("Created backup of corrupted file at: {}", backupPath);
+
+            // Delete the original corrupted file to prevent future loading issues
+            Files.deleteIfExists(originalPath);
+            ShowcaseMod.LOGGER.info("Deleted corrupted file: {}", originalPath);
+        } catch (IOException e) {
+            ShowcaseMod.LOGGER.error("Failed to create backup of corrupted file", e);
         }
     }
 }
