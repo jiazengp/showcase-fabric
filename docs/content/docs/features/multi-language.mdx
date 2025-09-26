@@ -1,0 +1,152 @@
+---
+title: Multi-Language Support
+description: Built-in internationalization with 17 supported languages
+category: features
+---
+
+# Multi-Language Support
+
+<MinecraftVersion auto />
+
+Showcase mod includes built-in internationalization (i18n) support with comprehensive language coverage.
+
+## Supported Languages
+
+The mod currently supports **17 languages**:
+
+| Language | Code | Completeness |
+|----------|------|--------------|
+| 🇺🇸 English (US) | `en_us` | 100% (Base) |
+| 🇨🇳 中文 (简体) | `zh_cn` | 100% |
+| 🇹🇼 中文 (繁體) | `zh_tw` | 95% |
+| 🇭🇰 中文 (香港) | `zh_hk` | 95% |
+| 🇩🇪 Deutsch | `de_de` | 90% |
+| 🇪🇸 Español | `es_es` | 90% |
+| 🇫🇷 Français | `fr_fr` | 90% |
+| 🇮🇹 Italiano | `it_it` | 85% |
+| 🇯🇵 日本語 | `ja_jp` | 85% |
+| 🇰🇷 한국어 | `ko_kr` | 85% |
+| 🇷🇺 Русский | `ru_ru` | 85% |
+| 🇧🇷 Português (BR) | `pt_br` | 80% |
+| 🇳🇱 Nederlands | `nl_nl` | 80% |
+| 🇵🇱 Polski | `pl_pl` | 80% |
+| 🇸🇪 Svenska | `sv_se` | 75% |
+| 🇩🇰 Dansk | `da_dk` | 75% |
+| 🇹🇷 Türkçe | `tr_tr` | 70% |
+
+## Language Selection
+
+Languages are automatically detected from:
+
+1. **Player's Minecraft language setting** (primary)
+2. **Server default language** (fallback)
+3. **English** (ultimate fallback)
+
+## Contributing Translations
+
+We welcome community contributions to improve and expand language support!
+
+### How to Contribute
+
+1. **Fork the repository**: [showcase-fabric on GitHub](https://github.com/jiazengp/showcase-fabric)
+
+2. **Find language files**: Navigate to `src/main/resources/data/showcase/lang/`
+
+3. **Choose your language**:
+   - **Update existing**: Edit an existing `.json` file to improve translations
+   - **Add new language**: Create a new file following the naming convention `xx_xx.json`
+
+4. **Translation format**:
+   ```json
+   {
+     "showcase.command.item.success": "§6Item shared successfully!",
+     "showcase.message.no_permission": "§cYou don't have permission to do this",
+     "showcase.gui.inventory.title": "§8%s's Inventory"
+   }
+   ```
+
+### Translation Guidelines
+
+**Text Formatting**:
+- Preserve `§` color codes (e.g., `§6` for gold, `§c` for red)
+- Keep `%s`, `%d` placeholders intact for variable substitution
+- Maintain consistent tone and style
+
+**Key Categories**:
+- `showcase.command.*` - Command feedback messages
+- `showcase.message.*` - General user messages
+- `showcase.gui.*` - Interface titles and labels
+- `showcase.error.*` - Error messages
+- `showcase.help.*` - Help text and descriptions
+
+**Context Examples**:
+```json
+{
+  "showcase.command.item.success": "§6Successfully shared your item!",
+  "showcase.message.cooldown": "§cPlease wait §l%d §rseconds before sharing again",
+  "showcase.gui.container.title": "§8%s's %s",
+  "showcase.error.no_item": "§cYou must be holding an item to share"
+}
+```
+
+### Improving Existing Translations
+
+Even native speakers can help improve existing translations:
+
+- **Accuracy**: Ensure technical terms are correctly translated
+- **Consistency**: Use consistent terminology across all messages
+- **Culture**: Adapt messages to local cultural context
+- **Length**: Keep translations concise for UI elements
+
+### Testing Your Translations
+
+1. **Compile the mod** with your changes
+2. **Change your Minecraft language** to test
+3. **Test all commands** and verify message display
+4. **Check GUI elements** for proper formatting
+
+### Submitting Changes
+
+1. **Create a pull request** with your translation improvements
+2. **Include examples** of your changes in the PR description
+3. **Test thoroughly** before submitting
+4. **Respond to feedback** during the review process
+
+## Language File Structure
+
+Each language file contains approximately **150+ translation keys** covering:
+
+- Command responses and feedback
+- Error messages and warnings
+- GUI titles and interface text
+- Help documentation
+- Permission-related messages
+- Statistics and sharing confirmations
+
+## Technical Details
+
+**Language Loading**:
+- Languages load automatically on mod initialization
+- Fallback chain: Player language → Server default → English
+- Hot-reloading supported via `/showcase-manage reload`
+
+**Memory Efficiency**:
+- Only active languages are loaded into memory
+- Unused language files don't impact performance
+- Translations cached for optimal access speed
+
+## Community Recognition
+
+Contributors to translations are recognized in:
+- Mod credits and documentation
+- GitHub contributors list
+- Release notes for significant improvements
+
+<Callout type="tip">
+**Need Help?** Join our [GitHub Discussions](https://github.com/jiazengp/showcase-fabric/discussions) to ask questions about translation or coordinate with other contributors.
+</Callout>
+
+## Related Topics
+
+- [Configuration](/configuration/config-file) - Language settings
+- [Contributing Guide](https://github.com/jiazengp/showcase-fabric/blob/main/CONTRIBUTING.md) - Development guidelines
