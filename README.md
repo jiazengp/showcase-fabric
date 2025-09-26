@@ -4,7 +4,7 @@
 
 A server-side Minecraft mod that allows players to share links in chat to showcase items, inventories, containers, villager trades, and statistics through commands or chat keywords.
 
-📖 **[Complete Documentation](https://showcase-fabric.vercel.app)** | 🚀 **[Getting Started](https://showcase-fabric.vercel.app/docs/getting-started)** | 🔧 **[Configuration Guide](https://showcase-fabric.vercel.app/docs/configuration)**
+📖 **[Complete Documentation](https://showcase-fabric.vercel.app)**
 
 ## ✨ Features
 
@@ -102,9 +102,9 @@ Example: `Check out my [item]!` → automatically replaced with clickable share 
 %showcase:stats%       - Share statistics
 ```
 
-**Extended Placeholders**: 60+ placeholders for advanced integrations
+**Extended Placeholders**:
+
 - Player statistics: `%showcase:shares_count%`, `%showcase:total_views%`
-- Performance metrics: `%showcase:cache_hit_rate%`, `%showcase:server_uptime%`
 - Permission checks: `%showcase:can_share_item%`, `%showcase:has_admin_perms%`
 
 📚 **[View all placeholders](https://showcase-fabric.vercel.app/docs/developers/placeholderapi)**
@@ -126,23 +126,12 @@ Main configuration file: `config/showcase/config.yml` (YAML format)
 
 ## 📚 Documentation & Resources
 
-### 📖 Official Documentation
 - **[Complete Documentation](https://showcase-fabric.vercel.app)** - Full feature documentation
 - **[Getting Started](https://showcase-fabric.vercel.app/docs/getting-started)** - Installation and setup guide
 - **[Command Reference](https://showcase-fabric.vercel.app/docs/commands)** - All commands with examples
 - **[Configuration Guide](https://showcase-fabric.vercel.app/docs/configuration)** - Settings and customization
 - **[Developer API](https://showcase-fabric.vercel.app/docs/developers)** - PlaceholderAPI integration
 - **[FAQ & Troubleshooting](https://showcase-fabric.vercel.app/docs/support/faq)** - Common issues and solutions
-
-### 🔗 Download Links
-- **[Modrinth](https://modrinth.com/mod/showcase)** - Recommended
-- **[CurseForge](https://www.curseforge.com/minecraft/mc-mods/showcasemod)** - Alternative
-- **[GitHub Releases](https://github.com/jiazengp/showcase-fabric/releases)** - Source & development builds
-
-### 💬 Community & Support
-- **[Issues & Bug Reports](https://github.com/jiazengp/showcase-fabric/issues)** - GitHub Issues
-- **[Feature Requests](https://github.com/jiazengp/showcase-fabric/discussions)** - GitHub Discussions
-- **[Changelog](https://showcase-fabric.vercel.app/docs/support/changelog)** - Version history
 
 ## 📝 License
 
