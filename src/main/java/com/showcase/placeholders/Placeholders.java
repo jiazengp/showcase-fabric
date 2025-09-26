@@ -77,6 +77,7 @@ public class Placeholders {
     }
 
     public static void registerPlaceholders() {
+        // Register original share placeholders
         registerPlaceholder(INVENTORY, ShowcaseManager.ShareType.INVENTORY, Permissions.Chat.Placeholder.INVENTORY,
                 (shareData) -> ShareCommandUtils.createClickableItemName(
                         ShowcaseManager.ShareType.INVENTORY,
@@ -123,6 +124,9 @@ public class Placeholders {
                             ShowcaseManager.createItemShare(shareData.player, stack, shareData.duration, null)
                     );
                 });
+
+        // Register extended placeholders
+        ExtendedPlaceholders.registerExtendedPlaceholders();
     }
 
     public static boolean containsPlaceholders(String text) {
