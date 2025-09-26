@@ -1,0 +1,59 @@
+---
+title: Sharing Villager Trades
+description: Share villager trading interfaces and offers
+category: features
+---
+
+# Sharing Villager Trades
+
+Share villager trading interfaces to display available trades and prices to other players.
+
+## Villager Trade Sharing
+
+Share the complete trading interface of any villager you've recently interacted with.
+
+```
+/showcase merchant [receivers] [duration] [description]
+```
+
+## Trade Information Display
+
+When sharing villager trades, players can see:
+
+- **All available trades** - Complete trade list
+- **Trade prices** - Required items and quantities
+- **Trade limits** - Uses remaining and restocking
+- **Experience rewards** - XP gained per trade
+- **Trade tiers** - Novice through Master levels
+
+## Usage Requirements
+
+- Must have opened villager trading interface within **10 seconds**
+- Villager must still be accessible
+- Works with all villager professions
+
+## Parameters
+
+- **receivers**: Target players (optional, defaults to all players)
+- **duration**: Share duration in seconds (optional, uses config default)
+- **description**: Custom description text (optional)
+
+## Chat Keywords
+
+Use keywords in square brackets for quick sharing:
+
+- `[merchant]` or `[m]` - Share recently opened villager trades
+
+## Examples
+
+```
+/showcase merchant
+/showcase merchant @a 300 "Great librarian trades"
+/showcase merchant Steve
+
+Found amazing [merchant] trades!
+```
+
+## Permissions
+
+- `showcase.command.merchant` - Share villager trades

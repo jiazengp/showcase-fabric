@@ -1,0 +1,54 @@
+---
+title: Sharing Inventories
+description: Share player inventories, hotbars, and ender chests
+category: features
+---
+
+# Sharing Inventories
+
+Share complete inventories with other players for easy item display and organization review.
+
+## Types of Inventory Sharing
+
+### Full Inventory
+Share your complete 36-slot player inventory.
+
+```
+/showcase inventory [receivers] [duration] [description]
+```
+
+### Hotbar Only
+Share only your 9-slot hotbar items.
+
+```
+/showcase hotbar [receivers] [duration] [description]
+```
+
+### Ender Chest
+Share your ender chest contents (27 slots).
+
+```
+/showcase enderchest [receivers] [duration] [description]
+```
+
+## Examples
+
+```
+/showcase inventory                 # Share with everyone
+/showcase hotbar @a 5m "My setup"   # Share hotbar for 5 minutes
+/showcase enderchest Bob 1h         # Share ender chest with Bob for 1 hour
+```
+
+## Chat Keywords
+
+- `[inventory]` or `[inv]` - Share full inventory
+- `[hotbar]` or `[hb]` - Share hotbar only
+- `[ender_chest]` or `[ec]` - Share ender chest
+
+**Example:** `Check out my [inventory]!`
+
+## Permissions
+
+- `showcase.command.inventory` - Share full inventory
+- `showcase.command.hotbar` - Share hotbar
+- `showcase.command.enderchest` - Share ender chest

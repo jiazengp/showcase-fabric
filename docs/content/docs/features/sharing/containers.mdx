@@ -1,0 +1,49 @@
+---
+title: Sharing Containers
+description: Share chest contents, shulker boxes, and other containers
+category: features
+---
+
+# Sharing Containers
+
+Share any container's contents that you've recently opened, including chests, barrels, shulker boxes, and more.
+
+## Container Sharing
+
+Share the contents of any container you opened within the last 10 seconds.
+
+```
+/showcase container [receivers] [duration] [description]
+```
+
+## Supported Container Types
+
+- **Chests** - Single and double chests
+- **Barrels** - All barrel variants
+- **Shulker Boxes** - All colors and types
+- **Hoppers** - Hopper inventories
+- **Dispensers/Droppers** - Redstone containers
+- **Furnaces** - Smelting inventories
+- **Brewing Stands** - Potion brewing inventories
+
+## Examples
+
+```
+/showcase container                      # Share with everyone
+/showcase container @a 10m "Storage"     # Share for 10 minutes
+/showcase container Alice 5m             # Share with Alice for 5 minutes
+```
+
+## Chat Keywords
+
+- `[container]` or `[c]` - Share recently opened container
+
+**Example:** `Just organized my [container]!`
+
+## Requirements
+
+- Must open container within **10 seconds** before command
+
+## Permissions
+
+- `showcase.command.container` - Share container contents
