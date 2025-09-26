@@ -2,6 +2,7 @@ package com.showcase;
 
 import com.mojang.serialization.Codec;
 import com.showcase.command.ShowcaseCommand;
+import com.showcase.command.PlaceholderTestCommand;
 import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.GlobalDataManager;
@@ -10,12 +11,14 @@ import com.showcase.data.ShareEntry;
 import com.showcase.listener.ChatMessageListener;
 import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.placeholders.Placeholders;
+import com.showcase.placeholders.ShowcaseStatistics;
 import com.showcase.utils.*;
 import com.showcase.utils.countdown.CountdownBossBarManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import com.showcase.utils.DevUtils;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +45,15 @@ public class ShowcaseMod implements ModInitializer {
 		GlobalDataManager.register(PLAYER_SHARE_STORAGE_ID, PLAYER_SHARE_STORAGE);
 
 		CommandRegistrationCallback.EVENT.register(
-				(dispatcher, registryAccess, environment) ->
-						ShowcaseCommand.register(dispatcher)
+				(dispatcher, registryAccess, environment) -> {
+					ShowcaseCommand.register(dispatcher);
+					// Register test commands only in development environment
+					DevUtils.ifDevelopment(() -> PlaceholderTestCommand.register(dispatcher));
+				}
 		);
 
+		// Initialize statistics and placeholders
+		ShowcaseStatistics.initialize();
 		Placeholders.registerPlaceholders();
 		ChatMessageListener.registerChatHandler();
 		CountdownBossBarManager.registerTickEvent();
@@ -55,7 +63,10 @@ public class ShowcaseMod implements ModInitializer {
 			try {
 				Map<String, ShareEntry> data = GlobalDataManager.getData(server, PLAYER_SHARE_STORAGE_ID);
 				if (data != null) ShowcaseManager.register(data);
-				
+
+				// Initialize statistics system with server instance
+				ShowcaseStatistics.setServer(server);
+
 				// Check resource pack configuration for icon feature
 				ResourcePackChecker.checkResourcePackConfiguration(server);
 			} catch (Exception e) {
@@ -68,7 +79,9 @@ public class ShowcaseMod implements ModInitializer {
 			ContainerOpenWatcher.cleanup();
 			CountdownBossBarManager.cleanup();
 			try {
+				// Save showcase data and statistics
 				GlobalDataManager.setData(server, PLAYER_SHARE_STORAGE_ID, ShowcaseManager.getActiveShares());
+				ShowcaseStatistics.saveStatistics(); // Final save before shutdown
 				GlobalDataManager.saveAll(server);
 			} catch (Exception e) {
 				LOGGER.error("Failed to save showcase data", e);

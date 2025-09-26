@@ -8,6 +8,7 @@ import com.showcase.data.ShareRepository;
 import com.showcase.gui.ContainerGui;
 import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
+import com.showcase.placeholders.ShowcaseStatistics;
 import com.showcase.utils.*;
 import com.showcase.utils.permissions.PermissionChecker;
 import net.minecraft.item.ItemStack;
@@ -67,6 +68,11 @@ public final class ShowcaseManager {
         inv.addStack(stack.copy());
 
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), STATS, inv, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.STATS,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
@@ -78,6 +84,11 @@ public final class ShowcaseManager {
         for (int i = 1; i < 9; i++) inv.setStack(i, DIVIDER_ITEM);
 
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), ITEM, inv, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.ITEM,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
@@ -85,6 +96,11 @@ public final class ShowcaseManager {
         String id = nextId();
         ReadOnlyInventory inv = snapshotFullInventory(owner);
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.INVENTORY, inv, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.INVENTORY,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
@@ -92,6 +108,11 @@ public final class ShowcaseManager {
         String id = nextId();
         ReadOnlyInventory inv = new HotbarSnapshotInventory(owner.getInventory());
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.HOTBAR, inv, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.HOTBAR,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
@@ -103,18 +124,33 @@ public final class ShowcaseManager {
             inv.setStack(i, owner.getEnderChestInventory().getStack(i).copy());
         }
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.ENDER_CHEST, inv, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.ENDER_CHEST,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
     public static String createContainerShare(ServerPlayerEntity owner, ReadOnlyInventory container, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.CONTAINER, container, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.CONTAINER,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
     public static String createMerchantShare(ServerPlayerEntity owner, MerchantContext merchantContext, Integer duration, Collection<ServerPlayerEntity> receivers) {
         String id = nextId();
         ShareRepository.store(id, new ShareEntry(owner.getUuid(), ShareType.MERCHANT, merchantContext, duration, receivers));
+
+        // Record statistics
+        ShowcaseStatistics.recordShareCreation(owner, ShareType.MERCHANT,
+            duration != null ? java.time.Duration.ofSeconds(duration) : java.time.Duration.ofMinutes(5));
+
         return id;
     }
 
@@ -142,6 +178,9 @@ public final class ShowcaseManager {
         if (result == net.minecraft.util.ActionResult.FAIL) return false;
 
         entry.incrementViewCount();
+
+        // Record view statistics
+        ShowcaseStatistics.recordShareView(originalOwner != null ? originalOwner : viewer, viewer);
 
         try {
             var gui = factory(viewer, entry);
@@ -174,6 +213,10 @@ public final class ShowcaseManager {
     public static boolean expireShareById(String id) {
         ShareEntry e = ShareRepository.get(id);
         if (e == null) return false;
+
+        // Record share expiry statistics (pass null if player is offline)
+        ShowcaseStatistics.recordShareExpiry(null, e.getType());
+
         e.invalidShare();
         return true;
     }
@@ -319,10 +362,16 @@ public final class ShowcaseManager {
 
     private static void purgeExpired() {
         long now = Instant.now().toEpochMilli();
-        Set<String> toRemove = ShareRepository.getAllShares().entrySet().stream()
+        Set<Map.Entry<String, ShareEntry>> expiredEntries = ShareRepository.getAllShares().entrySet().stream()
                 .filter(e -> now - e.getValue().getTimestamp() > e.getValue().getDuration() * 1000L || e.getValue().getIsInvalid())
-                .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
-        toRemove.forEach(ShareRepository::remove);
+
+        // Record expiry statistics for naturally expired shares
+        expiredEntries.forEach(entry -> {
+            ShowcaseStatistics.recordShareExpiry(null, entry.getValue().getType());
+        });
+
+        // Remove expired shares
+        expiredEntries.forEach(entry -> ShareRepository.remove(entry.getKey()));
     }
 }

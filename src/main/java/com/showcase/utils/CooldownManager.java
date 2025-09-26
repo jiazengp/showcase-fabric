@@ -4,7 +4,6 @@ import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +31,7 @@ public final class CooldownManager {
      * @return true if the player is on cooldown, false otherwise
      */
     public static boolean isOnCooldown(@NotNull ServerPlayerEntity player, @NotNull ShowcaseManager.ShareType type) {
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) return false;
+        if (DevUtils.isDevelopment()) return false;
         if (PermissionChecker.isOp(player) || PermissionChecker.hasPermission(player, Permissions.getCommandTypeFromShareType(type).getCooldown(), 4)) return false;
         EnumMap<ShowcaseManager.ShareType, Long> map = COOLDOWNS.get(player.getUuid());
         if (map == null) return false;
@@ -50,7 +49,7 @@ public final class CooldownManager {
      * @param type the share type
      */
     public static void setCooldown(@NotNull ServerPlayerEntity player, @NotNull ShowcaseManager.ShareType type) {
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) return;
+        if (DevUtils.isDevelopment()) return;
 
         int cooldownSeconds = ModConfigManager.getShareSettings(type).cooldown;
         long cooldownEnd = Instant.now().toEpochMilli() + (cooldownSeconds * 1000L);
@@ -67,7 +66,7 @@ public final class CooldownManager {
      * @return the remaining cooldown time in seconds, or 0 if not on cooldown
      */
     public static long getRemainingCooldown(@NotNull ServerPlayerEntity player, @NotNull ShowcaseManager.ShareType type) {
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) return 0;
+        if (DevUtils.isDevelopment()) return 0;
 
         EnumMap<ShowcaseManager.ShareType, Long> map = COOLDOWNS.get(player.getUuid());
         if (map == null) return 0;
