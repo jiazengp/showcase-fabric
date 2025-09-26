@@ -37,7 +37,11 @@ public abstract class MixinServerPlayerEntity {
     }
 
     @Inject(method = "damage", at = @At("TAIL"))
+    #if MC_VER >= 1212
     private void ase$closeOnDamage(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    #else
+    private void ase$closeOnDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    #endif
         if (GuiHelpers.getCurrentGui((ServerPlayerEntity) (Object) this) instanceof BaseWorldGui baseGui) {
             baseGui.close();
         }
