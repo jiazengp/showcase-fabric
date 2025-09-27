@@ -28,9 +28,6 @@ export const docs = defineDocs({
 
 export default defineConfig({
   mdxOptions: {
-    // Enhanced MDX options for better code highlighting and components
-    remarkPlugins: [],
-    rehypePlugins: [],
     // Provider import for custom components
     providerImportSource: '@/mdx-components',
   },
