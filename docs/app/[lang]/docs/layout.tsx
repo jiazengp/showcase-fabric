@@ -20,6 +20,15 @@ export default async function Layout({
       sidebar={{
         enabled: true,
         collapsible: true,
+        defaultOpenLevel: 1,
+        banner: (
+          <div className="flex flex-col gap-2 rounded-lg border bg-card p-3 text-sm">
+            <p className="font-medium">🚀 Version 2.4.0</p>
+            <p className="text-muted-foreground">
+              New PlaceholderAPI support, enhanced statistics, and Minecraft 1.21.1 compatibility.
+            </p>
+          </div>
+        ),
         tabs: [
           {
             title: 'Getting Started',

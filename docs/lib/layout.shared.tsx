@@ -16,6 +16,8 @@ export function baseOptions(locale?: string): BaseLayoutProps {
     i18n,
     nav: {
       title: 'Showcase Mod',
+      url: `${localizedPrefix}/`,
+      transparentMode: 'top',
     },
     // Enhanced navigation links
     links: [
@@ -25,15 +27,36 @@ export function baseOptions(locale?: string): BaseLayoutProps {
         active: 'nested-url',
       },
       {
+        type: 'menu',
+        text: 'Download',
+        items: [
+          {
+            text: 'Modrinth',
+            url: 'https://modrinth.com/mod/showcase',
+            description: 'Recommended platform',
+            external: true,
+          },
+          {
+            text: 'CurseForge',
+            url: 'https://www.curseforge.com/minecraft/mc-mods/showcasemod',
+            description: 'Alternative platform',
+            external: true,
+          },
+          {
+            text: 'GitHub Releases',
+            url: 'https://github.com/jiazengp/showcase-fabric/releases',
+            description: 'Source and development builds',
+            external: true,
+          },
+        ],
+      },
+      {
         text: 'GitHub',
         url: 'https://github.com/jiazengp/showcase-fabric',
         external: true,
       },
-      {
-        text: 'Download',
-        url: 'https://modrinth.com/mod/showcase',
-        external: true,
-      },
     ],
+    // Enhanced footer configuration
+    githubUrl: 'https://github.com/jiazengp/showcase-fabric',
   };
 }
