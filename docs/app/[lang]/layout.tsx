@@ -1,8 +1,8 @@
 import { RootProvider } from 'fumadocs-ui/provider';
-import type { Translations } from 'fumadocs-ui/i18n';
+import '../globals.css';
 
 const translations = {
-  cn: {
+  zh: {
     search: '搜索文档...',
     toc: '目录',
     lastUpdate: '最后更新',
@@ -15,7 +15,7 @@ const translations = {
 
 const locales = [
   { name: 'English', locale: 'en' },
-  { name: '中文', locale: 'cn' },
+  { name: '中文', locale: 'zh' },
 ];
 
 export default async function LanguageLayout({
@@ -33,6 +33,19 @@ export default async function LanguageLayout({
         locale: lang,
         locales,
         translations: translations[lang as keyof typeof translations],
+      }}
+      search={{
+        enabled: true,
+        hotKey: [
+          { display: 'K', key: 'k' },
+          { display: '⌘', key: 'meta' },
+        ],
+      }}
+      theme={{
+        attribute: 'class',
+        defaultTheme: 'system',
+        enableSystem: true,
+        disableTransitionOnChange: false,
       }}
     >
       {children}
