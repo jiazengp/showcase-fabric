@@ -1,9 +1,12 @@
 import '@/app/global.css';
 import { Inter } from 'next/font/google';
+import { createMetadata } from '@/lib/metadata';
 
 const inter = Inter({
   subsets: ['latin'],
 });
+
+export const metadata = createMetadata();
 
 export default function Layout({
   children,

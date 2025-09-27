@@ -1,0 +1,138 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* Include fumadocs-ui source for Tailwind CSS v4 */
+@source '../node_modules/fumadocs-ui/dist/**/*.js';
+
+/* Custom theme variables */
+:root {
+  /* Enhanced color palette */
+  --fd-primary: 99 102 241;
+  --fd-secondary: 139 92 246;
+  --fd-accent: 6 182 212;
+
+  /* Custom layout variables */
+  --fd-layout-width: 1400px;
+  --fd-sidebar-width: 280px;
+
+  /* Enhanced spacing */
+  --fd-content-padding: 2rem;
+  --fd-nav-height: 3.5rem;
+}
+
+/* Dark mode optimizations */
+[data-theme='dark'] {
+  --fd-background: 3 7 18;
+  --fd-foreground: 248 250 252;
+  --fd-muted: 15 23 42;
+  --fd-muted-foreground: 148 163 184;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--fd-muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--fd-muted-foreground) / 0.5);
+}
+
+/* Enhanced code block styling */
+pre[data-language] {
+  @apply rounded-lg border bg-muted/30;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-color: rgb(var(--fd-border) / 0.5);
+}
+
+/* Improved table styling */
+.prose table {
+  @apply border-collapse border;
+  border-color: rgb(var(--fd-border) / 0.5);
+}
+
+.prose th,
+.prose td {
+  @apply border px-3 py-2;
+  border-color: rgb(var(--fd-border) / 0.3);
+}
+
+.prose th {
+  @apply bg-muted/30 font-semibold;
+}
+
+/* Enhanced callout styling */
+[data-callout] {
+  @apply rounded-lg border-l-4 p-4 my-4;
+}
+
+[data-callout="info"] {
+  @apply border-l-blue-500 bg-blue-50 dark:bg-blue-950/20;
+}
+
+[data-callout="tip"] {
+  @apply border-l-green-500 bg-green-50 dark:bg-green-950/20;
+}
+
+[data-callout="warn"] {
+  @apply border-l-yellow-500 bg-yellow-50 dark:bg-yellow-950/20;
+}
+
+[data-callout="error"] {
+  @apply border-l-red-500 bg-red-50 dark:bg-red-950/20;
+}
+
+/* Performance optimizations */
+.prose {
+  @apply max-w-none;
+}
+
+/* Smooth transitions */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Focus improvements for accessibility */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary ring-0;
+}
+
+/* Loading states */
+.loading {
+  @apply animate-pulse;
+}
+
+/* Enhanced sidebar animations */
+.sidebar-enter {
+  @apply animate-slide-in;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  :root {
+    --fd-content-padding: 1rem;
+    --fd-sidebar-width: 260px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    @apply hidden;
+  }
+
+  .prose {
+    @apply text-black;
+  }
+}
