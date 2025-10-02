@@ -3,6 +3,7 @@ package com.showcase.utils;
 import com.showcase.config.ModConfigManager;
 import com.showcase.gui.MapViewerContext;
 import com.showcase.gui.MapViewerGui;
+import com.showcase.utils.compat.ServerPlayerCompat;
 import eu.pb4.sgui.api.GuiHelpers;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.*;
@@ -78,7 +79,7 @@ public final class MapViewer {
         MapViewerGui gui = new MapViewerGui(context, 0);
         gui.open();
 
-        viewingSessions.put(playerId, new ViewingSession(displayMap, player.getWorld().getServer().getTicks() + displaySeconds * 20));
+        viewingSessions.put(playerId, new ViewingSession(displayMap, ServerPlayerCompat.getWorld(player).getServer().getTicks() + displaySeconds * 20));
     }
 
     public static void viewMap(ServerPlayerEntity player, ItemStack mapItem) {
@@ -135,7 +136,7 @@ public final class MapViewer {
         ViewingSession session = viewingSessions.get(playerId);
         if (session == null) return false;
 
-        int currentTick = player.getWorld().getServer().getTicks();
+        int currentTick = ServerPlayerCompat.getWorld(player).getServer().getTicks();
         int newTick = currentTick + additionalSeconds * 20;
         viewingSessions.put(playerId, new ViewingSession(session.displayMap, newTick));
         return true;
@@ -145,7 +146,7 @@ public final class MapViewer {
         ViewingSession session = viewingSessions.get(player.getUuid());
         if (session == null) return 0;
 
-        int currentTick = player.getWorld().getServer().getTicks();
+        int currentTick = ServerPlayerCompat.getWorld(player).getServer().getTicks();
         return Math.max(0, (session.autoRestoreTick - currentTick) / 20);
     }
 

@@ -38,6 +38,14 @@ public class PlayerUtils {
 
     public static Optional<String> getPlayerNameFromCache(MinecraftServer server, UUID uuid) {
         try {
+            #if MC_VER >= 1219
+            // In 1.21.9+, use ProfileCache instead of UserCache
+            var profileCache = server.getApiServices().nameToIdCache();
+            var profileEntry = profileCache.getByUuid(uuid);
+            if (profileEntry.isPresent()) {
+                return Optional.ofNullable(profileEntry.get().name());
+            }
+            #else
             UserCache userCache = server.getUserCache();
             if (userCache != null) {
                 Optional<GameProfile> profile = userCache.getByUuid(uuid);
@@ -45,6 +53,7 @@ public class PlayerUtils {
                     return Optional.of(profile.get().getName());
                 }
             }
+            #endif
         } catch (Exception e) {
             ShowcaseMod.LOGGER.error("Error getting player name from cache: {}", e.getMessage());
         }

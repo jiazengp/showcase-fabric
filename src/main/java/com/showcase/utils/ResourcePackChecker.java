@@ -2,6 +2,7 @@ package com.showcase.utils;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
+import com.showcase.utils.compat.ServerPlayerCompat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerPropertiesHandler;
@@ -86,7 +87,7 @@ public class ResourcePackChecker {
             return;
         }
         
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = ServerPlayerCompat.getServer(player);
         if (server instanceof DedicatedServer dedicated && dedicated.getProperties().serverResourcePackProperties.isPresent()) {
             String resourcePackUrl = dedicated.getProperties().serverResourcePackProperties.get().url();
             if (resourcePackUrl == null || resourcePackUrl.trim().isEmpty()) {

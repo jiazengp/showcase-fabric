@@ -1,6 +1,7 @@
 package com.showcase.utils;
 
 import com.showcase.ShowcaseMod;
+import com.showcase.utils.compat.ProfileCompat;
 import com.showcase.utils.ui.ItemIconProvider;
 import net.minecraft.component.DataComponentTypes;
 #if MC_VER >= 1212
@@ -178,7 +179,7 @@ public class StackUtils {
 
     public static ItemStack getPlayerHead(ServerPlayerEntity player) {
         ItemStack head = new ItemStack(Items.PLAYER_HEAD);
-        head.set(DataComponentTypes.PROFILE, new ProfileComponent(player.getGameProfile()));
+        head.set(DataComponentTypes.PROFILE, ProfileCompat.createProfileComponent(player.getGameProfile()));
         return head;
     }
 

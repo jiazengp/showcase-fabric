@@ -4,6 +4,7 @@ import com.showcase.command.ShowcaseManager;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.utils.ReadOnlyInventory;
+import com.showcase.utils.compat.StyleCompat;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -82,7 +83,7 @@ public class ItemIconProvider {
         String fullIconKey = fontNamespace + "." + iconPath;
         
         return Text.translatable(fullIconKey)
-                .setStyle(Style.EMPTY.withFont(fontId).withColor(Formatting.WHITE).withUnderline(false));
+                .setStyle(StyleCompat.withFont(Style.EMPTY, fontId).withColor(Formatting.WHITE).withUnderline(false));
     }
 
     private static boolean isEnabled() {

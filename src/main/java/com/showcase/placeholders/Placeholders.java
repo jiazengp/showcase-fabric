@@ -127,6 +127,29 @@ public class Placeholders {
 
         // Register extended placeholders
         ExtendedPlaceholders.registerExtendedPlaceholders();
+
+        // Register avatar placeholder
+        eu.pb4.placeholders.api.Placeholders.register(
+                Identifier.of("showcase", "avatar"), (ctx, arg) -> {
+                    if (arg == null)
+                        return PlaceholderResult.invalid("No argument provided");
+
+                    String[] split = arg.split(" ");
+                    String name = split[0];
+                    int offset = split.length < 2 ? 0 : Integer.parseInt(split[1]);
+                    boolean flipped = split.length > 2 && split[2].equals("flipped");
+
+                    com.showcase.impl.AvatarManager.get(name, offset, flipped, com.showcase.impl.AvatarManager.NOOP);
+
+                    Text res = com.showcase.impl.AvatarManager.CACHED.get(
+                            new com.showcase.impl.AvatarManager.Key(name, offset, flipped));
+                    if (res == null) {
+                        res = com.showcase.impl.AvatarManager.CACHED.get(
+                                new com.showcase.impl.AvatarManager.Key("Steve", offset, flipped));
+                    }
+
+                    return PlaceholderResult.value(res);
+                });
     }
 
     public static boolean containsPlaceholders(String text) {

@@ -50,15 +50,29 @@ public class StatUtils {
         java.time.LocalDateTime now = java.time.LocalDateTime.now();
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("MM-dd HH:mm");
         String currentTime = now.format(formatter);
-        
-        return Text.empty()
+
+        MutableText coverPage = Text.empty()
                 .append(Text.translatable("gui.stats")
                         .formatted(Formatting.BOLD))
                 .append("\n\n")
                 .append(Text.literal("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
                         .formatted(Formatting.DARK_GRAY))
-                .append("\n\n")
+                .append("\n\n");
 
+        // Add player avatar using placeholder
+        try {
+            Text avatarText = eu.pb4.placeholders.api.Placeholders.parseText(
+                    eu.pb4.placeholders.api.node.TextNode.of("%showcase:avatar " + player.getGameProfile().getName() + "%"),
+                    eu.pb4.placeholders.api.PlaceholderContext.of(player)
+            );
+            if (avatarText != null) {
+                coverPage.append(avatarText).append("\n\n");
+            }
+        } catch (Exception e) {
+            ShowcaseMod.LOGGER.debug("Failed to load player avatar for stats book: " + e.getMessage());
+        }
+
+        coverPage
                 .append(Text.translatable("gui.abuseReport.type.name"))
                 .append(": ")
                 .append(player.getName())
@@ -67,11 +81,9 @@ public class StatUtils {
                 .append(Text.translatable("showcase.stats.message.create_date"))
                 .append(": ")
                 .append(Text.literal(currentTime))
-                .append("\n\n")
-
-                .append(Text.literal("UUID: "))
-                .append(Text.literal(player.getUuidAsString()))
                 .append("\n\n");
+
+        return coverPage;
 
     }
     
@@ -167,7 +179,7 @@ public class StatUtils {
                         .collect(Collectors.toList()),
                 true
         );
-        String fileName = player.getGameProfile().getName();
+        String fileName = player.getName().getString();
         String createdAt = java.time.format.DateTimeFormatter.ofPattern("MM-dd HH:mm")
                 .format(java.time.LocalDateTime.now());
         int totalPages = pages.size();

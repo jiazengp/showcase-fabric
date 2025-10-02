@@ -2,6 +2,7 @@ package com.showcase.listener;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
+import com.showcase.utils.compat.ServerPlayerCompat;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
 import eu.pb4.placeholders.api.PlaceholderContext;
@@ -54,9 +55,9 @@ public class ChatMessageListener {
                 return true;
             }
 
-            if (sender.getServer() == null) return true;
+            if (ServerPlayerCompat.getServer(sender) == null) return true;
 
-            sender.getServer().getPlayerManager().broadcast(
+            ServerPlayerCompat.getServer(sender).getPlayerManager().broadcast(
                     Text.translatable("chat.type.text", sender.getDisplayName(), parsedMessage),
                     false
             );
