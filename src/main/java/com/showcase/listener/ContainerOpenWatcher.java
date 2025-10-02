@@ -1,6 +1,7 @@
 package com.showcase.listener;
 
 import com.showcase.gui.MerchantContext;
+import com.showcase.utils.ContainerTitleResolver;
 import com.showcase.utils.ReadOnlyInventory;
 import com.showcase.utils.TextUtils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -10,8 +11,6 @@ import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
-import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.village.TradeOfferList;
 
 import java.util.*;
@@ -78,7 +77,7 @@ public class ContainerOpenWatcher {
 
         if (handler == null || entry == null) return;
 
-        MerchantContext merchantContext = getMerchantContext(handler, resolveContainerTitle(factory));
+        MerchantContext merchantContext = getMerchantContext(handler, ContainerTitleResolver.resolveContainerTitle(player, handler, factory));
 
         if (merchantContext == null) {
             if (entry.onTimeout != null) entry.onTimeout.run();
@@ -120,7 +119,8 @@ public class ContainerOpenWatcher {
             return;
         }
 
-        Text name = resolveContainerTitle(factory);
+        // Use the new resolver to get accurate container title
+        Text name = ContainerTitleResolver.resolveContainerTitle(player, handler, factory);
         ScreenHandlerType<?> type = handler.getType() == ScreenHandlerType.CRAFTER_3X3 ? ScreenHandlerType.CRAFTING : handler.getType();
         ReadOnlyInventory tempInv;
 
@@ -167,38 +167,12 @@ public class ContainerOpenWatcher {
         return tempInv;
     }
 
+    /**
+     * @deprecated Use ContainerTitleResolver.resolveContainerTitle() instead
+     */
+    @Deprecated
     public static Text resolveContainerTitle(NamedScreenHandlerFactory factory) {
-        if (factory == null) return TextUtils.UNKNOWN_ENTRY;
-
-        Text displayName = factory.getDisplayName();
-
-        if (displayName == null || displayName.getString().isBlank()) {
-            return TextUtils.UNKNOWN_ENTRY;
-        }
-
-        TextContent content = displayName.getContent();
-        String fallbackKey = null;
-
-        if (content instanceof TranslatableTextContent translatable) {
-            return Text.translatable(translatable.getKey());
-        }
-
-        if (factory instanceof NamedScreenHandlerFactory named) {
-            Text originalName = named.getDisplayName();
-            if (originalName != null && originalName.getContent() instanceof TranslatableTextContent translatable) {
-                fallbackKey = translatable.getKey();
-            }
-        }
-
-        if (fallbackKey != null) {
-            return Text.literal("")
-                    .append(displayName)
-                    .append(Text.literal("("))
-                    .append(Text.translatable(fallbackKey))
-                    .append(Text.literal(")"));
-        }
-
-        return displayName;
+        return ContainerTitleResolver.resolveContainerTitle(factory);
     }
 
     public static void registerTickEvent() {
