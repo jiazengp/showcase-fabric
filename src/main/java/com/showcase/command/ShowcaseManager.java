@@ -10,6 +10,7 @@ import com.showcase.gui.MerchantContext;
 import com.showcase.gui.ReadonlyMerchantGui;
 import com.showcase.placeholders.ShowcaseStatistics;
 import com.showcase.utils.*;
+import com.showcase.utils.compat.ServerPlayerCompat;
 import com.showcase.utils.permissions.PermissionChecker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandlerType;
@@ -38,10 +39,28 @@ public final class ShowcaseManager {
         return t;
     });
 
+    /**
+     * Get the scheduler for async tasks
+     * @return the scheduled executor service
+     */
+    public static ScheduledExecutorService getScheduler() {
+        return SCHEDULER;
+    }
+
     static {
-        // Schedule the recycler.
+        // Schedule the recycler for expired shares
         long intervalSeconds = 60;
         SCHEDULER.scheduleAtFixedRate(ShowcaseManager::purgeExpired, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
+
+        // Schedule cooldown cleanup every 5 minutes
+        long cooldownCleanupInterval = 300; // 5 minutes
+        SCHEDULER.scheduleAtFixedRate(() -> {
+            try {
+                com.showcase.utils.CooldownManager.cleanupExpiredCooldowns();
+            } catch (Exception e) {
+                ShowcaseMod.LOGGER.error("Error during cooldown cleanup", e);
+            }
+        }, cooldownCleanupInterval, cooldownCleanupInterval, TimeUnit.SECONDS);
     }
 
     private ShowcaseManager() {
@@ -169,7 +188,7 @@ public final class ShowcaseManager {
         }
 
         // Get the original owner for the event
-        MinecraftServer server = viewer.getServer();
+        MinecraftServer server = ServerPlayerCompat.getServer(viewer);
         if (server == null) return false;
         
         ServerPlayerEntity originalOwner = server.getPlayerManager().getPlayer(entry.getOwnerUuid());
@@ -292,7 +311,7 @@ public final class ShowcaseManager {
 
     private static ContainerGui factory(ServerPlayerEntity viewer, ShareEntry entry) {
         ReadOnlyInventory inv = entry.getInventory();
-        MinecraftServer server = viewer.getServer();
+        MinecraftServer server = ServerPlayerCompat.getServer(viewer);
 
         if (server == null) return null;
 

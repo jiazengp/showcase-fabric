@@ -16,6 +16,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -51,6 +53,9 @@ public class ShowcaseStatistics {
 
     // Player statistics data class
     public static class PlayerStats {
+        // Maximum number of duration records to keep per player
+        private static final int MAX_DURATION_RECORDS = 1000;
+
         public final AtomicInteger totalShares = new AtomicInteger(0);
         public final AtomicLong totalViews = new AtomicLong(0);
         public final Map<ShowcaseManager.ShareType, AtomicInteger> sharesByType = new ConcurrentHashMap<>();
@@ -64,6 +69,17 @@ public class ShowcaseStatistics {
             for (ShowcaseManager.ShareType type : ShowcaseManager.ShareType.values()) {
                 sharesByType.put(type, new AtomicInteger(0));
             }
+        }
+
+        /**
+         * Add a duration record with automatic size limiting
+         */
+        public void addDuration(Duration duration) {
+            // Remove oldest entry if at capacity (FIFO)
+            if (shareDurations.size() >= MAX_DURATION_RECORDS) {
+                shareDurations.remove(0);
+            }
+            shareDurations.add(duration);
         }
     }
 
@@ -335,7 +351,7 @@ public class ShowcaseStatistics {
         // Update player statistics
         stats.totalShares.incrementAndGet();
         stats.sharesByType.get(type).incrementAndGet();
-        stats.shareDurations.add(duration);
+        stats.addDuration(duration);
         stats.lastShareTime = Instant.now();
 
         // Update daily statistics
@@ -565,6 +581,7 @@ public class ShowcaseStatistics {
     // Save debouncing
     private static volatile long lastSaveRequest = 0;
     private static final long SAVE_DEBOUNCE_MS = 5000; // 5 seconds
+    private static ScheduledFuture<?> pendingSaveTask = null;
 
     /**
      * Schedule periodic statistics save
@@ -576,24 +593,29 @@ public class ShowcaseStatistics {
     }
 
     /**
-     * Schedule asynchronous save with debouncing to avoid excessive saves
+     * Schedule asynchronous save with debouncing to avoid excessive saves.
+     * Uses ShowcaseManager's scheduler instead of creating new threads.
      */
     public static void scheduleAsyncSave() {
         long now = System.currentTimeMillis();
         lastSaveRequest = now;
 
-        // Use a simple thread to handle debounced saves
-        new Thread(() -> {
+        // Cancel previous pending save task if exists
+        if (pendingSaveTask != null && !pendingSaveTask.isDone()) {
+            pendingSaveTask.cancel(false);
+        }
+
+        // Schedule save using ShowcaseManager's existing scheduler
+        pendingSaveTask = ShowcaseManager.getScheduler().schedule(() -> {
             try {
-                Thread.sleep(SAVE_DEBOUNCE_MS);
                 // Only save if no new save requests came in during debounce period
                 if (System.currentTimeMillis() - lastSaveRequest >= SAVE_DEBOUNCE_MS) {
                     saveStatistics();
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            } catch (Exception e) {
+                ShowcaseMod.LOGGER.error("Error during scheduled statistics save", e);
             }
-        }, "ShowcaseStatistics-AsyncSave").start();
+        }, SAVE_DEBOUNCE_MS, TimeUnit.MILLISECONDS);
     }
 
     /**
