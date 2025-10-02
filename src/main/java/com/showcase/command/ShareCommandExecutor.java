@@ -1,13 +1,13 @@
 package com.showcase.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.showcase.command.TimeArgumentType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ContainerOpenWatcher;
@@ -48,12 +48,89 @@ public class ShareCommandExecutor {
         int execute(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer durationSeconds);
     }
 
-    public static TimeArgumentType shareDurationArgument() {
-        return TimeArgumentType.time(
-                ModConfigManager.getShareLinkMinExpiry(),
-                ModConfigManager.getShareLinkDefaultExpiry()
-        );
+    /**
+     * Returns a RequiredArgumentBuilder for duration input with suggestions and validation
+     */
+    public static RequiredArgumentBuilder<ServerCommandSource, String> shareDurationArgument() {
+        return argument(DURATION_ARG, StringArgumentType.word())
+                .suggests(TIME_SUGGESTIONS);
     }
+
+    /**
+     * Suggestion provider for time duration with validation feedback
+     */
+    private static final SuggestionProvider<ServerCommandSource> TIME_SUGGESTIONS = (context, builder) -> {
+        String input = builder.getRemaining().toLowerCase();
+        int min = ModConfigManager.getShareLinkMinExpiry();
+        int max = ModConfigManager.getShareLinkDefaultExpiry();
+
+        // Check if player is OP
+        boolean isOp = false;
+        try {
+            ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+            isOp = isOp(player);
+        } catch (Exception ignored) {
+            // Player not available, default to non-OP
+        }
+
+        // Suggest common time formats
+        if (input.isEmpty()) {
+            // Calculate suggested values from config
+            // Ensure suggestions are within valid range and make sense
+            int suggestedMin = min;
+            int suggestedMid = (min + max) / 2;
+            int suggestedMax = max;
+
+            String minFormat = TimeUtils.formatDurationShort(suggestedMin);
+            String midFormat = TimeUtils.formatDurationShort(suggestedMid);
+            String maxFormat = TimeUtils.formatDurationShort(suggestedMax);
+
+            builder.suggest(minFormat, Text.translatable("showcase.command.duration.suggestion.minimum", TimeUtils.formatSeconds(suggestedMin)));
+            builder.suggest(midFormat, Text.translatable("showcase.command.duration.suggestion.recommended", TimeUtils.formatSeconds(suggestedMid)));
+            builder.suggest(maxFormat, Text.translatable("showcase.command.duration.suggestion.maximum", TimeUtils.formatSeconds(suggestedMax)));
+
+            if (isOp) {
+                builder.suggest("1h", Text.translatable("showcase.command.duration.suggestion.op_only"));
+            }
+        } else {
+            // Try to parse the input and validate
+            try {
+                int seconds = TimeUtils.parseTimeToSeconds(input);
+
+                if (!isOp && (seconds < min || seconds > max)) {
+                    // Show validation error in tooltip
+                    builder.suggest(input, Text.translatable("showcase.command.duration.error.out_of_range",
+                        TimeUtils.formatSeconds(min), TimeUtils.formatSeconds(max)));
+                } else {
+                    // Show valid time in tooltip
+                    String timeDisplay = TimeUtils.formatSeconds(seconds);
+                    Text status = isOp ?
+                        Text.translatable("showcase.command.duration.valid.op", timeDisplay) :
+                        Text.translatable("showcase.command.duration.valid", timeDisplay);
+                    builder.suggest(input, status);
+                }
+            } catch (IllegalArgumentException e) {
+                // Invalid format - suggest corrections
+                if (input.matches("\\d+")) {
+                    try {
+                        int numValue = Integer.parseInt(input);
+                        builder.suggest(input + "s", Text.translatable("showcase.command.duration.hint.add_seconds"));
+                        builder.suggest(input + "m", Text.translatable("showcase.command.duration.hint.add_minutes"));
+                        if (isOp || numValue <= max / 60) {
+                            builder.suggest(input + "h", Text.translatable("showcase.command.duration.hint.add_hours"));
+                        }
+                    } catch (NumberFormatException nfe) {
+                        // Number too large, show error
+                        builder.suggest(input, Text.translatable("showcase.command.duration.error.invalid_format"));
+                    }
+                } else {
+                    builder.suggest(input, Text.translatable("showcase.command.duration.error.invalid_format"));
+                }
+            }
+        }
+
+        return builder.buildFuture();
+    };
 
     public static LiteralArgumentBuilder<ServerCommandSource> createItemShareCommand(boolean withSource) {
         return createShareCommand(ShareConstants.ITEM, withSource, ShareCommandExecutor::shareItem);
@@ -112,7 +189,7 @@ public class ShareCommandExecutor {
                     .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, null, null))
                     .then(argument(RECEIVERS_ARG, EntityArgumentType.players())
                             .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, getReceivers(ctx), null))
-                            .then(argument(DURATION_ARG, shareDurationArgument())
+                            .then(shareDurationArgument()
                                     .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, getReceivers(ctx), getValidatedDuration(ctx)))
                                     .then(argument(DESCRIPTION_ARG, greedyString())
                                             .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), getDescription(ctx), getReceivers(ctx), getValidatedDuration(ctx)))
@@ -123,7 +200,7 @@ public class ShareCommandExecutor {
         } else {
             command.then(argument(RECEIVERS_ARG, EntityArgumentType.players())
                     .executes(ctx -> executor.execute(ctx, null, null, getReceivers(ctx), null))
-                    .then(argument(DURATION_ARG, shareDurationArgument())
+                    .then(shareDurationArgument()
                             .executes(ctx -> executor.execute(ctx, null, null, getReceivers(ctx), getValidatedDuration(ctx)))
                             .then(argument(DESCRIPTION_ARG, greedyString())
                                     .executes(ctx -> executor.execute(ctx, null, getDescription(ctx), getReceivers(ctx), getValidatedDuration(ctx)))
@@ -141,7 +218,7 @@ public class ShareCommandExecutor {
 
         command.then(argument(RECEIVERS_ARG, EntityArgumentType.players())
                 .executes(ctx -> executor.execute(ctx, null, getReceivers(ctx), null))
-                .then(argument(DURATION_ARG, shareDurationArgument())
+                .then(shareDurationArgument()
                         .executes(ctx -> executor.execute(ctx, null, getReceivers(ctx), getValidatedDuration(ctx)))
                         .then(argument(DESCRIPTION_ARG, greedyString())
                                 .executes(ctx -> executor.execute(ctx, getDescription(ctx), getReceivers(ctx), getValidatedDuration(ctx)))
@@ -356,7 +433,17 @@ public class ShareCommandExecutor {
     }
 
     private static int getValidatedDuration(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
-        int requested = TimeArgumentType.getTime(ctx, DURATION_ARG);
+        String timeString = StringArgumentType.getString(ctx, DURATION_ARG);
+        int requested;
+
+        try {
+            requested = TimeUtils.parseTimeToSeconds(timeString);
+        } catch (IllegalArgumentException e) {
+            throw new SimpleCommandExceptionType(
+                    Text.translatable("showcase.command.invalid_time_format")
+            ).create();
+        }
+
         int min = ModConfigManager.getShareLinkMinExpiry();
         int max = ModConfigManager.getShareLinkDefaultExpiry();
 

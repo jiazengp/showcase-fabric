@@ -112,5 +112,20 @@
   "showcase.stats.message.total_pages": "总页数",
 
   "showcase.viewer.countdown_title": "正在查看内容",
-  "showcase.viewer.instructions": "§r§7按 §fQ §7键或丢弃物品来关闭 • 使用滚轮导航"
+  "showcase.viewer.instructions": "§r§7按 §fQ §7键或丢弃物品来关闭 • 使用滚轮导航",
+
+  "showcase.command.duration.suggestion.minimum": "§a最短: %s",
+  "showcase.command.duration.suggestion.recommended": "§b推荐: %s",
+  "showcase.command.duration.suggestion.maximum": "§e最长: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1小时 (仅OP)",
+  "showcase.command.duration.error.out_of_range": "§c✗ 必须在 %s 和 %s 之间",
+  "showcase.command.duration.error.invalid_format": "§c✗ 格式错误 (使用: 1h30m 或 5m 或 30s)",
+  "showcase.command.duration.valid": "§a✓ 有效 - %s",
+  "showcase.command.duration.valid.op": "§a✓ 有效 (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7添加 's' 表示秒",
+  "showcase.command.duration.hint.add_minutes": "§7添加 'm' 表示分钟",
+  "showcase.command.duration.hint.add_hours": "§7添加 'h' 表示小时",
+  "showcase.command.no_permission.receivers": "§c你没有权限指定接收者",
+  "showcase.command.no_permission.duration": "§c你没有权限设置自定义时长",
+  "showcase.command.no_permission.description": "§c你没有权限添加描述"
 }

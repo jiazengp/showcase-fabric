@@ -9,6 +9,7 @@ import com.showcase.gui.MerchantContext;
 import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
+import com.showcase.utils.compat.ServerPlayerCompat;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -244,7 +245,7 @@ public class ShareCommandUtils {
             String receiverList = receivers.stream().map(ServerPlayerEntity::getDisplayName).filter(Objects::nonNull).map(Text::getString).collect(Collectors.joining(", "));
             sender.sendMessage(translatable("showcase.message.private_share_tip", sourcePlayer.getDisplayName(), clickableItemName, Text.literal(receiverList)));
         } else {
-            MinecraftServer server = sender.getServer();
+            MinecraftServer server = ServerPlayerCompat.getServer(sender);
             if (server != null) {
                 server.getPlayerManager().broadcast(finalMessage, false);
             }
@@ -366,9 +367,7 @@ public class ShareCommandUtils {
     }
 
     public static MutableText buildShareLine(ServerPlayerEntity viewer, String shareId, ShareEntry share) {
-        MinecraftServer server = viewer.getServer();
-
-        if (server == null) return Text.literal("Server not available");
+        MinecraftServer server = ServerPlayerCompat.getServer(viewer);
 
         Text ownerName =  PlayerUtils.getSafeDisplayName(server, share.getOwnerUuid());
         Text itemName = getShareItemName(share);

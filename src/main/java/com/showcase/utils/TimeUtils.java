@@ -36,31 +36,43 @@ public class TimeUtils {
                     ". Use format like '1h', '30m', '1h30m', or plain seconds");
         }
 
-        int totalSeconds = 0;
+        long totalSeconds = 0;
 
         // Hours
         String hours = matcher.group(1);
         if (hours != null) {
-            totalSeconds += Integer.parseInt(hours) * 3600;
+            long h = Long.parseLong(hours);
+            if (h > 24 * 365) {  // More than 1 year
+                throw new IllegalArgumentException("Hours value too large: " + h);
+            }
+            totalSeconds += h * 3600;
         }
 
         // Minutes
         String minutes = matcher.group(2);
         if (minutes != null) {
-            totalSeconds += Integer.parseInt(minutes) * 60;
+            long m = Long.parseLong(minutes);
+            if (m > 60 * 24 * 365) {  // More than 1 year
+                throw new IllegalArgumentException("Minutes value too large: " + m);
+            }
+            totalSeconds += m * 60;
         }
 
         // Seconds
         String seconds = matcher.group(3);
         if (seconds != null) {
-            totalSeconds += Integer.parseInt(seconds);
+            totalSeconds += Long.parseLong(seconds);
         }
 
         if (totalSeconds <= 0) {
             throw new IllegalArgumentException("Duration must be greater than 0");
         }
 
-        return totalSeconds;
+        if (totalSeconds > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Duration too large: " + totalSeconds + " seconds");
+        }
+
+        return (int) totalSeconds;
     }
 
     /**
@@ -94,5 +106,45 @@ public class TimeUtils {
         }
 
         return result.toString();
+    }
+
+    /**
+     * Format seconds into a short duration format suitable for command input
+     * @param seconds the duration in seconds
+     * @return formatted duration like "1h30m" or "5m" or "30s"
+     */
+    public static String formatDurationShort(int seconds) {
+        if (seconds <= 0) {
+            return "0s";
+        }
+
+        int hours = seconds / 3600;
+        int minutes = (seconds % 3600) / 60;
+        int remainingSeconds = seconds % 60;
+
+        StringBuilder result = new StringBuilder();
+
+        if (hours > 0) {
+            result.append(hours).append("h");
+        }
+
+        if (minutes > 0) {
+            result.append(minutes).append("m");
+        }
+
+        if (remainingSeconds > 0 || (hours == 0 && minutes == 0)) {
+            result.append(remainingSeconds).append("s");
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Format seconds into a compact time representation
+     * @param seconds the duration in seconds
+     * @return formatted time like "1h 30m" or "45s"
+     */
+    public static String formatSeconds(int seconds) {
+        return formatTime(seconds);
     }
 }

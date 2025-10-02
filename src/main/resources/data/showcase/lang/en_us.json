@@ -104,5 +104,20 @@
   "showcase.stats.message.total_pages": "Total Pages",
 
   "showcase.viewer.countdown_title": "Viewing Content",
-  "showcase.viewer.instructions": "§r§7Press §fQ §7or drop item to close • Use scrollwheel to navigate"
+  "showcase.viewer.instructions": "§r§7Press §fQ §7or drop item to close • Use scrollwheel to navigate",
+
+  "showcase.command.duration.suggestion.minimum": "§aMinimum: %s",
+  "showcase.command.duration.suggestion.recommended": "§bRecommended: %s",
+  "showcase.command.duration.suggestion.maximum": "§eMaximum: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 hour (OP only)",
+  "showcase.command.duration.error.out_of_range": "§c✗ Must be between %s and %s",
+  "showcase.command.duration.error.invalid_format": "§c✗ Invalid format (use: 1h30m or 5m or 30s)",
+  "showcase.command.duration.valid": "§a✓ Valid - %s",
+  "showcase.command.duration.valid.op": "§a✓ Valid (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7Add 's' for seconds",
+  "showcase.command.duration.hint.add_minutes": "§7Add 'm' for minutes",
+  "showcase.command.duration.hint.add_hours": "§7Add 'h' for hours",
+  "showcase.command.no_permission.receivers": "§cYou don't have permission to specify receivers",
+  "showcase.command.no_permission.duration": "§cYou don't have permission to set custom duration",
+  "showcase.command.no_permission.description": "§cYou don't have permission to add description"
 }
