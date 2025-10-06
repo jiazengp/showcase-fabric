@@ -172,7 +172,7 @@ public class ModConfig {
     @Configuration
     public static class ItemIconSettings {
         @Comment("Enable item icons in showcase messages")
-        public boolean enabled = true;
+        public boolean enabled = false;
 
         @Comment("Font namespace for item icons (e.g., 'custom', 'showcase')")
         public String fontNamespace = "iconifycraft";
