@@ -57,27 +57,15 @@ public class StatUtils {
                 .append("\n\n")
                 .append(Text.literal("▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬")
                         .formatted(Formatting.DARK_GRAY))
-                .append("\n\n");
-
-        // Add player avatar using placeholder
-        try {
-            Text avatarText = eu.pb4.placeholders.api.Placeholders.parseText(
-                    eu.pb4.placeholders.api.node.TextNode.of("%showcase:avatar " + player.getGameProfile().getName() + "%"),
-                    eu.pb4.placeholders.api.PlaceholderContext.of(player)
-            );
-            if (avatarText != null) {
-                coverPage.append(avatarText).append("\n\n");
-            }
-        } catch (Exception e) {
-            ShowcaseMod.LOGGER.debug("Failed to load player avatar for stats book: " + e.getMessage());
-        }
-
-        coverPage
+                .append("\n\n")
                 .append(Text.translatable("gui.abuseReport.type.name"))
                 .append(": ")
                 .append(player.getName())
                 .append("\n\n")
-
+                .append(Text.literal("UUID: "))
+                .append(Text.literal(player.getUuidAsString())
+                        .formatted(Formatting.GRAY))
+                .append("\n\n")
                 .append(Text.translatable("showcase.stats.message.create_date"))
                 .append(": ")
                 .append(Text.literal(currentTime))
