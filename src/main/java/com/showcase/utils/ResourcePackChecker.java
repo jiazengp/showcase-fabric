@@ -3,6 +3,7 @@ package com.showcase.utils;
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.compat.ServerPlayerCompat;
+import com.showcase.utils.permissions.PermissionChecker;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerPropertiesHandler;
@@ -83,7 +84,7 @@ public class ResourcePackChecker {
         }
         
         // Only send warning to ops and only if no resource pack is configured
-        if (!player.hasPermissionLevel(2)) {
+        if (!PermissionChecker.isOp(player)) {
             return;
         }
         

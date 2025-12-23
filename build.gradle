@@ -24,7 +24,7 @@ def versionProperties = loadVersionProperties()
 def compatibleVersions = versionProperties.getProperty("minecraft_version")
 
 // Parse version components once for reuse
-def parseVersionComponents(String version) {
+static def parseVersionComponents(String version) {
 	def parts = version.split('\\.')
 	return [
 		major: parts.length > 0 ? parts[0] : "1",
@@ -76,7 +76,7 @@ writeBuildGradlePredefine(versionProperties, mcVersionInfo)
 
 // Manifold preprocessor configuration
 manifold {
-	manifoldVersion = "2024.1.42"
+	manifoldVersion = "2025.1.29"
 }
 
 base {
@@ -109,11 +109,11 @@ dependencies {
 	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0")))
 	include(modImplementation("me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"))
 
-	include(implementation("de.exlll:configlib-core:4.6.1"))
-	include(implementation("de.exlll:configlib-yaml:4.6.1"))
-	include(implementation("org.snakeyaml:snakeyaml-engine:2.10"))
-	
-	// Manifold preprocessor for version compatibility (inspired by Fuji)
+    include(implementation("de.exlll:configlib-core:4.6.1"))
+    include(implementation("de.exlll:configlib-yaml:4.6.1"))
+    include(implementation("org.snakeyaml:snakeyaml-engine:2.10"))
+
+    // Manifold preprocessor for version compatibility (inspired by Fuji)
 	annotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 	testAnnotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 
@@ -171,39 +171,39 @@ jar {
 
 
 // Task to list available Minecraft versions
-task listVersions {
-	group = 'showcase'
-	description = 'List all available Minecraft versions for building'
-	
-	doLast {
-		def versionPropertiesDir = file("version_properties")
-		def availableVersions = []
-		
-		if (versionPropertiesDir.exists()) {
-			versionPropertiesDir.listFiles().each { file ->
-				if (file.name.endsWith('.properties')) {
-					availableVersions.add(file.name.replace('.properties', ''))
-				}
-			}
-		}
-		
-		// Sort versions (newest first)
-		availableVersions.sort { a, b -> 
-			def aParts = a.split('\\.')
-			def bParts = b.split('\\.')
-			for (int i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-				int aNum = i < aParts.length ? Integer.parseInt(aParts[i]) : 0
-				int bNum = i < bParts.length ? Integer.parseInt(bParts[i]) : 0
-				if (aNum != bNum) return bNum - aNum
-			}
-			return 0
-		}
-		
-		println "Available Minecraft versions for building:"
-		availableVersions.each { version ->
-			println "  - ${version}"
-		}
-		println "\nTo build for a specific version: ./gradlew build -PmcVer=<version>"
-		println "To build for all versions: ./buildAll.sh (Linux/Mac) or buildAll.bat (Windows)"
-	}
+tasks.register('listVersions') {
+    group = 'showcase'
+    description = 'List all available Minecraft versions for building'
+
+    doLast {
+        def versionPropertiesDir = file("version_properties")
+        def availableVersions = []
+
+        if (versionPropertiesDir.exists()) {
+            versionPropertiesDir.listFiles().each { file ->
+                if (file.name.endsWith('.properties')) {
+                    availableVersions.add(file.name.replace('.properties', ''))
+                }
+            }
+        }
+
+        // Sort versions (newest first)
+        availableVersions.sort { a, b ->
+            def aParts = a.split('\\.')
+            def bParts = b.split('\\.')
+            for (int i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+                int aNum = i < aParts.length ? Integer.parseInt(aParts[i]) : 0
+                int bNum = i < bParts.length ? Integer.parseInt(bParts[i]) : 0
+                if (aNum != bNum) return bNum - aNum
+            }
+            return 0
+        }
+
+        println "Available Minecraft versions for building:"
+        availableVersions.each { version ->
+            println "  - ${version}"
+        }
+        println "\nTo build for a specific version: ./gradlew build -PmcVer=<version>"
+        println "To build for all versions: ./buildAll.sh (Linux/Mac) or buildAll.bat (Windows)"
+    }
 }
