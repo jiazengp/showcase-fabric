@@ -109,8 +109,8 @@ dependencies {
 	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0")))
 	include(modImplementation("me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"))
 
-    include(implementation("de.exlll:configlib-core:4.6.1"))
-    include(implementation("de.exlll:configlib-yaml:4.6.1"))
+    include(implementation("de.exlll:configlib-core:4.8.0"))
+    include(implementation("de.exlll:configlib-yaml:4.8.0"))
     include(implementation("org.snakeyaml:snakeyaml-engine:2.10"))
 
     // Manifold preprocessor for version compatibility (inspired by Fuji)
