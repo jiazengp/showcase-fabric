@@ -22,8 +22,8 @@ jobs:
       - name: get minecraft versions
         id: get-versions
         run: |
-          # Extract versions from version_properties directory
-          versions=$(find version_properties/ -name "*.properties" -exec basename {} .properties \; | jq -R -s -c 'split("\n")[:-1]')
+          chmod +x .github/scripts/get-all-versions.sh
+          versions=$(.github/scripts/get-all-versions.sh)
           echo "versions=$versions" >> $GITHUB_OUTPUT
           echo "Found versions: $versions"
 
@@ -45,7 +45,7 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'microsoft'
 
       - name: make gradle wrapper executable
@@ -66,7 +66,7 @@ jobs:
           # Check required properties exist
           PROPS_FILE="version_properties/${{ matrix.minecraft-version }}.properties"
           
-          required_props=("minecraft_version" "fabric_loader_version" "fabric_version" "yarn_mappings_version")
+          required_props=("minecraft_version" "fabric_loader_version" "fabric_version")
           
           for prop in "${required_props[@]}"; do
             if ! grep -q "^${prop}=" "$PROPS_FILE"; then
@@ -109,7 +109,7 @@ jobs:
           echo "✓ JAR file created successfully: $(basename "$jar_file") ($jar_size bytes)"
 
       - name: run compatibility tests
-        if: matrix.minecraft-version == '1.21.6'
+        if: matrix.minecraft-version == '26.2'
         run: |
           echo "Running compatibility tests for Minecraft ${{ matrix.minecraft-version }}..."
           ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }} || echo "GameTest not available for this version - skipping"

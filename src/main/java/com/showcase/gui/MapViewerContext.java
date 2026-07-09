@@ -1,17 +1,17 @@
 package com.showcase.gui;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public final class MapViewerContext extends BaseViewerContext {
     public ItemStack map;
 
-    public MapViewerContext(ServerPlayerEntity player, ItemStack map) {
+    public MapViewerContext(ServerPlayer player, ItemStack map) {
         super(player);
         this.map = map;
     }
 
-    public MapViewerContext(ServerPlayerEntity player, ItemStack map, int durationSeconds) {
+    public MapViewerContext(ServerPlayer player, ItemStack map, int durationSeconds) {
         super(player, durationSeconds);
         this.map = map;
     }

@@ -1,41 +1,27 @@
 package com.showcase.utils.compat;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.UserCache;
-#if MC_VER >= 1219
-import net.minecraft.server.PlayerConfigEntry;
-#endif
-
 import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.CachedUserNameToIdResolver;
+import net.minecraft.server.players.NameAndId;
 
 /**
- * Compatibility layer for UserCache APIs across different Minecraft versions.
- * Handles API differences in 1.21.9+.
+ * Helpers around the current server-side user-cache APIs.
  */
 public class UserCacheCompat {
 
     /**
-     * Gets the UserCache from MinecraftServer.
-     * In 1.21.9+, getUserCache() may have been changed or removed.
+     * Gets the current server name-to-id cache.
      */
-    public static UserCache getUserCache(ServerPlayerEntity player) {
-        #if MC_VER >= 1219
-        return (UserCache) player.getEntityWorld().getServer().getApiServices().nameToIdCache();
-        #else
-        return player.getServer().getUserCache();
-        #endif
+    public static CachedUserNameToIdResolver getUserCache(ServerPlayer player) {
+        return (CachedUserNameToIdResolver) player.level().getServer().services().nameToIdCache();
     }
 
     /**
-     * Gets a GameProfile by UUID from UserCache.
-     * In 1.21.9+, the return type changed from Optional<GameProfile> to Optional<PlayerConfigEntry>.
+     * Resolves the cached UUID entry.
      */
-    public static Optional<UUID> getByUuid(UserCache userCache, UUID uuid) {
-        #if MC_VER >= 1219
-        return userCache.getByUuid(uuid).map(PlayerConfigEntry::id);
-        #else
-        return userCache.getByUuid(uuid).map(profile -> profile.getId());
-        #endif
+    public static Optional<UUID> getByUuid(CachedUserNameToIdResolver userCache, UUID uuid) {
+        return userCache.get(uuid).map(NameAndId::id);
     }
 }

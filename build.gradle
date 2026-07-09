@@ -1,13 +1,31 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 	id 'java'
 	id "systems.manifold.manifold-gradle-plugin" version "0.0.2-alpha"
 }
 
-// Enhanced version properties loading with preprocessor support
+// Version property loading constrained to the supported mainline (26.x+).
+static boolean isSupportedMainlineVersion(String version) {
+	def parts = version.tokenize('.')
+	if (parts.isEmpty()) {
+		return false
+	}
+	try {
+		return Integer.parseInt(parts[0]) >= 26
+	} catch (NumberFormatException ignored) {
+		return false
+	}
+}
+
 def loadVersionProperties() {
-	def mcVer = project.findProperty('mcVer') ?: project.findProperty('minecraft_version') ?: gradle.ext.mcVer
+	def requestedMcVer = providers.gradleProperty('mcVer').orNull
+			?: providers.gradleProperty('minecraft_version').orNull
+			?: gradle.ext.mcVer
+	def mcVer = String.valueOf(requestedMcVer)
+	if (!isSupportedMainlineVersion(mcVer)) {
+		throw new GradleException("Minecraft ${mcVer} is outside the supported mainline. This branch only supports 26.x+.")
+	}
 	def targetPropertiesFile = file("version_properties/${mcVer}.properties")
 	
 	def versionProperties = new Properties()
@@ -36,7 +54,7 @@ static def parseVersionComponents(String version) {
 
 def mcVersionInfo = parseVersionComponents(versionProperties.getProperty("minecraft_version"))
 
-// Generate build.properties for preprocessor definitions (inspired by Fuji)
+// Generate build.properties for version-gated compilation.
 def writeBuildGradlePredefine(Properties versionProps, mcInfo) {
 	def currentMcVer = versionProps.getProperty("minecraft_version")
 	def buildPropsFile = file("build.properties")
@@ -53,13 +71,13 @@ def writeBuildGradlePredefine(Properties versionProps, mcInfo) {
 	sb.append("MC_MINOR=${mcInfo.minor}\n") 
 	sb.append("MC_PATCH=${mcInfo.patch}\n")
 	
-	// Set other version flags to 0 for conditional compilation
+	// Set other supported-version flags to 0 for conditional compilation.
 	def versionPropertiesDir = file("version_properties")
 	if (versionPropertiesDir.exists()) {
 		versionPropertiesDir.listFiles().each { file ->
 			if (file.name.endsWith('.properties')) {
 				def otherVersion = file.name.replace('.properties', '')
-				if (otherVersion != currentMcVer) {
+				if (otherVersion != currentMcVer && isSupportedMainlineVersion(otherVersion)) {
 					def otherInfo = parseVersionComponents(otherVersion)
 					sb.append("MC_${otherInfo.major}_${otherInfo.minor}_${otherInfo.patch}=0\n")
 				}
@@ -98,22 +116,21 @@ dependencies {
 	implementation platform("net.fabricmc.fabric-api:fabric-api-bom:${versionProperties.getProperty("fabric_version")}")
 
 	minecraft "com.mojang:minecraft:${versionProperties.getProperty("minecraft_version")}"
-	mappings "net.fabricmc:yarn:${versionProperties.getProperty("yarn_mappings_version")}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
+	implementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
-	modImplementation include("eu.pb4:placeholder-api:${versionProperties.getProperty("placeholder_api_version")}")
-	modImplementation include("eu.pb4:sgui:${versionProperties.getProperty("sgui_api_version")}")
-	modImplementation include("xyz.nucleoid:server-translations-api:${versionProperties.getProperty("server_translations_api_version")}")
+	implementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
+	implementation "net.fabricmc.fabric-api:fabric-permission-api-v1:1.0.3+b7020ca29e"
+	implementation include("eu.pb4:placeholder-api:${versionProperties.getProperty("placeholder_api_version")}")
+	implementation include("eu.pb4:sgui:${versionProperties.getProperty("sgui_api_version")}")
+	implementation include("xyz.nucleoid:server-translations-api:${versionProperties.getProperty("server_translations_api_version")}")
 
-	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0")))
-	include(modImplementation("me.lucko:fabric-permissions-api:${versionProperties.getProperty("fabric_permissions_api_version")}"))
+	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.4")))
 
     include(implementation("de.exlll:configlib-core:4.6.1"))
     include(implementation("de.exlll:configlib-yaml:4.6.1"))
     include(implementation("org.snakeyaml:snakeyaml-engine:2.10"))
 
-    // Manifold preprocessor for version compatibility (inspired by Fuji)
+    // Manifold preprocessor for supported-version compatibility.
 	annotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 	testAnnotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 
@@ -125,12 +142,18 @@ dependencies {
 
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+
+	def javaVersion = JavaVersion.toVersion(Integer.parseInt(versionProperties.getProperty("java_version")))
+	sourceCompatibility = javaVersion
+	targetCompatibility = javaVersion
+
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(Integer.parseInt(versionProperties.getProperty("java_version")))
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = Integer.parseInt(versionProperties.getProperty("java_version"))
 }
 
 processResources {
@@ -170,7 +193,7 @@ jar {
 }
 
 
-// Task to list available Minecraft versions
+// Task to list the supported Minecraft versions for this branch.
 tasks.register('listVersions') {
     group = 'showcase'
     description = 'List all available Minecraft versions for building'
@@ -182,7 +205,10 @@ tasks.register('listVersions') {
         if (versionPropertiesDir.exists()) {
             versionPropertiesDir.listFiles().each { file ->
                 if (file.name.endsWith('.properties')) {
-                    availableVersions.add(file.name.replace('.properties', ''))
+                    def version = file.name.replace('.properties', '')
+                    if (isSupportedMainlineVersion(version)) {
+                        availableVersions.add(version)
+                    }
                 }
             }
         }
@@ -199,11 +225,11 @@ tasks.register('listVersions') {
             return 0
         }
 
-        println "Available Minecraft versions for building:"
+        println "Available Minecraft versions for building (26.x+ mainline):"
         availableVersions.each { version ->
             println "  - ${version}"
         }
         println "\nTo build for a specific version: ./gradlew build -PmcVer=<version>"
-        println "To build for all versions: ./buildAll.sh (Linux/Mac) or buildAll.bat (Windows)"
+        println "To build for all supported versions: ./buildAll.sh (Linux/Mac) or buildAll.bat (Windows)"
     }
 }

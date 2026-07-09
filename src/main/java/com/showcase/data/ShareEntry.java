@@ -7,12 +7,10 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.gui.MerchantContext;
 import com.showcase.utils.PlayerUtils;
 import com.showcase.utils.ReadOnlyInventory;
-import net.minecraft.server.network.ServerPlayerEntity;
-
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import net.minecraft.server.level.ServerPlayer;
 
 import static com.showcase.gui.MerchantContext.MERCHANT_CONTEXT_CODEC;
 import static com.showcase.utils.ReadOnlyInventory.READ_ONLY_INVENTORY_CODEC;
@@ -71,14 +69,14 @@ public class ShareEntry {
         this.receiverUuids = receiverUuids != null ? receiverUuids : new HashSet<>();
     }
 
-    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, MerchantContext merchantContext, Integer duration, Collection<ServerPlayerEntity> receivers) {
+    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, MerchantContext merchantContext, Integer duration, Collection<ServerPlayer> receivers) {
         this(ownerUuid, type, null, merchantContext,
                 Instant.now().toEpochMilli(),
                 duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration,
                 0, false, PlayerUtils.getReceiverUuids(receivers));
     }
 
-    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, ReadOnlyInventory inventory, Integer duration, Collection<ServerPlayerEntity> receivers) {
+    public ShareEntry(UUID ownerUuid, ShowcaseManager.ShareType type, ReadOnlyInventory inventory, Integer duration, Collection<ServerPlayer> receivers) {
         this(ownerUuid, type, inventory, null,
                 Instant.now().toEpochMilli(),
                 duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration,
@@ -100,17 +98,17 @@ public class ShareEntry {
     public void incrementViewCount() { this.viewCount++; }
     public void invalidShare() { this.isInvalid = true; }
 
-    public void addReceiver(ServerPlayerEntity player) {
-        receiverUuids.add(player.getUuid());
+    public void addReceiver(ServerPlayer player) {
+        receiverUuids.add(player.getUUID());
     }
 
-    public void removeReceiver(ServerPlayerEntity player) {
-        receiverUuids.remove(player.getUuid());
+    public void removeReceiver(ServerPlayer player) {
+        receiverUuids.remove(player.getUUID());
     }
 
-    public Collection<ServerPlayerEntity> getReceiver(net.minecraft.server.MinecraftServer server) {
+    public Collection<ServerPlayer> getReceiver(net.minecraft.server.MinecraftServer server) {
         return receiverUuids.stream()
-                .map(server.getPlayerManager()::getPlayer)
+                .map(server.getPlayerList()::getPlayer)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

@@ -1,12 +1,12 @@
 package com.showcase.utils.inventory;
 
 import com.showcase.utils.inventory.ReadOnlyInventory;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import com.showcase.utils.ScreenHandlerUtils;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
 
 /**
  * Common inventory operations extracted from StackUtils and other classes
@@ -34,22 +34,22 @@ public final class InventoryUtils {
      * @param player the player whose inventory to snapshot
      * @return read-only inventory containing the full player inventory
      */
-    public static ReadOnlyInventory snapshotPlayerInventory(PlayerInventory player) {
+    public static ReadOnlyInventory snapshotPlayerInventory(Inventory player) {
         int rows = (PLAYER_INVENTORY_SIZE + 8) / 9; // Calculate rows needed
         ReadOnlyInventory snapshot = new ReadOnlyInventory(
                 PLAYER_INVENTORY_SIZE, 
-                Text.translatable("container.inventory"), 
+                Component.translatable("container.inventory"), 
                 ScreenHandlerUtils.handlerTypeForRows(rows)
         );
         
         // Copy hotbar (slots 0-8)
         for (int i = HOTBAR_START; i <= HOTBAR_END; i++) {
-            snapshot.setStack(i, player.getStack(i).copy());
+            snapshot.setItem(i, player.getItem(i).copy());
         }
         
         // Copy main inventory (slots 9-35) 
         for (int i = MAIN_INVENTORY_START; i <= MAIN_INVENTORY_END; i++) {
-            snapshot.setStack(i, player.getStack(i).copy());
+            snapshot.setItem(i, player.getItem(i).copy());
         }
         
         return snapshot;
@@ -60,15 +60,15 @@ public final class InventoryUtils {
      * @param player the player whose hotbar to snapshot
      * @return read-only inventory containing the hotbar
      */
-    public static ReadOnlyInventory snapshotHotbar(PlayerInventory player) {
+    public static ReadOnlyInventory snapshotHotbar(Inventory player) {
         ReadOnlyInventory snapshot = new ReadOnlyInventory(
                 HOTBAR_SIZE,
-                Text.translatable("showcase.inventory.hotbar"),
-                ScreenHandlerType.GENERIC_9X1
+                Component.translatable("showcase.inventory.hotbar"),
+                MenuType.GENERIC_9x1
         );
         
         for (int i = 0; i < HOTBAR_SIZE; i++) {
-            snapshot.setStack(i, player.getStack(i).copy());
+            snapshot.setItem(i, player.getItem(i).copy());
         }
         
         return snapshot;
@@ -80,8 +80,8 @@ public final class InventoryUtils {
      * @param displayName the display name for the snapshot
      * @return read-only copy of the inventory
      */
-    public static ReadOnlyInventory snapshotInventory(Inventory source, Text displayName) {
-        int size = source.size();
+    public static ReadOnlyInventory snapshotInventory(Container source, Component displayName) {
+        int size = source.getContainerSize();
         int rows = (size + 8) / 9; // Calculate rows needed, rounding up
         
         ReadOnlyInventory snapshot = new ReadOnlyInventory(
@@ -91,7 +91,7 @@ public final class InventoryUtils {
         );
         
         for (int i = 0; i < size; i++) {
-            snapshot.setStack(i, source.getStack(i).copy());
+            snapshot.setItem(i, source.getItem(i).copy());
         }
         
         return snapshot;
@@ -104,11 +104,11 @@ public final class InventoryUtils {
      * @param screenHandler the screen handler type to use
      * @return read-only copy of the inventory
      */
-    public static ReadOnlyInventory snapshotInventory(Inventory source, Text displayName, ScreenHandlerType<?> screenHandler) {
-        ReadOnlyInventory snapshot = new ReadOnlyInventory(source.size(), displayName, screenHandler);
+    public static ReadOnlyInventory snapshotInventory(Container source, Component displayName, MenuType<?> screenHandler) {
+        ReadOnlyInventory snapshot = new ReadOnlyInventory(source.getContainerSize(), displayName, screenHandler);
         
-        for (int i = 0; i < source.size(); i++) {
-            snapshot.setStack(i, source.getStack(i).copy());
+        for (int i = 0; i < source.getContainerSize(); i++) {
+            snapshot.setItem(i, source.getItem(i).copy());
         }
         
         return snapshot;
@@ -119,10 +119,10 @@ public final class InventoryUtils {
      * @param inventory the inventory to count
      * @return number of non-empty item stacks
      */
-    public static int countNonEmptyStacks(Inventory inventory) {
+    public static int countNonEmptyStacks(Container inventory) {
         int count = 0;
-        for (int i = 0; i < inventory.size(); i++) {
-            if (!inventory.getStack(i).isEmpty()) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            if (!inventory.getItem(i).isEmpty()) {
                 count++;
             }
         }
@@ -134,9 +134,9 @@ public final class InventoryUtils {
      * @param inventory the inventory to check
      * @return true if all slots are empty
      */
-    public static boolean isEmpty(Inventory inventory) {
-        for (int i = 0; i < inventory.size(); i++) {
-            if (!inventory.getStack(i).isEmpty()) {
+    public static boolean isEmpty(Container inventory) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            if (!inventory.getItem(i).isEmpty()) {
                 return false;
             }
         }
@@ -148,9 +148,9 @@ public final class InventoryUtils {
      * @param inventory the inventory to search
      * @return the first non-empty ItemStack, or ItemStack.EMPTY if none found
      */
-    public static ItemStack getFirstNonEmptyStack(Inventory inventory) {
-        for (int i = 0; i < inventory.size(); i++) {
-            ItemStack stack = inventory.getStack(i);
+    public static ItemStack getFirstNonEmptyStack(Container inventory) {
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stack = inventory.getItem(i);
             if (!stack.isEmpty()) {
                 return stack;
             }
@@ -166,13 +166,13 @@ public final class InventoryUtils {
      * @param targetStart starting slot in target
      * @param count number of slots to copy
      */
-    public static void copySlots(Inventory source, Inventory target, int sourceStart, int targetStart, int count) {
+    public static void copySlots(Container source, Container target, int sourceStart, int targetStart, int count) {
         for (int i = 0; i < count; i++) {
             int sourceSlot = sourceStart + i;
             int targetSlot = targetStart + i;
             
-            if (sourceSlot < source.size() && targetSlot < target.size()) {
-                target.setStack(targetSlot, source.getStack(sourceSlot).copy());
+            if (sourceSlot < source.getContainerSize() && targetSlot < target.getContainerSize()) {
+                target.setItem(targetSlot, source.getItem(sourceSlot).copy());
             }
         }
     }

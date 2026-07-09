@@ -1,8 +1,8 @@
 package com.showcase.data;
 
 import com.showcase.ShowcaseMod;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;

@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§rKlicka för att visa",
   "showcase.message.invalid_or_expired": "§rDenna delningslänk är ogiltig eller har gått ut",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%ss %s",
   "showcase.screen.hotbar_title": "§r%ss %s",

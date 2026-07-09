@@ -10,7 +10,7 @@ interface VersionedCodeBlockProps {
  * Display a code block with version placeholders automatically replaced
  *
  * Placeholders:
- * - {MC_VERSION} - Minecraft version (e.g., "1.21.6")
+ * - {MC_VERSION} - Minecraft version (e.g., "26.2")
  * - {FABRIC_VERSION} - Fabric API version
  * - {LOADER_VERSION} - Fabric Loader version
  * - {PLACEHOLDER_API_VERSION} - PlaceholderAPI version

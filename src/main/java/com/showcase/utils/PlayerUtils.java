@@ -3,57 +3,43 @@ package com.showcase.utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
 import com.showcase.ShowcaseMod;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.UserCache;
-
+import net.minecraft.server.level.ServerPlayer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class PlayerUtils {
-    public static Set<UUID> getReceiverUuids(Collection<ServerPlayerEntity> receivers) {
+    public static Set<UUID> getReceiverUuids(Collection<ServerPlayer> receivers) {
         if (receivers  == null) return null;
-        return receivers.stream().map(ServerPlayerEntity::getUuid).collect(Collectors.toSet());
+        return receivers.stream().map(ServerPlayer::getUUID).collect(Collectors.toSet());
     }
 
-    public static MutableText getSafeDisplayName(ServerPlayerEntity player) {
-        if (player == null) return Text.translatable("argument.entity.notfound.player");
-        Text displayName = Text.translatable("chat.type.text", player.getDisplayName(), "");
-        return (MutableText) Objects.requireNonNullElseGet(displayName, player::getName);
+    public static MutableComponent getSafeDisplayName(ServerPlayer player) {
+        if (player == null) return Component.translatable("argument.entity.notfound.player");
+        Component displayName = Component.translatable("chat.type.text", player.getDisplayName(), "");
+        return (MutableComponent) Objects.requireNonNullElseGet(displayName, player::getName);
     }
 
-    public static MutableText getSafeDisplayName(MinecraftServer server, UUID uuid) {
-        if (server == null) return Text.translatable("argument.entity.notfound.player");
-        ServerPlayerEntity player = server.getPlayerManager().getPlayer(uuid);
+    public static MutableComponent getSafeDisplayName(MinecraftServer server, UUID uuid) {
+        if (server == null) return Component.translatable("argument.entity.notfound.player");
+        ServerPlayer player = server.getPlayerList().getPlayer(uuid);
         if (player != null) return getSafeDisplayName(player);
         Optional<String> playerName = getPlayerNameFromUuid(server, uuid);
-        return playerName.map(s -> Text.translatable("chat.type.text", s, "")).orElseGet(() -> Text.translatable("argument.entity.notfound.player"));
+        return playerName.map(s -> Component.translatable("chat.type.text", s, "")).orElseGet(() -> Component.translatable("argument.entity.notfound.player"));
     }
 
     public static Optional<String> getPlayerNameFromCache(MinecraftServer server, UUID uuid) {
         try {
-            #if MC_VER >= 1219
-            // In 1.21.9+, use ProfileCache instead of UserCache
-            var profileCache = server.getApiServices().nameToIdCache();
-            var profileEntry = profileCache.getByUuid(uuid);
+            var profileCache = server.services().nameToIdCache();
+            var profileEntry = profileCache.get(uuid);
             if (profileEntry.isPresent()) {
                 return Optional.ofNullable(profileEntry.get().name());
             }
-            #else
-            UserCache userCache = server.getUserCache();
-            if (userCache != null) {
-                Optional<GameProfile> profile = userCache.getByUuid(uuid);
-                if (profile.isPresent()) {
-                    return Optional.of(profile.get().getName());
-                }
-            }
-            #endif
         } catch (Exception e) {
             ShowcaseMod.LOGGER.error("Error getting player name from cache: {}", e.getMessage());
         }
@@ -62,7 +48,7 @@ public class PlayerUtils {
 
     public static Optional<String> getPlayerNameFromUserCacheFile(MinecraftServer server, UUID uuid) {
         try {
-            Path worldPath = server.getSavePath(net.minecraft.util.WorldSavePath.ROOT);
+            Path worldPath = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT);
             Path userCachePath = worldPath.resolve("usercache.json");
 
             if (Files.exists(userCachePath)) {

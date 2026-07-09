@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§r클릭하여 보기",
   "showcase.message.invalid_or_expired": "§r이 공유 링크는 유효하지 않거나 만료되었습니다",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s의 %s",
   "showcase.screen.hotbar_title": "§r%s의 %s",

@@ -1,7 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-REM Multi-version build script for Showcase mod
-REM Inspired by Fuji's buildAll script
+REM Build every supported mainline version (26.x+) for Showcase.
 
 echo Starting multi-version build for Showcase mod...
 echo Build started at: %DATE% %TIME%
@@ -15,29 +14,39 @@ set successful_builds=0
 set failed_builds=0
 
 REM Verify version properties files exist
-echo Verifying version properties files...
+echo Verifying supported version properties files...
 if not exist "version_properties\*.properties" (
     echo ERROR: No version properties files found in version_properties\ directory
     exit /b 1
 )
 
-REM Count total versions
+REM Count supported versions
 for %%f in (version_properties\*.properties) do (
-    set /a total_versions+=1
+    call :is_supported_version "%%~nf"
+    if !ERRORLEVEL! EQU 0 (
+        set /a total_versions+=1
+    )
 )
-echo Found %total_versions% Minecraft versions to build
+if %total_versions% EQU 0 (
+    echo ERROR: No supported 26.x+ version properties files found
+    exit /b 1
+)
+echo Found %total_versions% supported Minecraft versions to build
 
 REM Build for all available versions
 echo.
 echo Starting builds...
 for %%f in (version_properties\*.properties) do (
     set "version=%%~nf"
-    call :build_version !version!
+    call :is_supported_version "!version!"
     if !ERRORLEVEL! EQU 0 (
-        set /a successful_builds+=1
-    ) else (
-        set /a failed_builds+=1
-        echo × Failed to build for Minecraft !version!
+        call :build_version !version!
+        if !ERRORLEVEL! EQU 0 (
+            set /a successful_builds+=1
+        ) else (
+            set /a failed_builds+=1
+            echo × Failed to build for Minecraft !version!
+        )
     )
 )
 
@@ -68,9 +77,12 @@ echo Verifying build artifacts...
 set missing_jars=0
 for %%f in (version_properties\*.properties) do (
     set "version=%%~nf"
-    if not exist "build\buildAllJars\showcase-*+!version!.jar" (
-        echo WARNING: Missing JAR for Minecraft !version!
-        set /a missing_jars+=1
+    call :is_supported_version "!version!"
+    if !ERRORLEVEL! EQU 0 (
+        if not exist "build\buildAllJars\showcase-*+!version!.jar" (
+            echo WARNING: Missing JAR for Minecraft !version!
+            set /a missing_jars+=1
+        )
     )
 )
 
@@ -82,6 +94,14 @@ if %missing_jars% GTR 0 (
 )
 
 goto :eof
+
+:is_supported_version
+set "version=%~1"
+set "major="
+for /f "tokens=1 delims=." %%m in ("%version%") do set "major=%%m"
+if not defined major exit /b 1
+if %major% GEQ 26 exit /b 0
+exit /b 1
 
 :build_version
 set "mcver=%~1"
@@ -102,7 +122,7 @@ echo Building without cleaning (preserving previous versions)...
 
 REM Build for specific version (inspired by Fuji)
 echo Building mod for Minecraft %mcver%...
-call gradlew build -PmcVer=%mcver%
+call gradlew.bat build -PmcVer=%mcver%
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Build failed for Minecraft %mcver%
     exit /b 1

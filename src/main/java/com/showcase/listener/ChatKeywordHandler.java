@@ -7,13 +7,12 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.placeholders.Placeholders;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 
 import static com.showcase.utils.permissions.PermissionChecker.isOp;
 
@@ -85,7 +84,7 @@ public class ChatKeywordHandler {
         return Pattern.compile("\\[\\s*(" + joined + ")\\s*]", Pattern.CASE_INSENSITIVE);
     }
 
-    public String processMessage(String originalMessage, ServerPlayerEntity player) {
+    public String processMessage(String originalMessage, ServerPlayer player) {
         if (originalMessage == null || originalMessage.isBlank()) return originalMessage;
 
         Matcher matcher = keywordPattern.matcher(originalMessage);
@@ -130,7 +129,7 @@ public class ChatKeywordHandler {
         return SUPPORTED_PLACEHOLDERS;
     }
 
-    private boolean hasPermission(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+    private boolean hasPermission(ServerPlayer player, ShowcaseManager.ShareType shareType) {
         ModConfig.ShareSettings settings = config.shareSettings.get(shareType);
         return settings != null &&
                 PermissionChecker.hasPermission(player, 

@@ -23,6 +23,9 @@
   "showcase.message.expiry_notice": "§r（該鏈接將在 §l%d§r 分鐘後過期）",
   "showcase.message.click_to_view": "§r點擊查看",
   "showcase.message.invalid_or_expired": "§r該展示鏈接無效或已過期",
+
+  
+  "showcase.name.container": "容器",
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s的%s",
   "showcase.screen.hotbar_title": "§r%s的%s",

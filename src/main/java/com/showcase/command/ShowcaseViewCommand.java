@@ -5,19 +5,19 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 public class ShowcaseViewCommand {
-        public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
+        public static void register(CommandDispatcher<CommandSourceStack> dispatcher, String command) {
             dispatcher.register(literal(command)
                     .requires(ctx -> PermissionChecker.hasPermission(ctx, Permissions.Command.VIEW, 0))
                     .then(argument("id", StringArgumentType.string())
                             .executes(ctx -> {
-                                ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                                ServerPlayer player = ctx.getSource().getPlayerOrException();
                                 String id = StringArgumentType.getString(ctx, "id");
                                 if (!ShowcaseManager.openSharedContent(player, id)) {
                                     return -1;

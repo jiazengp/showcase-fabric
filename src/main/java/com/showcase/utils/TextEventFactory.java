@@ -1,17 +1,15 @@
 package com.showcase.utils;
 
 import com.showcase.utils.compat.TextEventCompat;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-
 import java.net.URI;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.world.item.ItemStack;
 
 /**
- * Factory class for creating text events with version compatibility.
- * This class provides a unified interface for creating HoverEvent and ClickEvent instances
- * that can be easily modified for different Minecraft versions.
+ * Factory class for creating text events on the current 26.x mainline.
+ * This class provides a unified interface for creating HoverEvent and ClickEvent instances.
  */
 public class TextEventFactory {
 
@@ -76,7 +74,7 @@ public class TextEventFactory {
      * @param text The text to show
      * @return HoverEvent instance
      */
-    public static HoverEvent showText(Text text) {
+    public static HoverEvent showText(Component text) {
         return TextEventCompat.showText(text);
     }
     
@@ -122,7 +120,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent previousPageTooltip() {
-        return showText(Text.translatable("spectatorMenu.previous_page"));
+        return showText(Component.translatable("spectatorMenu.previous_page"));
     }
     
     /**
@@ -130,7 +128,7 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent nextPageTooltip() {
-        return showText(Text.translatable("spectatorMenu.next_page"));
+        return showText(Component.translatable("spectatorMenu.next_page"));
     }
     
     /**
@@ -138,6 +136,6 @@ public class TextEventFactory {
      * @return HoverEvent instance
      */
     public static HoverEvent cancelShareTooltip() {
-        return showText(Text.translatable("showcase.message.manage.cancel.tip"));
+        return showText(Component.translatable("showcase.message.manage.cancel.tip"));
     }
 }

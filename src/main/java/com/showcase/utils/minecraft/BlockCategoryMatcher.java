@@ -1,12 +1,11 @@
 package com.showcase.utils.minecraft;
 
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.registry.RegistryKey;
-
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 
 /**
  * Handles pattern matching for block categorization based on item names
@@ -61,16 +60,16 @@ public final class BlockCategoryMatcher {
      * @param itemName the item name (without namespace)
      * @return the appropriate item group category
      */
-    public static RegistryKey<ItemGroup> categorizeByName(String itemName) {
-        if (matchesColoredBlock(itemName)) return ItemGroups.COLORED_BLOCKS;
-        if (matchesAny(NATURAL_BLOCK_PATTERNS, itemName)) return ItemGroups.NATURAL;
-        if (matchesAny(FUNCTIONAL_BLOCK_PATTERNS, itemName)) return ItemGroups.FUNCTIONAL;
-        if (matchesAny(REDSTONE_BLOCK_PATTERNS, itemName)) return ItemGroups.REDSTONE;
-        if (matchesAny(COMBAT_BLOCK_PATTERNS, itemName)) return ItemGroups.COMBAT;
-        if (matchesAny(INGREDIENT_BLOCK_PATTERNS, itemName)) return ItemGroups.INGREDIENTS;
-        if (matchesAny(BUILDING_BLOCK_PATTERNS, itemName)) return ItemGroups.BUILDING_BLOCKS;
+    public static ResourceKey<CreativeModeTab> categorizeByName(String itemName) {
+        if (matchesColoredBlock(itemName)) return CreativeModeTabs.COLORED_BLOCKS;
+        if (matchesAny(NATURAL_BLOCK_PATTERNS, itemName)) return CreativeModeTabs.NATURAL_BLOCKS;
+        if (matchesAny(FUNCTIONAL_BLOCK_PATTERNS, itemName)) return CreativeModeTabs.FUNCTIONAL_BLOCKS;
+        if (matchesAny(REDSTONE_BLOCK_PATTERNS, itemName)) return CreativeModeTabs.REDSTONE_BLOCKS;
+        if (matchesAny(COMBAT_BLOCK_PATTERNS, itemName)) return CreativeModeTabs.COMBAT;
+        if (matchesAny(INGREDIENT_BLOCK_PATTERNS, itemName)) return CreativeModeTabs.INGREDIENTS;
+        if (matchesAny(BUILDING_BLOCK_PATTERNS, itemName)) return CreativeModeTabs.BUILDING_BLOCKS;
 
-        return ItemGroups.BUILDING_BLOCKS; // default fallback
+        return CreativeModeTabs.BUILDING_BLOCKS; // default fallback
     }
 
     private static boolean matchesColoredBlock(String name) {

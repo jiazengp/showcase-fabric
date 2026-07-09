@@ -9,19 +9,19 @@ import com.showcase.utils.ShareConstants;
 import com.showcase.utils.StackUtils;
 import com.showcase.utils.TextUtils;
 import com.showcase.utils.stats.StatUtils;
-import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.arguments.SimpleArguments;
 import eu.pb4.placeholders.api.node.LiteralNode;
 import eu.pb4.placeholders.api.node.TextNode;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
+import eu.pb4.placeholders.api.parsers.NodeParser;
 import java.util.function.Function;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 
 import static com.showcase.utils.permissions.PermissionChecker.isOp;
 
@@ -37,19 +37,20 @@ public class Placeholders {
     private static final String INVALID_DURATION = "Invalid valid duration";
     private static final String NO_PLAYER = "No valid player";
 
-    private record ShareData(ServerPlayerEntity player, int duration) {}
+    private record ShareData(ServerPlayer player, int duration) {}
+    private static final NodeParser SERVER_PLACEHOLDER_PARSER = eu.pb4.placeholders.api.Placeholders.SERVER_PLACEHOLDER_PARSER;
 
     private static void registerPlaceholder(Identifier identifier, ShowcaseManager.ShareType shareType, 
-                                          String permission, Function<ShareData, MutableText> shareCreator) {
-        eu.pb4.placeholders.api.Placeholders.register(identifier, (ctx, arg) -> {
+                                          String permission, Function<ShareData, MutableComponent> shareCreator) {
+        eu.pb4.placeholders.api.Placeholders.registerServer(identifier, (ctx, arg) -> {
             try {
                 PlaceholderResult validation = validatePlaceholderRequest(ctx, arg, shareType, permission);
                 if (validation != null) return validation;
 
-                ServerPlayerEntity player = ctx.player();
+                ServerPlayer player = ctx.serverPlayer();
                 int duration = getDurationFromSimpleArguments(arg, player);
                 
-                MutableText result = shareCreator.apply(new ShareData(player, duration));
+                MutableComponent result = shareCreator.apply(new ShareData(player, duration));
                 ShowcaseManager.setCooldown(player, shareType);
                 
                 return PlaceholderResult.value(result);
@@ -59,9 +60,9 @@ public class Placeholders {
         });
     }
 
-    private static PlaceholderResult validatePlaceholderRequest(PlaceholderContext ctx, String arg, 
+    private static PlaceholderResult validatePlaceholderRequest(ServerPlaceholderContext ctx, String arg, 
                                                               ShowcaseManager.ShareType shareType, String permission) {
-        ServerPlayerEntity player = ctx.player();
+        ServerPlayer player = ctx.serverPlayer();
         if (player == null) return PlaceholderResult.invalid(NO_PLAYER);
         
         int duration = getDurationFromSimpleArguments(arg, player);
@@ -114,9 +115,9 @@ public class Placeholders {
 
         registerPlaceholder(ITEM, ShowcaseManager.ShareType.ITEM, Permissions.Chat.Placeholder.ITEM,
                 (shareData) -> {
-                    ItemStack stack = shareData.player.getEquippedStack(EquipmentSlot.MAINHAND);
+                    ItemStack stack = shareData.player.getItemBySlot(EquipmentSlot.MAINHAND);
                     if (stack.isEmpty()) {
-                        throw new RuntimeException(Text.translatable("showcase.message.no_item").getString());
+                        throw new RuntimeException(Component.translatable("showcase.message.no_item").getString());
                     }
                     return ShareCommandUtils.createClickableItemName(
                             ShowcaseManager.ShareType.ITEM,
@@ -130,7 +131,7 @@ public class Placeholders {
     }
 
     public static boolean containsPlaceholders(String text) {
-        TextNode[] nodes = eu.pb4.placeholders.api.Placeholders.DEFAULT_PLACEHOLDER_PARSER.parseNodes(
+        TextNode[] nodes = SERVER_PLACEHOLDER_PARSER.parseNodes(
                 new LiteralNode(text)
         );
 
@@ -143,8 +144,8 @@ public class Placeholders {
         return false;
     }
 
-    public static boolean isOnlyPlaceholders(String text, PlaceholderContext context) {
-        TextNode[] nodes = eu.pb4.placeholders.api.Placeholders.DEFAULT_PLACEHOLDER_PARSER.parseNodes(
+    public static boolean isOnlyPlaceholders(String text, ServerPlaceholderContext context) {
+        TextNode[] nodes = SERVER_PLACEHOLDER_PARSER.parseNodes(
                 new LiteralNode(text)
         );
 
@@ -162,7 +163,7 @@ public class Placeholders {
         return true;
     }
 
-    private static int getDurationFromSimpleArguments(String arg, ServerPlayerEntity player) {
+    private static int getDurationFromSimpleArguments(String arg, ServerPlayer player) {
         int inputDuration = SimpleArguments.intNumber(arg, ModConfigManager.getShareLinkDefaultExpiry());
 
         if (isOp(player)) {

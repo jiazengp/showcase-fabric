@@ -2,8 +2,6 @@ package com.showcase.utils.stats;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 
 public class StatFormatter {
     

@@ -1,17 +1,17 @@
 package com.showcase.utils;
 
 import com.showcase.utils.compat.ServerPlayerCompat;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Utility class for resolving container titles from various sources.
@@ -25,13 +25,13 @@ public class ContainerTitleResolver {
      * 2. From NamedScreenHandlerFactory displayName's translation key
      * 3. From literal displayName (fallback)
      */
-    public static Text resolveContainerTitle(ServerPlayerEntity player, ScreenHandler handler, NamedScreenHandlerFactory factory) {
+    public static Component resolveContainerTitle(ServerPlayer player, AbstractContainerMenu handler, MenuProvider factory) {
         if (factory == null) {
             return TextUtils.UNKNOWN_ENTRY;
         }
 
         // Try to get title from BlockEntity first (most accurate)
-        Text blockEntityTitle = tryGetTitleFromBlockEntity(player, handler);
+        Component blockEntityTitle = tryGetTitleFromBlockEntity(player, handler);
         if (blockEntityTitle != null) {
             return blockEntityTitle;
         }
@@ -43,24 +43,24 @@ public class ContainerTitleResolver {
     /**
      * Try to get the container title from the BlockEntity's Block
      */
-    private static Text tryGetTitleFromBlockEntity(ServerPlayerEntity player, ScreenHandler handler) {
+    private static Component tryGetTitleFromBlockEntity(ServerPlayer player, AbstractContainerMenu handler) {
         try {
             // Only GenericContainerScreenHandler has a reliable way to get BlockPos
-            if (handler instanceof GenericContainerScreenHandler containerHandler) {
+            if (handler instanceof ChestMenu containerHandler) {
                 // Try to get the BlockEntity from the inventory
-                var inventory = containerHandler.getInventory();
+                var inventory = containerHandler.getContainer();
 
                 // Check if this inventory is associated with a BlockEntity
                 if (inventory instanceof BlockEntity blockEntity) {
-                    BlockPos pos = blockEntity.getPos();
-                    ServerWorld world = ServerPlayerCompat.getWorld(player);
+                    BlockPos pos = blockEntity.getBlockPos();
+                    ServerLevel world = ServerPlayerCompat.getWorld(player);
 
                     // Verify the BlockEntity is still valid at this position
                     BlockEntity worldBlockEntity = world.getBlockEntity(pos);
                     if (worldBlockEntity != null && worldBlockEntity == blockEntity) {
                         Block block = world.getBlockState(pos).getBlock();
-                        String translationKey = block.getTranslationKey();
-                        return Text.translatable(translationKey);
+                        String translationKey = block.getDescriptionId();
+                        return Component.translatable(translationKey);
                     }
                 }
             }
@@ -74,18 +74,18 @@ public class ContainerTitleResolver {
     /**
      * Resolve title from NamedScreenHandlerFactory with fallback logic
      */
-    private static Text resolveFromFactory(NamedScreenHandlerFactory factory) {
-        Text displayName = factory.getDisplayName();
+    private static Component resolveFromFactory(MenuProvider factory) {
+        Component displayName = factory.getDisplayName();
 
         if (displayName == null || displayName.getString().isBlank()) {
             return TextUtils.UNKNOWN_ENTRY;
         }
 
-        TextContent content = displayName.getContent();
+        ComponentContents content = displayName.getContents();
 
         // If it's already a translatable text, return it
-        if (content instanceof TranslatableTextContent translatable) {
-            return Text.translatable(translatable.getKey());
+        if (content instanceof TranslatableContents translatable) {
+            return Component.translatable(translatable.getKey());
         }
 
         // Last resort: return the literal display name
@@ -95,7 +95,7 @@ public class ContainerTitleResolver {
     /**
      * Simple resolution from factory only (for backward compatibility)
      */
-    public static Text resolveContainerTitle(NamedScreenHandlerFactory factory) {
+    public static Component resolveContainerTitle(MenuProvider factory) {
         return resolveFromFactory(factory);
     }
 }

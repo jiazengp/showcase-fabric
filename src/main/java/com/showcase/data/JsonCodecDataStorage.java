@@ -7,8 +7,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.showcase.ShowcaseMod;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.WorldSavePath;
-
+import net.minecraft.world.level.storage.LevelResource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,7 +17,7 @@ public record JsonCodecDataStorage<T>(String path, Codec<T> codec) {
     private final static String DIR = "global-mod-data";
 
     public boolean save(MinecraftServer server, T data) {
-        Path globalPath = server.getSavePath(WorldSavePath.ROOT).resolve(DIR);
+        Path globalPath = server.getWorldPath(LevelResource.ROOT).resolve(DIR);
         Path filePath = globalPath.resolve(this.path + ".json");
 
         if (data == null) {
@@ -35,7 +34,7 @@ public record JsonCodecDataStorage<T>(String path, Codec<T> codec) {
                 Files.createDirectories(globalPath);
             }
 
-            var encoded = codec.encodeStart(server.getRegistryManager().getOps(JsonOps.INSTANCE), data)
+            var encoded = codec.encodeStart(server.registryAccess().createSerializationContext(JsonOps.INSTANCE), data)
                     .getOrThrow();
 
             Files.writeString(filePath, encoded.toString(), StandardCharsets.UTF_8);
@@ -50,7 +49,7 @@ public record JsonCodecDataStorage<T>(String path, Codec<T> codec) {
     }
 
     public T load(MinecraftServer server) {
-        Path filePath = server.getSavePath(WorldSavePath.ROOT).resolve(DIR).resolve(this.path + ".json");
+        Path filePath = server.getWorldPath(LevelResource.ROOT).resolve(DIR).resolve(this.path + ".json");
         if (!Files.exists(filePath)) {
             return null;
         }
@@ -59,7 +58,7 @@ public record JsonCodecDataStorage<T>(String path, Codec<T> codec) {
             String jsonString = Files.readString(filePath, StandardCharsets.UTF_8);
             JsonElement element = JsonParser.parseString(jsonString);
 
-            var decoded = codec.decode(server.getRegistryManager().getOps(JsonOps.INSTANCE), element);
+            var decoded = codec.decode(server.registryAccess().createSerializationContext(JsonOps.INSTANCE), element);
 
             if (decoded.result().isEmpty()) {
                 ShowcaseMod.LOGGER.error("Decoding failed or returned empty for global data at path {}", this.path);

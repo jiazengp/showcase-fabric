@@ -2,7 +2,7 @@
 
 # Script to extract version information from version_properties files
 # Usage: ./get-version-info.sh [version] [property]
-# Example: ./get-version-info.sh 1.21.4 compatible_minecraft_versions
+# Example: ./get-version-info.sh 26.2 compatible_minecraft_versions
 
 set -e
 

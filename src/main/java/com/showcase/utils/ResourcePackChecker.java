@@ -4,12 +4,12 @@ import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.compat.ServerPlayerCompat;
 import com.showcase.utils.permissions.PermissionChecker;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.dedicated.ServerPropertiesHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.server.ServerInterface;
+import net.minecraft.server.dedicated.DedicatedServerProperties;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ResourcePackChecker {
     private static boolean hasWarned = false;
@@ -26,22 +26,22 @@ public class ResourcePackChecker {
         }
         
         // Only works with dedicated servers
-        if (!(server instanceof DedicatedServer dedicated)) {
+        if (!(server instanceof ServerInterface dedicated)) {
             ShowcaseMod.LOGGER.debug("Not a dedicated server, skipping resource pack check");
             return;
         }
         
         try {
-            ServerPropertiesHandler props = dedicated.getProperties();
-            if (props.serverResourcePackProperties.isEmpty()) {
+            DedicatedServerProperties props = dedicated.getProperties();
+            if (props.serverResourcePackInfo.isEmpty()) {
                 warnAboutMissingResourcePack();
                 hasWarned = true;
                 return;
             }
 
-            String resourcePackUrl = props.serverResourcePackProperties.get().url();
-            String resourcePackSha1 = props.serverResourcePackProperties.get().hash();
-            boolean requireResourcePack = props.serverResourcePackProperties.get().isRequired();
+            String resourcePackUrl = props.serverResourcePackInfo.get().url();
+            String resourcePackSha1 = props.serverResourcePackInfo.get().hash();
+            boolean requireResourcePack = props.serverResourcePackInfo.get().isRequired();
             
             if (resourcePackUrl == null || resourcePackUrl.trim().isEmpty()) {
                 warnAboutMissingResourcePack();
@@ -78,7 +78,7 @@ public class ResourcePackChecker {
         ShowcaseMod.LOGGER.warn("=".repeat(60));
     }
     
-    public static void sendResourcePackWarningToPlayer(ServerPlayerEntity player) {
+    public static void sendResourcePackWarningToPlayer(ServerPlayer player) {
         if (!ModConfigManager.getConfig().itemIcons.enabled) {
             return;
         }
@@ -89,19 +89,19 @@ public class ResourcePackChecker {
         }
         
         MinecraftServer server = ServerPlayerCompat.getServer(player);
-        if (server instanceof DedicatedServer dedicated && dedicated.getProperties().serverResourcePackProperties.isPresent()) {
-            String resourcePackUrl = dedicated.getProperties().serverResourcePackProperties.get().url();
+        if (server instanceof ServerInterface dedicated && dedicated.getProperties().serverResourcePackInfo.isPresent()) {
+            String resourcePackUrl = dedicated.getProperties().serverResourcePackInfo.get().url();
             if (resourcePackUrl == null || resourcePackUrl.trim().isEmpty()) {
-                Text warningMessage = Text.literal("")
-                        .append(Text.literal("[" + ShowcaseMod.MOD_ID.toUpperCase() + "] ").formatted(Formatting.GOLD, Formatting.BOLD))
-                        .append(Text.literal("Warning: Item icons are enabled but no resource pack is configured! ")
-                                .formatted(Formatting.YELLOW))
-                        .append(Text.literal("Players will see translation keys instead of icons. ")
-                                .formatted(Formatting.WHITE))
-                        .append(Text.literal("Check server console for setup instructions.")
-                                .formatted(Formatting.GRAY));
+                Component warningMessage = Component.literal("")
+                        .append(Component.literal("[" + ShowcaseMod.MOD_ID.toUpperCase() + "] ").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD))
+                        .append(Component.literal("Warning: Item icons are enabled but no resource pack is configured! ")
+                                .withStyle(ChatFormatting.YELLOW))
+                        .append(Component.literal("Players will see translation keys instead of icons. ")
+                                .withStyle(ChatFormatting.WHITE))
+                        .append(Component.literal("Check server console for setup instructions.")
+                                .withStyle(ChatFormatting.GRAY));
                 
-                player.sendMessage(warningMessage, false);
+                player.sendSystemMessage(warningMessage, false);
             }
         }
     }

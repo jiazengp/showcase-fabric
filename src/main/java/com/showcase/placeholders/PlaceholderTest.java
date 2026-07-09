@@ -2,12 +2,11 @@ package com.showcase.placeholders;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.config.ModConfigManager;
-import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Test class for essential placeholder functionality
@@ -18,11 +17,11 @@ public class PlaceholderTest {
     /**
      * Test essential placeholders for a player
      */
-    public static void testEssentialPlaceholders(ServerPlayerEntity player) {
-        player.sendMessage(Text.literal("§7Testing essential placeholders..."));
+    public static void testEssentialPlaceholders(ServerPlayer player) {
+        player.sendSystemMessage(Component.literal("§7Testing essential placeholders..."));
 
         // Test core sharing placeholders
-        player.sendMessage(Text.literal("§6Core Sharing Placeholders:"));
+        player.sendSystemMessage(Component.literal("§6Core Sharing Placeholders:"));
         testPlaceholder(player, "item");
         testPlaceholder(player, "inventory");
         testPlaceholder(player, "hotbar");
@@ -30,35 +29,33 @@ public class PlaceholderTest {
         testPlaceholder(player, "stats");
 
         // Test player statistics placeholders
-        player.sendMessage(Text.literal("§6Statistics Placeholders:"));
+        player.sendSystemMessage(Component.literal("§6Statistics Placeholders:"));
         testPlaceholder(player, "shares_count");
         testPlaceholder(player, "total_views");
 
         // Test permission placeholders
-        player.sendMessage(Text.literal("§6Permission Placeholders:"));
+        player.sendSystemMessage(Component.literal("§6Permission Placeholders:"));
         testPlaceholder(player, "can_share_item");
         testPlaceholder(player, "has_admin_perms");
 
-        player.sendMessage(Text.literal("§7Placeholder testing complete."));
+        player.sendSystemMessage(Component.literal("§7Placeholder testing complete."));
     }
 
     /**
      * Test a single placeholder
      */
-    private static void testPlaceholder(ServerPlayerEntity player, String placeholderName) {
+    private static void testPlaceholder(ServerPlayer player, String placeholderName) {
         try {
-            Identifier id = Identifier.of("showcase", placeholderName);
-            PlaceholderContext context = PlaceholderContext.of(player);
-
-            // Use parseText to get the parsed result
-            Text result = Placeholders.parseText(
-                Text.literal("%showcase:" + placeholderName + "%"),
-                context
+            Identifier id = Identifier.fromNamespaceAndPath("showcase", placeholderName);
+            ServerPlaceholderContext context = ServerPlaceholderContext.of(player);
+            Component result = Placeholders.SERVER_PLACEHOLDER_PARSER.parseComponent(
+                "%showcase:" + placeholderName + "%",
+                context.asParserContext()
             );
 
-            player.sendMessage(Text.literal("§a✓ %showcase:" + placeholderName + "% = " + result.getString()));
+            player.sendSystemMessage(Component.literal("§a✓ %showcase:" + placeholderName + "% = " + result.getString()));
         } catch (Exception e) {
-            player.sendMessage(Text.literal("§c✗ %showcase:" + placeholderName + "% error: " + e.getMessage()));
+            player.sendSystemMessage(Component.literal("§c✗ %showcase:" + placeholderName + "% error: " + e.getMessage()));
             ShowcaseMod.LOGGER.error("Placeholder test failed for {}: {}", placeholderName, e.getMessage());
         }
     }
@@ -66,20 +63,20 @@ public class PlaceholderTest {
     /**
      * Test placeholder performance
      */
-    public static void testPlaceholderPerformance(ServerPlayerEntity player, int iterations) {
-        player.sendMessage(Text.literal("§7Testing placeholder performance with " + iterations + " iterations..."));
+    public static void testPlaceholderPerformance(ServerPlayer player, int iterations) {
+        player.sendSystemMessage(Component.literal("§7Testing placeholder performance with " + iterations + " iterations..."));
 
         String[] testPlaceholders = {"shares_count", "total_views", "can_share_item"};
-        PlaceholderContext context = PlaceholderContext.of(player);
+        ServerPlaceholderContext context = ServerPlaceholderContext.of(player);
 
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < iterations; i++) {
             for (String placeholderName : testPlaceholders) {
                 try {
-                    Placeholders.parseText(
-                        Text.literal("%showcase:" + placeholderName + "%"),
-                        context
+                    Placeholders.SERVER_PLACEHOLDER_PARSER.parseComponent(
+                        "%showcase:" + placeholderName + "%",
+                        context.asParserContext()
                     );
                 } catch (Exception e) {
                     ShowcaseMod.LOGGER.warn("Performance test failed for {}: {}", placeholderName, e.getMessage());
@@ -90,9 +87,9 @@ public class PlaceholderTest {
         long totalTime = System.currentTimeMillis() - startTime;
         double avgTimePerPlaceholder = (double) totalTime / (iterations * testPlaceholders.length);
 
-        player.sendMessage(Text.literal("§7Performance test complete:"));
-        player.sendMessage(Text.literal("§f- Total time: " + totalTime + "ms"));
-        player.sendMessage(Text.literal("§f- Average per placeholder: " + String.format("%.2f", avgTimePerPlaceholder) + "ms"));
+        player.sendSystemMessage(Component.literal("§7Performance test complete:"));
+        player.sendSystemMessage(Component.literal("§f- Total time: " + totalTime + "ms"));
+        player.sendSystemMessage(Component.literal("§f- Average per placeholder: " + String.format("%.2f", avgTimePerPlaceholder) + "ms"));
     }
 
     /**

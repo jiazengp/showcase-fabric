@@ -1,13 +1,13 @@
 package com.showcase.gui;
 
 import eu.pb4.sgui.api.gui.MerchantGui;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.village.TradeOffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.trading.MerchantOffer;
 
 public class ReadonlyMerchantGui extends MerchantGui {
     protected MerchantContext context;
 
-    public ReadonlyMerchantGui(ServerPlayerEntity player, MerchantContext tradeContext) {
+    public ReadonlyMerchantGui(ServerPlayer player, MerchantContext tradeContext) {
         super(player, false);
         this.context = tradeContext;
 
@@ -23,13 +23,13 @@ public class ReadonlyMerchantGui extends MerchantGui {
             this.setExperience(tradeContext.getExperience());
         }
 
-        for (TradeOffer offer : tradeContext.getOffers()) {
+        for (MerchantOffer offer : tradeContext.getOffers()) {
             this.addTrade(offer);
         }
     }
 
     @Override
-    public boolean onTrade(TradeOffer offer) {
+    public boolean onTrade(MerchantOffer offer) {
         return false;
     }
 }

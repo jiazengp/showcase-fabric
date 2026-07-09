@@ -7,10 +7,10 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.placeholders.PlaceholderTest;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Command for testing essential placeholder functionality
@@ -18,17 +18,17 @@ import net.minecraft.text.Text;
  */
 public class PlaceholderTestCommand {
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-            CommandManager.literal("showcase-test")
-                .requires(source -> source.isExecutedByPlayer() &&
+            Commands.literal("showcase-test")
+                .requires(source -> source.isPlayer() &&
                     PermissionChecker.hasPermission(source.getPlayer(), Permissions.Manage.CANCEL, 0))
-                .then(CommandManager.literal("placeholders")
+                .then(Commands.literal("placeholders")
                     .executes(PlaceholderTestCommand::testPlaceholders))
-                .then(CommandManager.literal("validation")
+                .then(Commands.literal("validation")
                     .executes(PlaceholderTestCommand::validatePlaceholders))
-                .then(CommandManager.literal("performance")
-                    .then(CommandManager.argument("iterations", IntegerArgumentType.integer(1, 1000))
+                .then(Commands.literal("performance")
+                    .then(Commands.argument("iterations", IntegerArgumentType.integer(1, 1000))
                         .executes(PlaceholderTestCommand::testPerformance)))
         );
     }
@@ -36,16 +36,16 @@ public class PlaceholderTestCommand {
     /**
      * Test all essential placeholders
      */
-    private static int testPlaceholders(CommandContext<ServerCommandSource> context) {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    private static int testPlaceholders(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
         if (player == null) return 0;
 
         if (!ModConfigManager.isPlaceholderExtensionsEnabled()) {
-            player.sendMessage(Text.literal("§cPlaceholder extensions are disabled in config"));
+            player.sendSystemMessage(Component.literal("§cPlaceholder extensions are disabled in config"));
             return 0;
         }
 
-        player.sendMessage(Text.literal("§6Starting placeholder test..."));
+        player.sendSystemMessage(Component.literal("§6Starting placeholder test..."));
         PlaceholderTest.testEssentialPlaceholders(player);
         return 1;
     }
@@ -53,17 +53,17 @@ public class PlaceholderTestCommand {
     /**
      * Validate placeholder registration
      */
-    private static int validatePlaceholders(CommandContext<ServerCommandSource> context) {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    private static int validatePlaceholders(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
         if (player == null) return 0;
 
-        player.sendMessage(Text.literal("§6Validating placeholder registration..."));
+        player.sendSystemMessage(Component.literal("§6Validating placeholder registration..."));
 
         boolean isValid = PlaceholderTest.validatePlaceholderRegistration();
         if (isValid) {
-            player.sendMessage(Text.literal("§a✓ All essential placeholders are registered correctly"));
+            player.sendSystemMessage(Component.literal("§a✓ All essential placeholders are registered correctly"));
         } else {
-            player.sendMessage(Text.literal("§c✗ Some placeholders are missing or not registered"));
+            player.sendSystemMessage(Component.literal("§c✗ Some placeholders are missing or not registered"));
         }
 
         return isValid ? 1 : 0;
@@ -72,13 +72,13 @@ public class PlaceholderTestCommand {
     /**
      * Test placeholder performance
      */
-    private static int testPerformance(CommandContext<ServerCommandSource> context) {
-        ServerPlayerEntity player = context.getSource().getPlayer();
+    private static int testPerformance(CommandContext<CommandSourceStack> context) {
+        ServerPlayer player = context.getSource().getPlayer();
         if (player == null) return 0;
 
         int iterations = IntegerArgumentType.getInteger(context, "iterations");
 
-        player.sendMessage(Text.literal("§6Starting performance test..."));
+        player.sendSystemMessage(Component.literal("§6Starting performance test..."));
         PlaceholderTest.testPlaceholderPerformance(player, iterations);
         return 1;
     }

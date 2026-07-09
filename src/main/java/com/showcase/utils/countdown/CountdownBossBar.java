@@ -1,16 +1,17 @@
 package com.showcase.utils.countdown;
 
-import net.minecraft.entity.boss.ServerBossBar;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.boss.BossBar;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.BossEvent;
+import java.util.UUID;
 
 public class CountdownBossBar {
-    private ServerBossBar bossBar;
-    private ServerPlayerEntity player;
+    private ServerBossEvent bossBar;
+    private ServerPlayer player;
     private final int totalTicks;
     private int ticksLeft;
-    private final Text baseTitle;
+    private final Component baseTitle;
     private boolean isRunning;
     private boolean isFinished;
     private boolean isPaused;
@@ -24,7 +25,7 @@ public class CountdownBossBar {
     private CountdownCallback callback;
     private int lastSecond = -1;
 
-    public CountdownBossBar(ServerPlayerEntity player, Text title, int seconds) {
+    public CountdownBossBar(ServerPlayer player, Component title, int seconds) {
         this.player = player;
         this.totalTicks = seconds * 20;
         this.ticksLeft = this.totalTicks;
@@ -33,7 +34,7 @@ public class CountdownBossBar {
         this.isFinished = false;
         this.isPaused = false;
 
-        this.bossBar = new ServerBossBar(title, BossBar.Color.GREEN, BossBar.Style.PROGRESS);
+        this.bossBar = new ServerBossEvent(UUID.randomUUID(), title, BossEvent.BossBarColor.GREEN, BossEvent.BossBarOverlay.PROGRESS);
         this.bossBar.addPlayer(player);
         updateBossBar();
     }
@@ -140,26 +141,26 @@ public class CountdownBossBar {
         int secondsLeft = getSecondsLeft();
 
         float progress = Math.max(0.0f, Math.min(1.0f, ticksLeft / (float) totalTicks));
-        bossBar.setPercent(progress);
+        bossBar.setProgress(progress);
 
-        Text newTitle = baseTitle.copy().append(Text.literal(" (" + secondsLeft + "s)"));
+        Component newTitle = baseTitle.copy().append(Component.literal(" (" + secondsLeft + "s)"));
 
         if (!bossBar.getName().equals(newTitle)) {
             bossBar.setName(newTitle);
         }
 
         if (progress <= 0.3f) {
-            bossBar.setColor(BossBar.Color.RED);
+            bossBar.setColor(BossEvent.BossBarColor.RED);
         } else if (progress <= 0.5f) {
-            bossBar.setColor(BossBar.Color.YELLOW);
+            bossBar.setColor(BossEvent.BossBarColor.YELLOW);
         } else {
-            bossBar.setColor(BossBar.Color.GREEN);
+            bossBar.setColor(BossEvent.BossBarColor.GREEN);
         }
 
         if (progress <= 0.05f) {
-            bossBar.setStyle(BossBar.Style.NOTCHED_20);
+            bossBar.setOverlay(BossEvent.BossBarOverlay.NOTCHED_20);
         } else {
-            bossBar.setStyle(BossBar.Style.PROGRESS);
+            bossBar.setOverlay(BossEvent.BossBarOverlay.PROGRESS);
         }
     }
 
@@ -172,7 +173,7 @@ public class CountdownBossBar {
     public void destroy() {
         stop();
         if (bossBar != null) {
-            bossBar.clearPlayers();
+            bossBar.removeAllPlayers();
         }
         this.bossBar = null;
         this.player = null;
@@ -207,7 +208,7 @@ public class CountdownBossBar {
         return isPaused;
     }
 
-    public ServerPlayerEntity getPlayer() {
+    public ServerPlayer getPlayer() {
         return player;
     }
 

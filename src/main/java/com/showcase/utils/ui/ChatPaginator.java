@@ -1,13 +1,12 @@
 package com.showcase.utils.ui;
 
 import com.showcase.utils.TextEventFactory;
-import net.minecraft.text.Text;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.Formatting;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class ChatPaginator<T> {
     private final List<T> items;
@@ -35,13 +34,13 @@ public class ChatPaginator<T> {
         return items.subList(fromIndex, toIndex);
     }
 
-    public MutableText renderPage(int page, Function<T, Text> renderer, String title) {
+    public MutableComponent renderPage(int page, Function<T, Component> renderer, String title) {
         int totalPages = getTotalPages();
         page = clampPage(page);
         List<T> pageItems = getPageItems(page);
 
-        MutableText result = Text.literal("")
-                .append(Text.literal(title + " Page " + page + "/" + totalPages + "\n").formatted(Formatting.GOLD, Formatting.BOLD));
+        MutableComponent result = Component.literal("")
+                .append(Component.literal(title + " Page " + page + "/" + totalPages + "\n").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
 
         for (T item : pageItems) {
             result.append(renderer.apply(item));
@@ -54,20 +53,20 @@ public class ChatPaginator<T> {
         return result;
     }
 
-    private MutableText buildNavLine(int page, int totalPages) {
-        MutableText nav = Text.literal("\n");
+    private MutableComponent buildNavLine(int page, int totalPages) {
+        MutableComponent nav = Component.literal("\n");
 
         if (page > 1) {
-            nav.append(Text.translatable("spectatorMenu.previous_page").formatted(Formatting.BLUE)
-                    .styled(s -> s.withClickEvent(TextEventFactory.navigateToPage(commandPrefix, page - 1))
+            nav.append(Component.translatable("spectatorMenu.previous_page").withStyle(ChatFormatting.BLUE)
+                    .withStyle(s -> s.withClickEvent(TextEventFactory.navigateToPage(commandPrefix, page - 1))
                             .withHoverEvent(TextEventFactory.previousPageTooltip())));
         }
 
-        nav.append(Text.literal(" | ").formatted(Formatting.DARK_GRAY));
+        nav.append(Component.literal(" | ").withStyle(ChatFormatting.DARK_GRAY));
 
         if (page < totalPages) {
-            nav.append(Text.translatable("spectatorMenu.next_page").formatted(Formatting.BLUE)
-                    .styled(s -> s.withClickEvent(TextEventFactory.navigateToPage(commandPrefix, page + 1))
+            nav.append(Component.translatable("spectatorMenu.next_page").withStyle(ChatFormatting.BLUE)
+                    .withStyle(s -> s.withClickEvent(TextEventFactory.navigateToPage(commandPrefix, page + 1))
                             .withHoverEvent(TextEventFactory.nextPageTooltip())));
         }
 

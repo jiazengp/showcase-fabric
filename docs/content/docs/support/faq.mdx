@@ -25,22 +25,18 @@ Showcase is a server-side Minecraft mod that allows players to share items, inve
 <Tabs items={["Current Versions", "Legacy Support", "Version Notes"]}>
   <Tab value="Current Versions">
     **Fully Supported**:
-    - Minecraft 1.21.6 (Latest)
-    - Minecraft 1.21.5
-    - Minecraft 1.21.4
-    - Minecraft 1.21.2
+    - Minecraft 26.2 (Current baseline)
 
     Each version has its own release build optimized for that specific Minecraft version.
   </Tab>
 
   <Tab value="Legacy Support">
     **Previous Versions**:
-    - Minecraft 1.21.1 (Limited support)
-    - Minecraft 1.21.0 (Limited support)
-    - Minecraft 1.20.x (Legacy - use Showcase v1.x)
+    - Minecraft 26.1 and below are no longer maintained on the mainline branch
+    - Use an older Showcase release only if you intentionally stay on an older server stack
 
     <Callout type="warn">
-    Legacy versions receive security updates only. Upgrade to supported versions for new features.
+    New features and fixes now target the 26.x server line only.
     </Callout>
   </Tab>
 
@@ -81,7 +77,7 @@ See the complete [Installation Guide](/docs/getting-started/installation) for de
 **Most common causes**:
 1. **Wrong Minecraft version** - Use exact version match
 2. **Missing Fabric API** - Required dependency
-3. **Outdated Java** - Java 21+ required for MC 1.21.x
+3. **Outdated Java** - Java 25+ required for MC 26.x
 4. **File corruption** - Re-download the JAR file
 
 Check the [Troubleshooting Guide](/docs/support/troubleshooting) for detailed solutions.

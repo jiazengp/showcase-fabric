@@ -29,6 +29,9 @@
   "showcase.message.click_to_view": "§rHaz clic para ver",
   "showcase.message.invalid_or_expired": "§rEste enlace de compartir es inválido o ha expirado",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s de %s",
   "showcase.screen.hotbar_title": "§r%s de %s",

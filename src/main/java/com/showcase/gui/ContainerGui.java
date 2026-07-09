@@ -4,39 +4,35 @@ import com.showcase.utils.BookOpener;
 import com.showcase.utils.MapViewer;
 import com.showcase.utils.StackUtils;
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElement;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.elements.SimpleGuiElement;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import eu.pb4.sgui.api.gui.SlotGuiInterface;
-import net.minecraft.component.DataComponentTypes;
-#if MC_VER >= 1212
-import net.minecraft.component.type.BundleContentsComponent;
-#endif
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.item.component.ItemContainerContents;
 
 public class ContainerGui extends SimpleGui {
     private ContainerGui parentGui = null;
     private boolean isOpeningNestedContainer = false;
 
-    public ContainerGui(ScreenHandlerType<?> containerType, ServerPlayerEntity player,
-                        Text title, DefaultedList<ItemStack> items) {
+    public ContainerGui(MenuType<?> containerType, ServerPlayer player,
+                        Component title, NonNullList<ItemStack> items) {
         super(containerType, player, false);
-        int expectedSlots = GuiHelpers.getHeight(containerType) * GuiHelpers.getWidth(containerType);
+        int expectedSlots = this.getHeight() * this.getWidth();
         if (items.size() > expectedSlots) throw new IllegalArgumentException("Items size exceeds container capacity");
         this.setTitle(title);
         this.setupItems(items);
     }
 
-    public ContainerGui(ScreenHandlerType<?> containerType, ServerPlayerEntity player,
-                        Text title, Inventory inventory) {
+    public ContainerGui(MenuType<?> containerType, ServerPlayer player,
+                        Component title, Container inventory) {
         super(containerType, player, false);
         this.setTitle(title);
         this.setupItemsFromInventory(inventory);
@@ -48,11 +44,10 @@ public class ContainerGui extends SimpleGui {
 
     private void prepareToOpenNextGUI() {
         isOpeningNestedContainer = true;
-        GuiHelpers.ignoreNextGuiClosing(this.player);
     }
 
-    private void openNestedContainer(ItemStack clickedItem, DefaultedList<ItemStack> contents,
-                                     ScreenHandlerType<?> containerType) {
+    private void openNestedContainer(ItemStack clickedItem, NonNullList<ItemStack> contents,
+                                     MenuType<?> containerType) {
         if (contents.isEmpty()) return;
 
         prepareToOpenNextGUI();
@@ -60,7 +55,7 @@ public class ContainerGui extends SimpleGui {
         ContainerGui nestedGui = new ContainerGui(
                 containerType,
                 this.player,
-                clickedItem.getName(),
+                clickedItem.getHoverName(),
                 contents
         );
 
@@ -71,10 +66,10 @@ public class ContainerGui extends SimpleGui {
         isOpeningNestedContainer = false;
     }
 
-    private DefaultedList<ItemStack> getCurrentItems() {
-        DefaultedList<ItemStack> items = DefaultedList.ofSize(this.getVirtualSize(), ItemStack.EMPTY);
+    private NonNullList<ItemStack> getCurrentItems() {
+        NonNullList<ItemStack> items = NonNullList.withSize(this.getVirtualSize(), ItemStack.EMPTY);
         for (int i = 0; i < this.getVirtualSize(); i++) {
-            GuiElementInterface element = this.getSlot(i);
+            GuiElement element = this.getGuiElement(i);
             if (element != null && !element.getItemStack().isEmpty()) {
                 items.set(i, element.getItemStack().copy());
             }
@@ -83,49 +78,46 @@ public class ContainerGui extends SimpleGui {
     }
 
     @Override
-    public void onClose() {
+    public void onPlayerClose(boolean ignored) {
         if (isOpeningNestedContainer) {
             isOpeningNestedContainer = false;
             return;
         }
 
-        super.onClose();
-
         openPreviousGui();
+        super.onPlayerClose(ignored);
     }
 
     private void openPreviousGui() {
         if (parentGui != null) parentGui.open();
     }
 
-    private static DefaultedList<ItemStack> getShulkerBoxContents(ItemStack shulkerBox) {
-        ContainerComponent container = shulkerBox.get(DataComponentTypes.CONTAINER);
+    private static NonNullList<ItemStack> getShulkerBoxContents(ItemStack shulkerBox) {
+        ItemContainerContents container = shulkerBox.get(DataComponents.CONTAINER);
         if (container != null) {
-            DefaultedList<ItemStack> items = DefaultedList.ofSize(27, ItemStack.EMPTY);
-            container.copyTo(items);
+            NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
+            container.copyInto(items);
             return items;
         }
-        return DefaultedList.of();
+        return NonNullList.create();
     }
 
-    private static DefaultedList<ItemStack> getBundleContents(ItemStack bundle) {
-        DefaultedList<ItemStack> items = DefaultedList.of();
-        #if MC_VER >= 1212
-        BundleContentsComponent bundleContents = bundle.get(DataComponentTypes.BUNDLE_CONTENTS);
+    private static NonNullList<ItemStack> getBundleContents(ItemStack bundle) {
+        NonNullList<ItemStack> items = NonNullList.create();
+        BundleContents bundleContents = bundle.get(DataComponents.BUNDLE_CONTENTS);
         if (bundleContents != null) {
-            bundleContents.iterate().forEach(items::add);
+            bundleContents.itemCopyStream().forEach(items::add);
         }
-        #endif
         return items;
     }
 
-    private static ScreenHandlerType<?> getShulkerBoxContainerType() {
-        return ScreenHandlerType.SHULKER_BOX;
+    private static MenuType<?> getShulkerBoxContainerType() {
+        return MenuType.SHULKER_BOX;
     }
 
-    private static ScreenHandlerType<?> getBundleContainerType() {return ScreenHandlerType.GENERIC_9X1; }
+    private static MenuType<?> getBundleContainerType() {return MenuType.GENERIC_9x1; }
 
-    private void setupItems(DefaultedList<ItemStack> items) {
+    private void setupItems(NonNullList<ItemStack> items) {
         int maxSlots = Math.min(items.size(), this.getVirtualSize());
 
         for (int i = 0; i < maxSlots; i++) {
@@ -136,22 +128,22 @@ public class ContainerGui extends SimpleGui {
         }
     }
 
-    private void setupItemsFromInventory(Inventory inventory) {
-        int maxSlots = Math.min(inventory.size(), this.getVirtualSize());
+    private void setupItemsFromInventory(Container inventory) {
+        int maxSlots = Math.min(inventory.getContainerSize(), this.getVirtualSize());
 
         for (int i = 0; i < maxSlots; i++) {
-            ItemStack stack = inventory.getStack(i);
+            ItemStack stack = inventory.getItem(i);
             if (!stack.isEmpty()) {
                 this.setSlot(i, createReadOnlyElement(stack));
             }
         }
     }
 
-    private GuiElementInterface createReadOnlyElement(ItemStack stack) {
-        return new GuiElement(stack.copy(), this::handleItemClick);
+    private GuiElement createReadOnlyElement(ItemStack stack) {
+        return new SimpleGuiElement(stack.copy(), this::handleItemClick);
     }
 
-    private void handleItemClick(int i, ClickType clickType, SlotActionType slotActionType, SlotGuiInterface slotGuiInterface) {}
+    private void handleItemClick(int i, ClickType clickType, ContainerInput slotActionType, eu.pb4.sgui.api.gui.SlotBasedGui slotGuiInterface) {}
 
     private void onShulkerBoxClick(ItemStack stack, ContainerGui gui) {
         gui.openNestedContainer(stack, getShulkerBoxContents(stack), getShulkerBoxContainerType());
@@ -161,18 +153,18 @@ public class ContainerGui extends SimpleGui {
         gui.openNestedContainer(stack, getBundleContents(stack), getBundleContainerType());
     }
 
-    private void onBookClick(ItemStack stack, ServerPlayerEntity player) {
+    private void onBookClick(ItemStack stack, ServerPlayer player) {
         this.close();
         BookOpener bookOpener = new BookOpener(player, stack);
         bookOpener.open();
     }
 
-    private void onMapClick(ItemStack stack, ServerPlayerEntity player) {
+    private void onMapClick(ItemStack stack, ServerPlayer player) {
         this.close();
         MapViewer.viewMap(player, stack);
     }
 
-    public void refreshItems(DefaultedList<ItemStack> items) {
+    public void refreshItems(NonNullList<ItemStack> items) {
         for (int i = 0; i < this.getVirtualSize(); i++) {
             this.clearSlot(i);
         }
@@ -180,7 +172,7 @@ public class ContainerGui extends SimpleGui {
         this.setupItems(items);
     }
 
-    public void refreshItemsFromInventory(Inventory inventory) {
+    public void refreshItemsFromInventory(Container inventory) {
         for (int i = 0; i < this.getVirtualSize(); i++) {
             this.clearSlot(i);
         }
@@ -189,15 +181,17 @@ public class ContainerGui extends SimpleGui {
     }
 
     @Override
-    public boolean onClick(int index, ClickType type, SlotActionType action, GuiElementInterface element) {
+    public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         if (type == ClickType.DROP || type == ClickType.CTRL_DROP) {
             this.close();
             return true;
         }
 
+        if (element == null) return false;
+
         ItemStack clickedStack = element.getItemStack();
 
-        if (clickedStack == null) return false;
+        if (clickedStack == null || clickedStack.isEmpty()) return false;
         if (StackUtils.isShulkerBox(clickedStack)) onShulkerBoxClick(clickedStack, this);
         if (StackUtils.isBundle(clickedStack)) onBundleClick(clickedStack, this);
         if (StackUtils.isMap(clickedStack)) onMapClick(clickedStack, this.player);

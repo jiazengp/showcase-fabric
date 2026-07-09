@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§rKliknij aby zobaczyć",
   "showcase.message.invalid_or_expired": "§rTen link udostępniania jest nieprawidłowy lub wygasł",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s gracza %s",
   "showcase.screen.hotbar_title": "§r%s gracza %s",

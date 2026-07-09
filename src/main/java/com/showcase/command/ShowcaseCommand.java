@@ -1,7 +1,7 @@
 package com.showcase.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
 public class ShowcaseCommand {
     public static final String RECEIVERS_ARG = "receivers";
@@ -14,7 +14,7 @@ public class ShowcaseCommand {
     public static final String ADMIN_SHARE_COMMAND = "admin-showcase";
     public static final String MANAGE_COMMAND = "showcase-manage";
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         ShowcaseViewCommand.register(dispatcher, VIEW_COMMAND);
         AdminShowcaseCommand.register(dispatcher, ADMIN_SHARE_COMMAND);
         PlayerShowcaseCommand.register(dispatcher, SHARE_COMMAND);

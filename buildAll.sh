@@ -1,6 +1,5 @@
 #!/bin/bash
-# Multi-version build script for Showcase mod
-# Inspired by Fuji's buildAll script
+# Build every supported mainline version (26.x+) for Showcase.
 
 
 echo "Starting multi-version build for Showcase mod..."
@@ -15,14 +14,20 @@ successful_builds=0
 failed_builds=0
 
 # Verify version properties files exist
-echo "Verifying version properties files..."
-if [ ! -d "version_properties" ] || [ -z "$(ls -A version_properties/*.properties 2>/dev/null)" ]; then
-    echo "ERROR: No version properties files found in version_properties/ directory"
+echo "Verifying supported version properties files..."
+if [ ! -d "version_properties" ]; then
+    echo "ERROR: version_properties/ directory not found"
+    exit 1
+fi
+
+mapfile -t supported_versions < <(find version_properties -maxdepth 1 -name "*.properties" -printf "%f\n" | sed 's/\.properties$//' | awk -F. '$1+0 >= 26' | sort -V)
+if [ ${#supported_versions[@]} -eq 0 ]; then
+    echo "ERROR: No supported 26.x+ version properties files found in version_properties/"
     exit 1
 fi
 
 # Count total versions
-total_versions=$(ls version_properties/*.properties | wc -l)
+total_versions=${#supported_versions[@]}
 echo "Found $total_versions Minecraft versions to build"
 
 # Function to build for a specific version
@@ -82,20 +87,15 @@ build_version() {
 echo ""
 echo "Starting builds..."
 echo "Version properties files found:"
-ls -la version_properties/*.properties || echo "No properties files found"
+printf '  - %s\n' "${supported_versions[@]}"
 
-for props_file in version_properties/*.properties; do
-    if [ -f "$props_file" ]; then
-        version=$(basename "$props_file" .properties)
-        echo "Processing Minecraft version: $version"
-        if build_version "$version"; then
-            ((successful_builds++))
-        else
-            ((failed_builds++))
-            echo "✗ Failed to build for Minecraft $version"
-        fi
+for version in "${supported_versions[@]}"; do
+    echo "Processing Minecraft version: $version"
+    if build_version "$version"; then
+        ((successful_builds++))
     else
-        echo "WARNING: Properties file not found: $props_file"
+        ((failed_builds++))
+        echo "✗ Failed to build for Minecraft $version"
     fi
 done
 
@@ -127,8 +127,7 @@ echo "Available JAR files:"
 ls -la build/buildAllJars/*.jar 2>/dev/null || echo "No JAR files found"
 
 missing_jars=0
-for props_file in version_properties/*.properties; do
-    version=$(basename "$props_file" .properties)
+for version in "${supported_versions[@]}"; do
     echo "Checking for Minecraft $version JAR..."
     # Check for JAR files with correct pattern
     if ls build/buildAllJars/showcase-*+$version.jar >/dev/null 2>&1; then

@@ -2,15 +2,14 @@ package com.showcase.utils.ui;
 
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.compat.TextEventCompat;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
-import java.net.URI;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Unified text creation utility that combines functionality from TextUtils and TextEventFactory
@@ -19,11 +18,11 @@ import java.net.URI;
 public final class TextBuilder {
     
     // Common formatting styles
-    private static final Style ERROR_STYLE = Style.EMPTY.withColor(Formatting.RED);
-    private static final Style WARNING_STYLE = Style.EMPTY.withColor(Formatting.YELLOW);
-    private static final Style SUCCESS_STYLE = Style.EMPTY.withColor(Formatting.GREEN);
-    private static final Style INFO_STYLE = Style.EMPTY.withColor(Formatting.AQUA);
-    private static final Style HIGHLIGHT_STYLE = Style.EMPTY.withColor(Formatting.GOLD);
+    private static final Style ERROR_STYLE = Style.EMPTY.withColor(ChatFormatting.RED);
+    private static final Style WARNING_STYLE = Style.EMPTY.withColor(ChatFormatting.YELLOW);
+    private static final Style SUCCESS_STYLE = Style.EMPTY.withColor(ChatFormatting.GREEN);
+    private static final Style INFO_STYLE = Style.EMPTY.withColor(ChatFormatting.AQUA);
+    private static final Style HIGHLIGHT_STYLE = Style.EMPTY.withColor(ChatFormatting.GOLD);
     
     private TextBuilder() {
         throw new UnsupportedOperationException("Utility class");
@@ -36,7 +35,7 @@ public final class TextBuilder {
      * @param text the text content
      * @return formatted error text
      */
-    public static MutableText error(Text text) {
+    public static MutableComponent error(Component text) {
         return text.copy().setStyle(ERROR_STYLE);
     }
     
@@ -46,8 +45,8 @@ public final class TextBuilder {
      * @param args translation arguments
      * @return formatted error text
      */
-    public static MutableText error(String key, Object... args) {
-        return Text.translatable(key, args).setStyle(ERROR_STYLE);
+    public static MutableComponent error(String key, Object... args) {
+        return Component.translatable(key, args).setStyle(ERROR_STYLE);
     }
     
     /**
@@ -55,7 +54,7 @@ public final class TextBuilder {
      * @param text the text content
      * @return formatted warning text
      */
-    public static MutableText warning(Text text) {
+    public static MutableComponent warning(Component text) {
         return text.copy().setStyle(WARNING_STYLE);
     }
     
@@ -65,8 +64,8 @@ public final class TextBuilder {
      * @param args translation arguments
      * @return formatted warning text
      */
-    public static MutableText warning(String key, Object... args) {
-        return Text.translatable(key, args).setStyle(WARNING_STYLE);
+    public static MutableComponent warning(String key, Object... args) {
+        return Component.translatable(key, args).setStyle(WARNING_STYLE);
     }
     
     /**
@@ -74,7 +73,7 @@ public final class TextBuilder {
      * @param text the text content
      * @return formatted success text
      */
-    public static MutableText success(Text text) {
+    public static MutableComponent success(Component text) {
         return text.copy().setStyle(SUCCESS_STYLE);
     }
     
@@ -84,8 +83,8 @@ public final class TextBuilder {
      * @param args translation arguments
      * @return formatted success text
      */
-    public static MutableText success(String key, Object... args) {
-        return Text.translatable(key, args).setStyle(SUCCESS_STYLE);
+    public static MutableComponent success(String key, Object... args) {
+        return Component.translatable(key, args).setStyle(SUCCESS_STYLE);
     }
     
     /**
@@ -93,7 +92,7 @@ public final class TextBuilder {
      * @param text the text content
      * @return formatted info text
      */
-    public static MutableText info(Text text) {
+    public static MutableComponent info(Component text) {
         return text.copy().setStyle(INFO_STYLE);
     }
 
@@ -106,8 +105,8 @@ public final class TextBuilder {
      * @param args translation arguments
      * @return formatted info text
      */
-    public static MutableText info(String key, Object... args) {
-        return Text.translatable(key, args).setStyle(INFO_STYLE);
+    public static MutableComponent info(String key, Object... args) {
+        return Component.translatable(key, args).setStyle(INFO_STYLE);
     }
     
     /**
@@ -115,7 +114,7 @@ public final class TextBuilder {
      * @param text the text content
      * @return formatted highlight text
      */
-    public static MutableText highlight(Text text) {
+    public static MutableComponent highlight(Component text) {
         return text.copy().setStyle(HIGHLIGHT_STYLE);
     }
     
@@ -125,8 +124,8 @@ public final class TextBuilder {
      * @param args translation arguments
      * @return formatted highlight text
      */
-    public static MutableText highlight(String key, Object... args) {
-        return Text.translatable(key, args).setStyle(HIGHLIGHT_STYLE);
+    public static MutableComponent highlight(String key, Object... args) {
+        return Component.translatable(key, args).setStyle(HIGHLIGHT_STYLE);
     }
     
     // Interactive text methods (combining TextEventFactory functionality)
@@ -137,8 +136,8 @@ public final class TextBuilder {
      * @param clickEvent the click event
      * @return clickable text
      */
-    public static MutableText clickable(Text text, ClickEvent clickEvent) {
-        return text.copy().styled(style -> style.withClickEvent(clickEvent));
+    public static MutableComponent clickable(Component text, ClickEvent clickEvent) {
+        return text.copy().withStyle(style -> style.withClickEvent(clickEvent));
     }
 
     /**
@@ -148,11 +147,11 @@ public final class TextBuilder {
      * @param applyUnderline whether to apply underline styling (respects config if true)
      * @return clickable text with optional underline
      */
-    public static MutableText clickableWithConfig(Text text, ClickEvent clickEvent, boolean applyUnderline) {
-        return text.copy().styled(style -> {
+    public static MutableComponent clickableWithConfig(Component text, ClickEvent clickEvent, boolean applyUnderline) {
+        return text.copy().withStyle(style -> {
             Style newStyle = style.withClickEvent(clickEvent);
             if (applyUnderline && ModConfigManager.getConfig().shareLink.enableClickableTextUnderline) {
-                newStyle = newStyle.withUnderline(true);
+                newStyle = newStyle.withUnderlined(true);
             }
             return newStyle;
         });
@@ -164,7 +163,7 @@ public final class TextBuilder {
      * @param clickEvent the click event
      * @return clickable text with conditional underline
      */
-    public static MutableText clickableWithConfig(Text text, ClickEvent clickEvent) {
+    public static MutableComponent clickableWithConfig(Component text, ClickEvent clickEvent) {
         return clickableWithConfig(text, clickEvent, true);
     }
     
@@ -175,8 +174,8 @@ public final class TextBuilder {
      * @param hoverEvent the hover event
      * @return interactive text with both events
      */
-    public static MutableText interactive(Text text, ClickEvent clickEvent, HoverEvent hoverEvent) {
-        return text.copy().styled(style -> style
+    public static MutableComponent interactive(Component text, ClickEvent clickEvent, HoverEvent hoverEvent) {
+        return text.copy().withStyle(style -> style
                 .withClickEvent(clickEvent)
                 .withHoverEvent(hoverEvent));
     }
@@ -189,11 +188,11 @@ public final class TextBuilder {
      * @param applyUnderline whether to apply underline styling (respects config if true)
      * @return interactive text with both events and optional underline
      */
-    public static MutableText interactiveWithConfig(Text text, ClickEvent clickEvent, HoverEvent hoverEvent, boolean applyUnderline) {
-        return text.copy().styled(style -> {
+    public static MutableComponent interactiveWithConfig(Component text, ClickEvent clickEvent, HoverEvent hoverEvent, boolean applyUnderline) {
+        return text.copy().withStyle(style -> {
             Style newStyle = style.withClickEvent(clickEvent).withHoverEvent(hoverEvent);
             if (applyUnderline && ModConfigManager.getConfig().shareLink.enableClickableTextUnderline) {
-                newStyle = newStyle.withUnderline(true);
+                newStyle = newStyle.withUnderlined(true);
             }
             return newStyle;
         });
@@ -206,7 +205,7 @@ public final class TextBuilder {
      * @param hoverEvent the hover event
      * @return interactive text with both events and conditional underline
      */
-    public static MutableText interactiveWithConfig(Text text, ClickEvent clickEvent, HoverEvent hoverEvent) {
+    public static MutableComponent interactiveWithConfig(Component text, ClickEvent clickEvent, HoverEvent hoverEvent) {
         return interactiveWithConfig(text, clickEvent, hoverEvent, true);
     }
     
@@ -216,7 +215,7 @@ public final class TextBuilder {
      * @param command the command to run (without /)
      * @return clickable command text
      */
-    public static MutableText runCommand(Text text, String command) {
+    public static MutableComponent runCommand(Component text, String command) {
         return clickable(text, TextEventCompat.runCommand("/" + command));
     }
     
@@ -226,7 +225,7 @@ public final class TextBuilder {
      * @param command the command to suggest (without /)
      * @return clickable suggestion text
      */
-    public static MutableText suggestCommand(Text text, String command) {
+    public static MutableComponent suggestCommand(Component text, String command) {
         return clickable(text, TextEventCompat.suggestCommand("/" + command));
     }
     
@@ -236,7 +235,7 @@ public final class TextBuilder {
      * @param url the URL to open
      * @return clickable URL text
      */
-    public static MutableText url(Text text, String url) {
+    public static MutableComponent url(Component text, String url) {
         return clickable(text, TextEventCompat.openUrl(url));
     }
     
@@ -246,8 +245,8 @@ public final class TextBuilder {
      * @param tooltip the tooltip text
      * @return text with hover event
      */
-    public static MutableText withTooltip(Text text, Text tooltip) {
-        return text.copy().styled(style -> style.withHoverEvent(TextEventCompat.showText(tooltip)));
+    public static MutableComponent withTooltip(Component text, Component tooltip) {
+        return text.copy().withStyle(style -> style.withHoverEvent(TextEventCompat.showText(tooltip)));
     }
     
     // Builder pattern for complex text construction
@@ -257,7 +256,7 @@ public final class TextBuilder {
      * @param text the initial text
      * @return a TextComponentBuilder for chaining
      */
-    public static TextComponentBuilder build(Text text) {
+    public static TextComponentBuilder build(Component text) {
         return new TextComponentBuilder(text.copy());
     }
     
@@ -268,31 +267,31 @@ public final class TextBuilder {
      * @return a TextComponentBuilder for chaining
      */
     public static TextComponentBuilder build(String key, Object... args) {
-        return new TextComponentBuilder(Text.translatable(key, args));
+        return new TextComponentBuilder(Component.translatable(key, args));
     }
     
     /**
      * Builder class for creating complex text components with method chaining
      */
     public static class TextComponentBuilder {
-        private final MutableText text;
+        private MutableComponent text;
         
-        private TextComponentBuilder(MutableText text) {
+        private TextComponentBuilder(MutableComponent text) {
             this.text = text;
         }
         
-        public TextComponentBuilder style(Formatting... formatting) {
-            text.formatted(formatting);
+        public TextComponentBuilder style(ChatFormatting... formatting) {
+            this.text = (MutableComponent) text.withStyle(formatting);
             return this;
         }
         
-        public TextComponentBuilder color(Formatting color) {
-            text.styled(style -> style.withColor(color));
+        public TextComponentBuilder color(ChatFormatting color) {
+            this.text = (MutableComponent) text.withStyle(style -> style.withColor(color));
             return this;
         }
         
         public TextComponentBuilder click(ClickEvent clickEvent) {
-            text.styled(style -> style.withClickEvent(clickEvent));
+            this.text = (MutableComponent) text.withStyle(style -> style.withClickEvent(clickEvent));
             return this;
         }
 
@@ -301,10 +300,10 @@ public final class TextBuilder {
         }
 
         public TextComponentBuilder clickWithConfig(ClickEvent clickEvent, boolean applyUnderline) {
-            text.styled(style -> {
+            this.text = (MutableComponent) text.withStyle(style -> {
                 Style newStyle = style.withClickEvent(clickEvent);
                 if (applyUnderline && ModConfigManager.getConfig().shareLink.enableClickableTextUnderline) {
-                    newStyle = newStyle.withUnderline(true);
+                    newStyle = newStyle.withUnderlined(true);
                 }
                 return newStyle;
             });
@@ -312,7 +311,7 @@ public final class TextBuilder {
         }
         
         public TextComponentBuilder hover(HoverEvent hoverEvent) {
-            text.styled(style -> style.withHoverEvent(hoverEvent));
+            this.text = (MutableComponent) text.withStyle(style -> style.withHoverEvent(hoverEvent));
             return this;
         }
         
@@ -328,16 +327,16 @@ public final class TextBuilder {
             return click(TextEventCompat.openUrl(url));
         }
         
-        public TextComponentBuilder tooltip(Text tooltip) {
+        public TextComponentBuilder tooltip(Component tooltip) {
             return hover(TextEventCompat.showText(tooltip));
         }
         
-        public TextComponentBuilder append(Text other) {
+        public TextComponentBuilder append(Component other) {
             text.append(other);
             return this;
         }
         
-        public MutableText build() {
+        public MutableComponent build() {
             return text;
         }
     }

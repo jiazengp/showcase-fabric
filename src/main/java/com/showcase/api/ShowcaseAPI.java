@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 
 /**
  * Main API class for the Showcase mod.
@@ -141,11 +141,11 @@ public final class ShowcaseAPI {
      * @return the action result from the event
      */
     @ApiStatus.Internal
-    public static ActionResult fireShowcaseCreatedEvent(@NotNull com.showcase.command.ShowcaseManager.ShareType shareType,
+    public static InteractionResult fireShowcaseCreatedEvent(@NotNull com.showcase.command.ShowcaseManager.ShareType shareType,
                                                          @NotNull com.showcase.data.ShareEntry shareEntry,
-                                                         @NotNull net.minecraft.server.network.ServerPlayerEntity sender,
-                                                         @NotNull net.minecraft.server.network.ServerPlayerEntity sourcePlayer,
-                                                         @org.jetbrains.annotations.Nullable java.util.Collection<net.minecraft.server.network.ServerPlayerEntity> receivers,
+                                                         @NotNull net.minecraft.server.level.ServerPlayer sender,
+                                                         @NotNull net.minecraft.server.level.ServerPlayer sourcePlayer,
+                                                         @org.jetbrains.annotations.Nullable java.util.Collection<net.minecraft.server.level.ServerPlayer> receivers,
                                                          @NotNull String shareId,
                                                          @org.jetbrains.annotations.Nullable String description,
                                                          @org.jetbrains.annotations.Nullable Integer duration) {
@@ -158,10 +158,10 @@ public final class ShowcaseAPI {
      * @return the action result from the event
      */
     @ApiStatus.Internal
-    public static ActionResult fireShowcaseViewedEvent(@NotNull net.minecraft.server.network.ServerPlayerEntity viewer,
+    public static InteractionResult fireShowcaseViewedEvent(@NotNull net.minecraft.server.level.ServerPlayer viewer,
                                                         @NotNull com.showcase.data.ShareEntry shareEntry,
                                                         @NotNull String shareId,
-                                                        @NotNull net.minecraft.server.network.ServerPlayerEntity originalOwner) {
+                                                        @NotNull net.minecraft.server.level.ServerPlayer originalOwner) {
         return ShowcaseEvents.SHOWCASE_VIEWED.invoker().onShowcaseViewed(viewer, shareEntry, shareId, originalOwner);
     }
 

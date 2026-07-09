@@ -16,9 +16,4 @@ public class MapViewerGui extends BaseWorldGui {
     protected BaseViewerContext.SwitchEntry asSwitchableUi() {
         return new BaseViewerContext.SwitchEntry((context, slot) -> new MapViewerGui((MapViewerContext) context, slot), this.getSelectedSlot());
     }
-
-    @Override
-    public void onClose() {
-        super.onClose();
-    }
 }

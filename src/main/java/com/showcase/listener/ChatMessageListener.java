@@ -6,12 +6,13 @@ import com.showcase.utils.compat.ServerPlayerCompat;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
-import net.minecraft.network.message.MessageType;
-import net.minecraft.network.message.SignedMessage;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.PlayerChatMessage;
+import net.minecraft.server.level.ServerPlayer;
 
 import static com.showcase.listener.ChatKeywordHandler.getSupportedPlaceholders;
 import static com.showcase.utils.permissions.PermissionChecker.isOp;
@@ -19,7 +20,7 @@ import static com.showcase.utils.permissions.PermissionChecker.isOp;
 public class ChatMessageListener {
     private static ChatKeywordHandler keywordHandler;
     private static final NodeParser CHAT_PARSER = NodeParser.builder()
-            .globalPlaceholders()
+            .serverPlaceholders()
             .requireSafe()
             .build();
 
@@ -31,24 +32,24 @@ public class ChatMessageListener {
         keywordHandler = new ChatKeywordHandler(ModConfigManager.getConfig());
     }
 
-    private static boolean messageHandler(SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters params) {
+    private static boolean messageHandler(PlayerChatMessage message, ServerPlayer sender, ChatType.Bound params) {
         if (keywordHandler == null) {
             ShowcaseMod.LOGGER.warn("ChatKeywordHandler not initialized; skipping placeholder processing.");
             return true;
         }
         if (!PermissionChecker.hasPermission(sender, Permissions.Chat.PLACEHOLDER, 0)) return true;
-        if (message.getContent().getString().length() >= 100 && !isOp(sender)) return true;
+        if (message.decoratedContent().getString().length() >= 100 && !isOp(sender)) return true;
 
-        String originalText = message.getContent().getString();
+        String originalText = message.decoratedContent().getString();
         String processedText = keywordHandler.processMessage(originalText, sender);
         ShowcaseMod.LOGGER.debug("Original: '{}', Processed: '{}'", originalText, processedText);
 
         if (containsPlaceholders(processedText)) {
-            Text parsedMessage;
+            Component parsedMessage;
             try {
-                parsedMessage = CHAT_PARSER.parseText(
+                parsedMessage = CHAT_PARSER.parseComponent(
                         processedText,
-                        PlaceholderContext.of(sender).asParserContext()
+                        ServerPlaceholderContext.of(sender).asParserContext()
                 );
             } catch (Exception e) {
                 ShowcaseMod.LOGGER.error("Failed to parse chat message: {}", processedText, e);
@@ -57,8 +58,8 @@ public class ChatMessageListener {
 
             if (ServerPlayerCompat.getServer(sender) == null) return true;
 
-            ServerPlayerCompat.getServer(sender).getPlayerManager().broadcast(
-                    Text.translatable("chat.type.text", sender.getDisplayName(), parsedMessage),
+            ServerPlayerCompat.getServer(sender).getPlayerList().broadcastSystemMessage(
+                    Component.translatable("chat.type.text", sender.getDisplayName(), parsedMessage),
                     false
             );
 

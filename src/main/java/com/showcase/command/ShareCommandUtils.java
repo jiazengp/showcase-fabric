@@ -12,19 +12,20 @@ import com.showcase.utils.TextUtils;
 import com.showcase.utils.compat.ServerPlayerCompat;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
 import com.showcase.utils.TextEventFactory;
-import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TradeOfferList;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.text.SimpleDateFormat;
@@ -34,14 +35,14 @@ import java.util.stream.Collectors;
 import static com.showcase.command.ShowcaseCommand.*;
 import static com.showcase.command.ShowcaseManager.ShareType.*;
 import static com.showcase.command.ShowcaseManager.getItemStackWithID;
-import static net.minecraft.text.Text.translatable;
+import static net.minecraft.network.chat.Component.translatable;
 
 public class ShareCommandUtils {
     private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("MM/dd HH:mm:ss");
 
-    public static Collection<ServerPlayerEntity> getReceivers(CommandContext<ServerCommandSource> ctx) {
+    public static Collection<ServerPlayer> getReceivers(CommandContext<CommandSourceStack> ctx) {
         try {
-            Collection<ServerPlayerEntity> receivers = EntityArgumentType.getPlayers(ctx, RECEIVERS_ARG);
+            Collection<ServerPlayer> receivers = EntityArgument.getPlayers(ctx, RECEIVERS_ARG);
             if (receivers.isEmpty()) return null;
             if (isAtAll(ctx, receivers)) return null;
             return receivers;
@@ -53,7 +54,7 @@ public class ShareCommandUtils {
     /**
      * Check if player has permission to specify receivers for the given share type
      */
-    public static boolean canSpecifyReceivers(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+    public static boolean canSpecifyReceivers(ServerPlayer player, ShowcaseManager.ShareType shareType) {
         Permissions.CommandType commandType = Permissions.getCommandTypeFromShareType(shareType);
         return PermissionChecker.hasPermission(player, commandType.receivers(), 2);
     }
@@ -61,7 +62,7 @@ public class ShareCommandUtils {
     /**
      * Check if player has permission to specify duration for the given share type
      */
-    public static boolean canSpecifyDuration(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+    public static boolean canSpecifyDuration(ServerPlayer player, ShowcaseManager.ShareType shareType) {
         Permissions.CommandType commandType = Permissions.getCommandTypeFromShareType(shareType);
         return PermissionChecker.hasPermission(player, commandType.duration(), 2);
     }
@@ -69,34 +70,34 @@ public class ShareCommandUtils {
     /**
      * Check if player has permission to specify description for the given share type
      */
-    public static boolean canSpecifyDescription(ServerPlayerEntity player, ShowcaseManager.ShareType shareType) {
+    public static boolean canSpecifyDescription(ServerPlayer player, ShowcaseManager.ShareType shareType) {
         Permissions.CommandType commandType = Permissions.getCommandTypeFromShareType(shareType);
         return PermissionChecker.hasPermission(player, commandType.description(), 1);
     }
 
-    public static ServerPlayerEntity getSenderPlayer(CommandContext<ServerCommandSource> ctx) {
+    public static ServerPlayer getSenderPlayer(CommandContext<CommandSourceStack> ctx) {
         try {
-            return ctx.getSource().getPlayerOrThrow();
+            return ctx.getSource().getPlayerOrException();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public static ServerPlayerEntity getSourcePlayer(CommandContext<ServerCommandSource> ctx) {
+    public static ServerPlayer getSourcePlayer(CommandContext<CommandSourceStack> ctx) {
         try {
-            return EntityArgumentType.getPlayer(ctx, SOURCE_ARG);
+            return EntityArgument.getPlayer(ctx, SOURCE_ARG);
         } catch (Exception e) {
             return null;
         }
     }
 
-    public static ServerPlayerEntity getSourceOrSender(CommandContext<ServerCommandSource> ctx) {
-        ServerPlayerEntity sourcePlayer = getSourcePlayer(ctx);
+    public static ServerPlayer getSourceOrSender(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer sourcePlayer = getSourcePlayer(ctx);
         if (sourcePlayer != null) return sourcePlayer;
         return getSenderPlayer(ctx);
     }
 
-    public static String getDescription(CommandContext<ServerCommandSource> ctx) {
+    public static String getDescription(CommandContext<CommandSourceStack> ctx) {
         try {
             return StringArgumentType.getString(ctx, DESCRIPTION_ARG);
         } catch (Exception e) {
@@ -104,16 +105,16 @@ public class ShareCommandUtils {
         }
     }
 
-    public static MutableText createContainerPreview(ShareEntry shareEntry) {
+    public static MutableComponent createContainerPreview(ShareEntry shareEntry) {
         if (shareEntry == null) return null;
 
-        Inventory inv = shareEntry.getInventory();
-        Map<Text, Integer> counts = new HashMap<>();
+        Container inv = shareEntry.getInventory();
+        Map<Component, Integer> counts = new HashMap<>();
 
-        for (int i = 0; i < inv.size(); i++) {
-            ItemStack s = inv.getStack(i);
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack s = inv.getItem(i);
             if (!s.isEmpty() && !StackUtils.isDivider(s)) {
-                counts.merge(s.getName(), s.getCount(), Integer::sum);
+                counts.merge(s.getHoverName(), s.getCount(), Integer::sum);
             }
         }
 
@@ -122,9 +123,9 @@ public class ShareCommandUtils {
         }
 
         int maxLines = 5;
-        MutableText out = Text.literal("");
+        MutableComponent out = Component.literal("");
         counts.entrySet().stream()
-                .sorted(Map.Entry.<Text, Integer>comparingByValue().reversed())
+                .sorted(Map.Entry.<Component, Integer>comparingByValue().reversed())
                 .limit(maxLines)
                 .forEach(e -> out.append(e.getKey()).append("×" + e.getValue() + "\n"));
 
@@ -134,20 +135,20 @@ public class ShareCommandUtils {
         return out;
     }
 
-    private static boolean isAtAll(CommandContext<ServerCommandSource> ctx, Collection<ServerPlayerEntity> receivers) {
+    private static boolean isAtAll(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> receivers) {
         String input = ctx.getInput();
-        int online = ctx.getSource().getServer().getPlayerManager().getPlayerList().size();
+        int online = ctx.getSource().getServer().getPlayerList().getPlayers().size();
         return input.contains("@a") && receivers.size() == online;
     }
 
-    private static MutableText getFinalPreviewText(Text itemName, ShowcaseManager.ShareType type, String shareId) {
+    private static MutableComponent getFinalPreviewText(Component itemName, ShowcaseManager.ShareType type, String shareId) {
         ShareEntry shareEntry = ShowcaseManager.getShareEntry(shareId);
-        MutableText sharePreview = shareEntry.getType() == MERCHANT ?
+        MutableComponent sharePreview = shareEntry.getType() == MERCHANT ?
                 createMerchantPreviewText(shareEntry.getMerchantContext()) : createContainerPreview(shareEntry);
 
-        MutableText preview = Text.literal("")
+        MutableComponent preview = Component.literal("")
                 .append(itemName)
-                .formatted(getFormattingColorForType(type, type == ITEM ? getItemStackWithID(shareId) : null))
+                .withStyle(getFormattingColorForType(type, type == ITEM ? getItemStackWithID(shareId) : null))
                 .append("\n");
 
         if (sharePreview != null) {
@@ -155,7 +156,7 @@ public class ShareCommandUtils {
                     .append(translatable("showcase.message.click_to_view"))
                     .append("\n\n")
                     .append(TextUtils.BADGE)
-                    .formatted(Formatting.GRAY);
+                    .withStyle(ChatFormatting.GRAY);
         } else {
             preview.append(TextUtils.EMPTY);
         }
@@ -163,28 +164,28 @@ public class ShareCommandUtils {
         return preview;
     }
 
-    private static MutableText createMerchantPreviewText(MerchantContext merchantContext) {
-        MutableText preview = Text.literal("");
+    private static MutableComponent createMerchantPreviewText(MerchantContext merchantContext) {
+        MutableComponent preview = Component.literal("");
 
         if (merchantContext.getExperience() > 0) {
-            preview.append(Text.translatable("argument.entity.options.level.description", merchantContext.getExperience()))
-                    .formatted(Formatting.GREEN)
+            preview.append(Component.translatable("argument.entity.options.level.description", merchantContext.getExperience()))
+                    .withStyle(ChatFormatting.GREEN)
                     .append("\n");
         }
 
-        TradeOfferList offers = merchantContext.getOffers();
+        MerchantOffers offers = merchantContext.getOffers();
         if (offers != null && !offers.isEmpty()) {
-            preview.append(Text.translatable("merchant.trades", offers.size()))
-                    .formatted(Formatting.AQUA)
+            preview.append(Component.translatable("merchant.trades", offers.size()))
+                    .withStyle(ChatFormatting.AQUA)
                     .append("\n");
 
             int maxPreview = Math.min(5, offers.size());
             for (int i = 0; i < maxPreview; i++) {
-                TradeOffer offer = offers.get(i);
+                MerchantOffer offer = offers.get(i);
                 if (offer != null) {
                     preview.append("• ")
-                            .append(offer.getSellItem().getName())
-                            .formatted(Formatting.YELLOW);
+                            .append(offer.getResult().getHoverName())
+                            .withStyle(ChatFormatting.YELLOW);
 
                     if (i < maxPreview - 1) {
                         preview.append("\n");
@@ -195,7 +196,7 @@ public class ShareCommandUtils {
             if (offers.size() > maxPreview) {
                 preview.append("\n")
                         .append(translatable("showcase.preview_text.more_trades", offers.size() - maxPreview))
-                        .formatted(Formatting.GRAY)
+                        .withStyle(ChatFormatting.GRAY)
                         .append("\n");
             }
         }
@@ -203,8 +204,8 @@ public class ShareCommandUtils {
         return preview;
     }
 
-    public static MutableText createClickableItemName(ShowcaseManager.ShareType type, Text itemName, String shareId) {
-        MutableText hoverableName = createClickableTag(itemName, type, shareId);
+    public static MutableComponent createClickableItemName(ShowcaseManager.ShareType type, Component itemName, String shareId) {
+        MutableComponent hoverableName = createClickableTag(itemName, type, shareId);
 
         if (type == ITEM || type == STATS) {
             ItemStack stack = ShowcaseManager.getItemStackWithID(shareId);
@@ -216,15 +217,15 @@ public class ShareCommandUtils {
             return hoverableName;
         }
 
-        MutableText preview = getFinalPreviewText(itemName, type, shareId);
+        MutableComponent preview = getFinalPreviewText(itemName, type, shareId);
         hoverableName.setStyle(hoverableName.getStyle()
                 .withHoverEvent(TextEventFactory.showText(preview)));
 
         return hoverableName;
     }
 
-    public static void sendShareMessage(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,  Collection<ServerPlayerEntity> receivers,
-                                        String description, ShowcaseManager.ShareType type, Text itemName, Integer duration, String shareId) {
+    public static void sendShareMessage(ServerPlayer sender, ServerPlayer sourcePlayer,  Collection<ServerPlayer> receivers,
+                                        String description, ShowcaseManager.ShareType type, Component itemName, Integer duration, String shareId) {
         // Get the share entry for the event
         ShareEntry shareEntry = ShowcaseManager.getShareEntry(shareId);
         if (shareEntry != null) {
@@ -232,41 +233,41 @@ public class ShareCommandUtils {
             ShowcaseAPI.fireShowcaseCreatedEvent(type, shareEntry, sender, sourcePlayer, receivers, shareId, description, duration);
         }
 
-        MutableText clickableItemName = createClickableItemName(type, itemName, shareId);
+        MutableComponent clickableItemName = createClickableItemName(type, itemName, shareId);
 
-        MutableText message = buildShareMessage(sender, sourcePlayer, receivers, description, type, clickableItemName);
-        MutableText finalMessage = message.append("\n").append(TextUtils.info(translatable("showcase.message.expiry_notice", (duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration) / 60)));
+        MutableComponent message = buildShareMessage(sender, sourcePlayer, receivers, description, type, clickableItemName);
+        MutableComponent finalMessage = message.append("\n").append(TextUtils.info(translatable("showcase.message.expiry_notice", (duration == null ? ModConfigManager.getShareLinkDefaultExpiry() : duration) / 60)));
 
         if (receivers != null) {
-            for (ServerPlayerEntity receiver : receivers) {
-                receiver.sendMessage(message);
+            for (ServerPlayer receiver : receivers) {
+                receiver.sendSystemMessage(message);
             }
 
-            String receiverList = receivers.stream().map(ServerPlayerEntity::getDisplayName).filter(Objects::nonNull).map(Text::getString).collect(Collectors.joining(", "));
-            sender.sendMessage(translatable("showcase.message.private_share_tip", sourcePlayer.getDisplayName(), clickableItemName, Text.literal(receiverList)));
+            String receiverList = receivers.stream().map(ServerPlayer::getDisplayName).filter(Objects::nonNull).map(Component::getString).collect(Collectors.joining(", "));
+            sender.sendSystemMessage(translatable("showcase.message.private_share_tip", sourcePlayer.getDisplayName(), clickableItemName, Component.literal(receiverList)));
         } else {
             MinecraftServer server = ServerPlayerCompat.getServer(sender);
             if (server != null) {
-                server.getPlayerManager().broadcast(finalMessage, false);
+                server.getPlayerList().broadcastSystemMessage(finalMessage, false);
             }
         }
     }
 
-    private static MutableText buildShareMessage(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,
-                                                 Collection<ServerPlayerEntity> receivers, String description,
-                                                 ShowcaseManager.ShareType type, MutableText clickableItemName) {
+    private static MutableComponent buildShareMessage(ServerPlayer sender, ServerPlayer sourcePlayer,
+                                                 Collection<ServerPlayer> receivers, String description,
+                                                 ShowcaseManager.ShareType type, MutableComponent clickableItemName) {
         if (description != null) {
             return buildPlayerDescriptionMessage(sourcePlayer, description, clickableItemName);
         }
 
-        boolean isPrivateMessage = receivers != null && sender.getUuid().equals(sourcePlayer.getUuid());
+        boolean isPrivateMessage = receivers != null && sender.getUUID().equals(sourcePlayer.getUUID());
 
         return isPrivateMessage ?
                 buildDefaultMessageForReceiver(sender, type, clickableItemName) :
                 buildDefaultMessageForBroadcast(sender, sourcePlayer, type, clickableItemName);
     }
 
-    public static MutableText buildPlayerDescriptionMessage(ServerPlayerEntity player, String description, MutableText clickableItemName) {
+    public static MutableComponent buildPlayerDescriptionMessage(ServerPlayer player, String description, MutableComponent clickableItemName) {
         return translatable("showcase.message.player_description",
                 PlayerUtils.getSafeDisplayName(player), description, clickableItemName);
     }
@@ -275,9 +276,9 @@ public class ShareCommandUtils {
         return TextEventFactory.runFullCommand("/" + VIEW_COMMAND + " " + id);
     }
 
-    public static MutableText buildDefaultMessageForReceiver(ServerPlayerEntity sender,
-                                                             ShowcaseManager.ShareType type, MutableText clickableItemName) {
-        MutableText senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
+    public static MutableComponent buildDefaultMessageForReceiver(ServerPlayer sender,
+                                                             ShowcaseManager.ShareType type, MutableComponent clickableItemName) {
+        MutableComponent senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
 
         return switch (type) {
             case ITEM -> translatable("showcase.message.default.item", senderPlayerDisplayName, clickableItemName);
@@ -290,11 +291,11 @@ public class ShareCommandUtils {
         };
     }
 
-    public static MutableText buildDefaultMessageForBroadcast(ServerPlayerEntity sender, ServerPlayerEntity sourcePlayer,
-                                                              ShowcaseManager.ShareType type, MutableText clickableItemName) {
-        boolean isSelf = sender.getUuid().equals(sourcePlayer.getUuid());
-        MutableText senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
-        MutableText sourcePlayerDisplayName = PlayerUtils.getSafeDisplayName(sourcePlayer);
+    public static MutableComponent buildDefaultMessageForBroadcast(ServerPlayer sender, ServerPlayer sourcePlayer,
+                                                              ShowcaseManager.ShareType type, MutableComponent clickableItemName) {
+        boolean isSelf = sender.getUUID().equals(sourcePlayer.getUUID());
+        MutableComponent senderPlayerDisplayName = PlayerUtils.getSafeDisplayName(sender);
+        MutableComponent sourcePlayerDisplayName = PlayerUtils.getSafeDisplayName(sourcePlayer);
 
         return switch (type) {
             case ITEM -> isSelf ?
@@ -321,133 +322,133 @@ public class ShareCommandUtils {
         };
     }
 
-    public static Formatting getFormattingColorForType(ShowcaseManager.ShareType type, ItemStack itemStack) {
+    public static ChatFormatting getFormattingColorForType(ShowcaseManager.ShareType type, ItemStack itemStack) {
         if (itemStack != null && !itemStack.isEmpty()) {
             if (isSpecialItem(itemStack)) {
-                return Formatting.GOLD;
+                return ChatFormatting.GOLD;
             }
 
             return switch (itemStack.getRarity()) {
-                case COMMON -> Formatting.WHITE;
-                case UNCOMMON -> Formatting.YELLOW;
-                case RARE -> Formatting.AQUA;
-                case EPIC -> Formatting.LIGHT_PURPLE;
+                case COMMON -> ChatFormatting.WHITE;
+                case UNCOMMON -> ChatFormatting.YELLOW;
+                case RARE -> ChatFormatting.AQUA;
+                case EPIC -> ChatFormatting.LIGHT_PURPLE;
             };
         }
 
         return switch (type) {
-            case ITEM -> Formatting.BLUE;
-            case STATS -> Formatting.DARK_AQUA;
-            case INVENTORY -> Formatting.GREEN;
-            case ENDER_CHEST -> Formatting.DARK_PURPLE;
-            case HOTBAR -> Formatting.YELLOW;
-            case CONTAINER, MERCHANT -> Formatting.GOLD;
+            case ITEM -> ChatFormatting.BLUE;
+            case STATS -> ChatFormatting.DARK_AQUA;
+            case INVENTORY -> ChatFormatting.GREEN;
+            case ENDER_CHEST -> ChatFormatting.DARK_PURPLE;
+            case HOTBAR -> ChatFormatting.YELLOW;
+            case CONTAINER, MERCHANT -> ChatFormatting.GOLD;
         };
     }
 
     private static boolean isSpecialItem(ItemStack itemStack) {
         return StackUtils.isMap(itemStack) ||
-                itemStack.isOf(Items.BOOK) ||
-                itemStack.isOf(Items.WRITABLE_BOOK) ||
-                itemStack.isOf(Items.WRITTEN_BOOK) ||
-                itemStack.isOf(Items.ENCHANTED_BOOK);
+                itemStack.is(Items.BOOK) ||
+                itemStack.is(Items.WRITABLE_BOOK) ||
+                itemStack.is(Items.WRITTEN_BOOK) ||
+                itemStack.is(Items.ENCHANTED_BOOK);
     }
 
-    public static MutableText createClickableTag(Text name, ShowcaseManager.ShareType type, String id) {
+    public static MutableComponent createClickableTag(Component name, ShowcaseManager.ShareType type, String id) {
         ItemStack stack = getItemStackWithID(id);
-        Formatting color = getFormattingColorForType(type, type == ITEM ? stack : null);
-        Text displayName = (type == ITEM  || type == STATS) ? name : Text.literal("[").append(name).append("]");
+        ChatFormatting color = getFormattingColorForType(type, type == ITEM ? stack : null);
+        Component displayName = (type == ITEM  || type == STATS) ? name : Component.literal("[").append(name).append("]");
 
-        return Text.literal("")
+        return Component.literal("")
                 .append(displayName)
-                .styled(style -> style
+                .withStyle(style -> style
                         .withColor(color)
-                        .withUnderline(true)
+                        .withUnderlined(true)
                         .withClickEvent(createShareClickEvent(id)));
     }
 
-    public static MutableText buildShareLine(ServerPlayerEntity viewer, String shareId, ShareEntry share) {
+    public static MutableComponent buildShareLine(ServerPlayer viewer, String shareId, ShareEntry share) {
         MinecraftServer server = ServerPlayerCompat.getServer(viewer);
 
-        Text ownerName =  PlayerUtils.getSafeDisplayName(server, share.getOwnerUuid());
-        Text itemName = getShareItemName(share);
+        Component ownerName =  PlayerUtils.getSafeDisplayName(server, share.getOwnerUuid());
+        Component itemName = getShareItemName(share);
 
-        return Text.literal("")
-                .append(Text.literal("▶ ").formatted(Formatting.DARK_GRAY))
+        return Component.literal("")
+                .append(Component.literal("▶ ").withStyle(ChatFormatting.DARK_GRAY))
                 .append(buildIdSection(shareId))
                 .append(buildOwnerSection(ownerName))
                 .append(buildShareSection(share, itemName, shareId))
                 .append(buildViewsSection(share.getViewCount()))
                 .append(buildTimeSection(share))
                 .append(buildCancelSection(shareId))
-                .append(Text.literal("\n\n"));
+                .append(Component.literal("\n\n"));
     }
 
-    private static MutableText buildIdSection(String shareId) {
-        return Text.literal("")
-                .append(Text.literal("[ID] ").formatted(Formatting.GRAY))
-                .append(Text.literal(shareId).formatted(Formatting.YELLOW)
-                        .styled(style -> style
+    private static MutableComponent buildIdSection(String shareId) {
+        return Component.literal("")
+                .append(Component.literal("[ID] ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(shareId).withStyle(ChatFormatting.YELLOW)
+                        .withStyle(style -> style
                                 .withClickEvent(TextEventFactory.copyToClipboard(shareId))
                                 .withHoverEvent(TextEventFactory.showText("Copy ID"))))
-                .append(Text.literal("  "));
+                .append(Component.literal("  "));
     }
 
-    private static MutableText buildOwnerSection(Text ownerName) {
-        return Text.literal("")
-                .append(Text.literal("[Owner] ").formatted(Formatting.GRAY))
-                .append(ownerName.copy().formatted(Formatting.GREEN))
-                .append(Text.literal("  "));
+    private static MutableComponent buildOwnerSection(Component ownerName) {
+        return Component.literal("")
+                .append(Component.literal("[Owner] ").withStyle(ChatFormatting.GRAY))
+                .append(ownerName.copy().withStyle(ChatFormatting.GREEN))
+                .append(Component.literal("  "));
     }
 
-    private static MutableText buildShareSection(ShareEntry share,
-                                                 Text itemName, String shareId) {
-        return Text.literal("")
-                .append(Text.literal("[Share] ").formatted(Formatting.GRAY))
+    private static MutableComponent buildShareSection(ShareEntry share,
+                                                 Component itemName, String shareId) {
+        return Component.literal("")
+                .append(Component.literal("[Share] ").withStyle(ChatFormatting.GRAY))
                 .append(createClickableItemName(share.getType(), itemName, shareId))
-                .append(Text.literal("  "));
+                .append(Component.literal("  "));
     }
 
-    private static MutableText buildViewsSection(int viewCount) {
-        return Text.literal("")
-                .append(Text.literal("[Views] ").formatted(Formatting.GRAY))
-                .append(Text.literal(String.valueOf(viewCount)).formatted(Formatting.AQUA))
-                .append(Text.literal("  "));
+    private static MutableComponent buildViewsSection(int viewCount) {
+        return Component.literal("")
+                .append(Component.literal("[Views] ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(String.valueOf(viewCount)).withStyle(ChatFormatting.AQUA))
+                .append(Component.literal("  "));
     }
 
-    private static MutableText buildTimeSection(ShareEntry share) {
+    private static MutableComponent buildTimeSection(ShareEntry share) {
         long expiryTime = share.getTimestamp() + share.getDuration() * 1000L;
 
-        return Text.literal("")
-                .append(Text.literal("\n    "))
-                .append(Text.literal("Created: ").formatted(Formatting.GRAY))
-                .append(Text.literal(formatTime(share.getTimestamp())).formatted(Formatting.WHITE))
-                .append(Text.literal(" | Expires: ").formatted(Formatting.GRAY))
-                .append(Text.literal(formatTime(expiryTime)).formatted(Formatting.WHITE));
+        return Component.literal("")
+                .append(Component.literal("\n    "))
+                .append(Component.literal("Created: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(formatTime(share.getTimestamp())).withStyle(ChatFormatting.WHITE))
+                .append(Component.literal(" | Expires: ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(formatTime(expiryTime)).withStyle(ChatFormatting.WHITE));
     }
 
-    private static MutableText buildCancelSection(String shareId) {
-        return Text.literal("")
-                .append(Text.literal(" | [Cancel Share] ")
-                        .styled(style -> style
-                                .withColor(Formatting.RED)
+    private static MutableComponent buildCancelSection(String shareId) {
+        return Component.literal("")
+                .append(Component.literal(" | [Cancel Share] ")
+                        .withStyle(style -> style
+                                .withColor(ChatFormatting.RED)
                                 .withClickEvent(TextEventFactory.runFullCommand("/" + MANAGE_COMMAND + " " + CANCEL_COMMAND + " " + shareId))
                                 .withHoverEvent(TextEventFactory.cancelShareTooltip())))
-                .append(Text.literal("  "));
+                .append(Component.literal("  "));
     }
 
-    private static Text getShareItemName(ShareEntry share) {
+    private static Component getShareItemName(ShareEntry share) {
         return switch (share.getType()) {
             case ITEM, STATS -> share.getInventory().getName();
             case INVENTORY -> TextUtils.INVENTORY;
             case HOTBAR -> TextUtils.HOTBAR;
             case ENDER_CHEST -> TextUtils.ENDER_CHEST;
             case MERCHANT -> {
-                Text name = share.getMerchantContext().getDisplayName();
+                Component name = share.getMerchantContext().getDisplayName();
                 yield name != null ? name : TextUtils.CONTAINER;
             }
             case CONTAINER -> {
-                Text name = share.getInventory().getName();
+                Component name = share.getInventory().getName();
                 yield name != null ? name : TextUtils.CONTAINER;
             }
         };
@@ -457,27 +458,27 @@ public class ShareCommandUtils {
         return TIME_FORMATTER.format(new Date(timestamp));
     }
 
-    public static List<String> getPlayerNameCompletions(CommandContext<ServerCommandSource> ctx) {
+    public static List<String> getPlayerNameCompletions(CommandContext<CommandSourceStack> ctx) {
         List<String> names = new ArrayList<>();
         MinecraftServer server = ctx.getSource().getServer();
 
         if (server != null) {
-            server.getPlayerManager()
-                    .getPlayerList()
+            server.getPlayerList()
+                    .getPlayers()
                     .forEach(player -> names.add(player.getName().getString()));
         }
 
         return names;
     }
 
-    public static @ApiStatus.Internal void handleError(CommandContext<ServerCommandSource> context, Throwable e)
+    public static @ApiStatus.Internal void handleError(CommandContext<CommandSourceStack> context, Throwable e)
     {
         //handle errors
         if(e instanceof Error)
             throw new Error("Unable to handle errors.", e);
 
         //handle command syntax errors
-        context.getSource().sendError(
+        context.getSource().sendFailure(
                 translatable("command.failed")
                         .append(":\n    " + e.getMessage()));
     }

@@ -2,13 +2,13 @@ package com.showcase.api;
 
 import com.showcase.command.ShowcaseManager;
 import com.showcase.data.ShareEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Wrapper class that provides access to ShowcaseManager functionality for external developers.
@@ -73,7 +73,7 @@ public class ShowcaseManagerWrapper {
      * @param type the share type
      * @return true if the player is on cooldown, false otherwise
      */
-    public boolean isOnCooldown(@NotNull ServerPlayerEntity player, @NotNull ShowcaseManager.ShareType type) {
+    public boolean isOnCooldown(@NotNull ServerPlayer player, @NotNull ShowcaseManager.ShareType type) {
         return ShowcaseManager.isOnCooldown(player, type);
     }
 
@@ -84,7 +84,7 @@ public class ShowcaseManagerWrapper {
      * @param type the share type
      * @return the remaining cooldown time in seconds, or 0 if not on cooldown
      */
-    public long getRemainingCooldown(@NotNull ServerPlayerEntity player, @NotNull ShowcaseManager.ShareType type) {
+    public long getRemainingCooldown(@NotNull ServerPlayer player, @NotNull ShowcaseManager.ShareType type) {
         return ShowcaseManager.getRemainingCooldown(player, type);
     }
 
@@ -96,7 +96,7 @@ public class ShowcaseManagerWrapper {
      * @param shareId the unique identifier of the share
      * @return true if the content was successfully opened, false otherwise
      */
-    public boolean openSharedContent(@NotNull ServerPlayerEntity viewer, @NotNull String shareId) {
+    public boolean openSharedContent(@NotNull ServerPlayer viewer, @NotNull String shareId) {
         return ShowcaseManager.openSharedContent(viewer, shareId);
     }
 

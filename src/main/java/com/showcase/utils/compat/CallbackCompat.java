@@ -1,28 +1,17 @@
 package com.showcase.utils.compat;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-#if MC_VER < 1212
-import net.minecraft.util.TypedActionResult;
-#endif
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 
 /**
- * Compatibility layer for Callback APIs across different Minecraft versions.
- * Handles return type differences between 1.21.1 and 1.21.2+.
+ * Small wrapper around callback return values for the 26.x mainline.
  */
 public class CallbackCompat {
     
     /**
-     * Creates an appropriate return value for UseItemCallback.
-     * In MC 1.21.1, returns TypedActionResult<ItemStack>
-     * In MC 1.21.2+, returns ActionResult
+     * Creates the return value for UseItemCallback on the current mainline.
      */
-    public static Object getUseItemCallbackResult(PlayerEntity player, ActionResult result) {
-        #if MC_VER >= 1212
+    public static InteractionResult getUseItemCallbackResult(Player player, InteractionResult result) {
         return result;
-        #else
-        return new TypedActionResult<>(result, ItemStack.EMPTY);
-        #endif
     }
 }

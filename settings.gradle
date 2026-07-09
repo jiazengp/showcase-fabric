@@ -9,7 +9,19 @@ pluginManagement {
 	}
 }
 
-// Enhanced version properties loading system inspired by Fuji
+// Version property loading constrained to the supported mainline (26.x+).
+static boolean isSupportedMainlineVersion(String version) {
+	def parts = version.tokenize('.')
+	if (parts.isEmpty()) {
+		return false
+	}
+	try {
+		return Integer.parseInt(parts[0]) >= 26
+	} catch (NumberFormatException ignored) {
+		return false
+	}
+}
+
 def loadProperties() {
 	def versionPropertiesDir = file("version_properties")
 	def availableVersions = []
@@ -17,7 +29,10 @@ def loadProperties() {
 	if (versionPropertiesDir.exists()) {
 		versionPropertiesDir.listFiles().each { file ->
 			if (file.name.endsWith('.properties')) {
-				availableVersions.add(file.name.replace('.properties', ''))
+				def version = file.name.replace('.properties', '')
+				if (isSupportedMainlineVersion(version)) {
+					availableVersions.add(version)
+				}
 			}
 		}
 	}
@@ -35,10 +50,19 @@ def loadProperties() {
 	}
 	
 	// Determine target Minecraft version
-	def targetMcVer = System.getProperty('mcVer') ?: System.getProperty('minecraft_version') ?: availableVersions[0]
+	def requestedMcVer = gradle.startParameter.projectProperties.get('mcVer')
+			?: gradle.startParameter.projectProperties.get('minecraft_version')
+			?: System.getProperty('mcVer')
+			?: System.getProperty('minecraft_version')
+			?: availableVersions[0]
+	def targetMcVer = String.valueOf(requestedMcVer)
 	
 	if (!targetMcVer) {
-		throw new GradleException("No Minecraft version specified and no version properties found")
+		throw new GradleException("No supported Minecraft version specified and no 26.x+ version properties found")
+	}
+
+	if (!isSupportedMainlineVersion(targetMcVer)) {
+		throw new GradleException("Minecraft ${targetMcVer} is outside the supported mainline. This branch only supports 26.x+.")
 	}
 	
 	def propertiesFile = file("version_properties/${targetMcVer}.properties")

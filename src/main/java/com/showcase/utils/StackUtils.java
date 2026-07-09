@@ -3,22 +3,22 @@ package com.showcase.utils;
 import com.showcase.ShowcaseMod;
 import com.showcase.utils.compat.ProfileCompat;
 import com.showcase.utils.ui.ItemIconProvider;
-import net.minecraft.component.DataComponentTypes;
-#if MC_VER >= 1212
-import net.minecraft.component.type.BundleContentsComponent;
-#endif
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.component.type.ProfileComponent;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.screen.*;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BundleContents;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.item.Items;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,19 +28,25 @@ import static com.showcase.utils.ScreenHandlerUtils.handlerTypeForRows;
 
 public class StackUtils {
     public static final ItemStack DIVIDER_ITEM;
+    private static final Item DIVIDER_ITEM_TYPE = resolveDividerItemType();
 
     static {
-        ItemStack temp = new ItemStack(Items.GRAY_STAINED_GLASS_PANE);
-        temp.set(DataComponentTypes.CUSTOM_NAME, Text.literal("⬛").formatted(Formatting.DARK_GRAY));
+        ItemStack temp = new ItemStack(DIVIDER_ITEM_TYPE);
+        temp.set(DataComponents.CUSTOM_NAME, Component.literal("⬛").withStyle(ChatFormatting.DARK_GRAY));
         DIVIDER_ITEM = temp;
     }
 
+    private static Item resolveDividerItemType() {
+        Item item = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("minecraft", "gray_stained_glass_pane"));
+        return item != null && item != Items.AIR ? item : Items.GLASS_PANE;
+    }
+
     public static Boolean isMap(ItemStack itemStack) {
-        return (itemStack.isOf(Items.MAP) || itemStack.isOf(Items.FILLED_MAP));
+        return (itemStack.is(Items.MAP) || itemStack.is(Items.FILLED_MAP));
     }
 
     public static Boolean isBook(ItemStack itemStack) {
-        return (itemStack.isOf(Items.WRITTEN_BOOK) || itemStack.isOf(Items.WRITABLE_BOOK));
+        return (itemStack.is(Items.WRITTEN_BOOK) || itemStack.is(Items.WRITABLE_BOOK));
     }
 
     public static boolean isShulkerBox(ItemStack itemStack) {
@@ -48,37 +54,32 @@ public class StackUtils {
     }
 
     public static boolean isBundle(ItemStack itemStack) {
-        #if MC_VER >= 1212
-        return itemStack.isIn(ItemTags.BUNDLES);
-        #else
-        // Bundles don't exist in versions < 1.21.2
-        return false;
-        #endif
+        return itemStack.is(ItemTags.BUNDLES);
     }
 
     public static boolean isDivider(ItemStack s) {
-        return !s.isEmpty() && s.isOf(Items.GRAY_STAINED_GLASS_PANE) &&
-                s.contains(DataComponentTypes.CUSTOM_NAME) &&
-                Objects.requireNonNull(s.get(DataComponentTypes.CUSTOM_NAME)).getString().equals("⬛");
+        return !s.isEmpty() && s.is(DIVIDER_ITEM_TYPE) &&
+                s.has(DataComponents.CUSTOM_NAME) &&
+                Objects.requireNonNull(s.get(DataComponents.CUSTOM_NAME)).getString().equals("⬛");
     }
 
-    private static final Set<ScreenHandlerType<?>> WHITELISTED_TYPES = Set.of(
-            ScreenHandlerType.GENERIC_9X3,
-            ScreenHandlerType.GENERIC_9X6,
-            ScreenHandlerType.GENERIC_3X3,
-            ScreenHandlerType.CRAFTER_3X3,
-            ScreenHandlerType.FURNACE,
-            ScreenHandlerType.SMOKER,
-            ScreenHandlerType.BLAST_FURNACE,
-            ScreenHandlerType.BREWING_STAND,
-            ScreenHandlerType.SHULKER_BOX
+    private static final Set<MenuType<?>> WHITELISTED_TYPES = Set.of(
+            MenuType.GENERIC_9x3,
+            MenuType.GENERIC_9x6,
+            MenuType.GENERIC_3x3,
+            MenuType.CRAFTER_3x3,
+            MenuType.FURNACE,
+            MenuType.SMOKER,
+            MenuType.BLAST_FURNACE,
+            MenuType.BREWING_STAND,
+            MenuType.SHULKER_BOX
     );
 
-    public static boolean isWhitelistedContainer(ScreenHandler handler) {
+    public static boolean isWhitelistedContainer(AbstractContainerMenu handler) {
         return WHITELISTED_TYPES.contains(handler.getType());
     }
 
-    public static Text getDisplayName(ItemStack stack) {
+    public static Component getDisplayName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return TextUtils.UNKNOWN_ENTRY;
         }
@@ -86,31 +87,31 @@ public class StackUtils {
         boolean isBook = StackUtils.isBook(stack);
         
         // Add icon prefix for items outside the brackets on the left
-        MutableText iconPrefix = ItemIconProvider.getIconForItem(stack);
+        MutableComponent iconPrefix = ItemIconProvider.getIconForItem(stack);
         
-        MutableText base = Text.empty();
+        MutableComponent base = Component.empty();
         
         // Add icon outside the brackets/book markers on the left
         if (!iconPrefix.getString().isEmpty()) {
             base.append(iconPrefix).append(" ");
         }
-        base.append(Text.literal(isBook ? "《" : "["));
+        base.append(Component.literal(isBook ? "《" : "["));
 
-        Text displayName = stack.getName();
-        Text translatedName = Text.translatable(stack.getItem().getTranslationKey());
+        Component displayName = stack.getHoverName();
+        Component translatedName = Component.translatable(stack.getItem().getDescriptionId());
 
         boolean hasCustomName = !displayName.equals(translatedName);
 
         base.append(displayName.copy());
 
         if (hasCustomName) {
-            base.append(Text.literal(" ("))
+            base.append(Component.literal(" ("))
                     .append(translatedName.copy())
-                    .append(Text.literal(")"));
+                    .append(Component.literal(")"));
         }
 
-        if (stack.getMaxCount() > 1 && stack.getCount() > 1) {
-            base.append("×").append(Text.literal(String.valueOf(stack.getCount()))).formatted(Formatting.AQUA);
+        if (stack.getMaxStackSize() > 1 && stack.getCount() > 1) {
+            base.append("×").append(Component.literal(String.valueOf(stack.getCount()))).withStyle(ChatFormatting.AQUA);
         }
 
         return base.append(isBook ? "》" : "]");
@@ -118,28 +119,26 @@ public class StackUtils {
 
     public static ReadOnlyInventory unpackFromItemStack(ItemStack stack) {
         List<ItemStack> tmp = new ArrayList<>();
-        Text itemName = StackUtils.getDisplayName(stack);
+        Component itemName = StackUtils.getDisplayName(stack);
 
         if (StackUtils.isBundle(stack)) {
-            #if MC_VER >= 1212
-            BundleContentsComponent bundle = stack.get(DataComponentTypes.BUNDLE_CONTENTS);
-            if (bundle != null) bundle.iterateCopy().forEach(tmp::add);
-            #endif
+            BundleContents bundle = stack.get(DataComponents.BUNDLE_CONTENTS);
+            if (bundle != null) bundle.itemCopyStream().forEach(tmp::add);
             int rows = Math.min(6, Math.max(1, (tmp.size() + 8) / 9));
             int size = rows * 9;
             ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, handlerTypeForRows(rows));
 
-            for (int i = 0; i < tmp.size() && i < size; i++) inv.setStack(i, tmp.get(i));
+            for (int i = 0; i < tmp.size() && i < size; i++) inv.setItem(i, tmp.get(i));
             return inv;
         }
 
         if (StackUtils.isShulkerBox(stack)) {
             try {
-                ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
-                if (container != null) tmp.addAll(container.stream().toList());
+                ItemContainerContents container = stack.get(DataComponents.CONTAINER);
+                if (container != null) tmp.addAll(container.allItemsCopyStream().toList());
                 int size = 27;
-                ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, ScreenHandlerType.SHULKER_BOX);
-                for (int i = 0; i < tmp.size() && i < size; i++) inv.setStack(i, tmp.get(i));
+                ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, MenuType.SHULKER_BOX);
+                for (int i = 0; i < tmp.size() && i < size; i++) inv.setItem(i, tmp.get(i));
                 return inv;
             } catch (RuntimeException e) {
                 ShowcaseMod.LOGGER.error(e.toString());
@@ -150,36 +149,38 @@ public class StackUtils {
         return null;
     }
 
-    public static ReadOnlyInventory snapshotFullInventory(ServerPlayerEntity player) {
-        ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, ScreenHandlerType.GENERIC_9X6);
+    public static ReadOnlyInventory snapshotFullInventory(ServerPlayer player) {
+        ReadOnlyInventory inv = new ReadOnlyInventory(54, TextUtils.INVENTORY, MenuType.GENERIC_9x6);
         ItemStack playerHead = StackUtils.getPlayerHead(player);
+        int level = Math.max(0, player.experienceLevel);
 
-        inv.setStack(0, playerHead.copy());
-        
-        // Add experience bottle with player's level
-        ItemStack experienceBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
-        experienceBottle.set(DataComponentTypes.CUSTOM_NAME, 
-            Text.translatable("showcase.screen.player_level", player.experienceLevel));
-        inv.setStack(1, experienceBottle);
-        
-        inv.setStack(2, DIVIDER_ITEM.copy());
-        inv.setStack(3, player.getEquippedStack(EquipmentSlot.HEAD).copy());
-        inv.setStack(4, player.getEquippedStack(EquipmentSlot.CHEST).copy());
-        inv.setStack(5, player.getEquippedStack(EquipmentSlot.LEGS).copy());
-        inv.setStack(6, player.getEquippedStack(EquipmentSlot.FEET).copy());
-        inv.setStack(7, DIVIDER_ITEM.copy());
-        inv.setStack(8, player.getEquippedStack(EquipmentSlot.OFFHAND).copy());
+        inv.setItem(0, playerHead.copy());
 
-        for (int i = 0; i < 9; i++) inv.setStack(i + 9, player.getInventory().getStack(i).copy());
-        for (int i = 18; i < 27; i++) inv.setStack(i, DIVIDER_ITEM.copy());
-        for (int i = 9; i < 36; i++) inv.setStack(i + 18, player.getInventory().getStack(i).copy());
+        if (level > 0) {
+            ItemStack experienceBottle = new ItemStack(Items.EXPERIENCE_BOTTLE);
+            experienceBottle.set(DataComponents.CUSTOM_NAME,
+                Component.translatable("showcase.screen.player_level", level));
+            inv.setItem(1, experienceBottle);
+        }
+        
+        inv.setItem(2, DIVIDER_ITEM.copy());
+        inv.setItem(3, player.getItemBySlot(EquipmentSlot.HEAD).copy());
+        inv.setItem(4, player.getItemBySlot(EquipmentSlot.CHEST).copy());
+        inv.setItem(5, player.getItemBySlot(EquipmentSlot.LEGS).copy());
+        inv.setItem(6, player.getItemBySlot(EquipmentSlot.FEET).copy());
+        inv.setItem(7, DIVIDER_ITEM.copy());
+        inv.setItem(8, player.getItemBySlot(EquipmentSlot.OFFHAND).copy());
+
+        for (int i = 0; i < 9; i++) inv.setItem(i + 9, player.getInventory().getItem(i).copy());
+        for (int i = 18; i < 27; i++) inv.setItem(i, DIVIDER_ITEM.copy());
+        for (int i = 9; i < 36; i++) inv.setItem(i + 18, player.getInventory().getItem(i).copy());
 
         return inv;
     }
 
-    public static ItemStack getPlayerHead(ServerPlayerEntity player) {
+    public static ItemStack getPlayerHead(ServerPlayer player) {
         ItemStack head = new ItemStack(Items.PLAYER_HEAD);
-        head.set(DataComponentTypes.PROFILE, ProfileCompat.createProfileComponent(player.getGameProfile()));
+        head.set(DataComponents.PROFILE, ProfileCompat.createProfileComponent(player.getGameProfile()));
         return head;
     }
 

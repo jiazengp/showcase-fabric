@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§rGörmek için tıklayın",
   "showcase.message.invalid_or_expired": "§rBu paylaşım bağlantısı geçersiz veya süresi dolmuş",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s oyuncusunun %s",
   "showcase.screen.hotbar_title": "§r%s oyuncusunun %s",

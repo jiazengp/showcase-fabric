@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§rKlik om te bekijken",
   "showcase.message.invalid_or_expired": "§rDeze deel-link is ongeldig of verlopen",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s's %s",
   "showcase.screen.hotbar_title": "§r%s's %s",

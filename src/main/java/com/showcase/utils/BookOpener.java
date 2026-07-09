@@ -1,28 +1,28 @@
 package com.showcase.utils;
 
 import eu.pb4.sgui.api.gui.BookGui;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 
 public final class BookOpener {
     private static final String BOOK_MARK = "isShowcaseBook";
     private final ItemStack book;
     private final BookGui gui;
 
-    public BookOpener(ServerPlayerEntity player, ItemStack book) {
+    public BookOpener(ServerPlayer player, ItemStack book) {
         this.book = book;
         this.gui = new BookGui(player, getNormalizeBook());
     }
 
     public ItemStack getNormalizeBook() {
         ItemStack bookCopy = this.book.copy();
-        NbtComponent customData = bookCopy.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
-        NbtCompound nbt = customData.copyNbt();
+        CustomData customData = bookCopy.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        CompoundTag nbt = customData.copyTag();
         nbt.putBoolean(BOOK_MARK, true);
-        bookCopy.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+        bookCopy.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
         return bookCopy;
     }

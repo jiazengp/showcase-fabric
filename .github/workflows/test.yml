@@ -16,8 +16,8 @@ jobs:
       - name: get minecraft versions
         id: get-versions
         run: |
-          # Extract versions from version_properties directory
-          versions=$(find version_properties/ -name "*.properties" -exec basename {} .properties \; | jq -R -s -c 'split("\n")[:-1]')
+          chmod +x .github/scripts/get-all-versions.sh
+          versions=$(.github/scripts/get-all-versions.sh)
           echo "versions=$versions" >> $GITHUB_OUTPUT
           echo "Found versions: $versions"
 
@@ -37,18 +37,18 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'microsoft'
 
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
 
       - name: GameTest for Minecraft ${{ matrix.minecraft-version }}
-        if: matrix.minecraft-version == '1.21.6'
+        if: matrix.minecraft-version == '26.2'
         run: ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }} || echo "GameTest not available for this version - skipping"
 
       - name: Unit Tests for Minecraft ${{ matrix.minecraft-version }}
-        if: matrix.minecraft-version == '1.21.6'
+        if: matrix.minecraft-version == '26.2'
         run: ./gradlew test -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Store reports

@@ -2,15 +2,14 @@ package com.showcase.gui;
 
 import com.showcase.utils.countdown.CountdownBossBar;
 import com.showcase.utils.countdown.CountdownBossBarManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 public abstract class BaseViewerContext {
-    public final ServerPlayerEntity player;
+    public final ServerPlayer player;
     public final List<SwitchEntry> interfaceList = new ArrayList<>();
     protected boolean closed = false;
     protected CountdownBossBar countdownBossBar;
@@ -21,12 +20,12 @@ public abstract class BaseViewerContext {
         void onViewerClose();
     }
 
-    public BaseViewerContext(ServerPlayerEntity player) {
+    public BaseViewerContext(ServerPlayer player) {
         this.player = player;
         this.durationSeconds = 0;
     }
 
-    public BaseViewerContext(ServerPlayerEntity player, int durationSeconds) {
+    public BaseViewerContext(ServerPlayer player, int durationSeconds) {
         this.player = player;
         this.durationSeconds = durationSeconds;
         
@@ -44,7 +43,7 @@ public abstract class BaseViewerContext {
         
         countdownBossBar = new CountdownBossBar(
             player, 
-            Text.translatable("showcase.viewer.countdown_title"),
+            Component.translatable("showcase.viewer.countdown_title"),
             durationSeconds
         ).setCallback(new CountdownBossBar.CountdownCallback() {
             @Override
@@ -68,11 +67,11 @@ public abstract class BaseViewerContext {
     }
 
     public void sendInstructionMessage() {
-        Text instructionMessage = Text.translatable("showcase.viewer.instructions")
-            .formatted(Formatting.GRAY);
+        Component instructionMessage = Component.translatable("showcase.viewer.instructions")
+            .withStyle(ChatFormatting.GRAY);
         
         // Send as action bar message for better visibility
-        player.sendMessage(instructionMessage, true);
+        player.sendSystemMessage(instructionMessage, true);
     }
 
     public void extendTime(int additionalSeconds) {

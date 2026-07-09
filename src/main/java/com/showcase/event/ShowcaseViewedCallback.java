@@ -3,8 +3,8 @@ package com.showcase.event;
 import com.showcase.data.ShareEntry;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,9 +13,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Return values:
  * <ul>
- * <li>{@link ActionResult#SUCCESS}: Allow the viewing and prevent other listeners from running</li>
- * <li>{@link ActionResult#PASS}: Allow the viewing and let other listeners run</li>
- * <li>{@link ActionResult#FAIL}: Cancel the viewing</li>
+ * <li>{@link InteractionResult#SUCCESS}: Allow the viewing and prevent other listeners from running</li>
+ * <li>{@link InteractionResult#PASS}: Allow the viewing and let other listeners run</li>
+ * <li>{@link InteractionResult#FAIL}: Cancel the viewing</li>
  * </ul>
  */
 @FunctionalInterface
@@ -23,14 +23,14 @@ public interface ShowcaseViewedCallback {
     Event<ShowcaseViewedCallback> EVENT = EventFactory.createArrayBacked(ShowcaseViewedCallback.class,
         (listeners) -> (viewer, shareEntry, shareId, originalOwner) -> {
             for (ShowcaseViewedCallback listener : listeners) {
-                ActionResult result = listener.onShowcaseViewed(viewer, shareEntry, shareId, originalOwner);
+                InteractionResult result = listener.onShowcaseViewed(viewer, shareEntry, shareId, originalOwner);
                 
-                if (result != ActionResult.PASS) {
+                if (result != InteractionResult.PASS) {
                     return result;
                 }
             }
             
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
 
     /**
@@ -42,8 +42,8 @@ public interface ShowcaseViewedCallback {
      * @param originalOwner the original owner of the showcased content
      * @return the action result
      */
-    ActionResult onShowcaseViewed(@NotNull ServerPlayerEntity viewer,
+    InteractionResult onShowcaseViewed(@NotNull ServerPlayer viewer,
                                   @NotNull ShareEntry shareEntry,
                                   @NotNull String shareId,
-                                  @NotNull ServerPlayerEntity originalOwner);
+                                  @NotNull ServerPlayer originalOwner);
 }

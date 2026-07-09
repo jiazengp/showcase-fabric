@@ -4,12 +4,12 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.showcase.config.ModConfigManager;
 import com.showcase.utils.permissions.PermissionChecker;
 import com.showcase.utils.permissions.Permissions;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class PlayerShowcaseCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, String command) {
         var root = literal(command)
                 .requires(ctx -> PermissionChecker.hasPermission(ctx, Permissions.COMMAND, 0))
                 .executes(ctx -> ShareCommandExecutor.shareItem(ctx, ShareCommandUtils.getSenderPlayer(ctx), null, null, null));

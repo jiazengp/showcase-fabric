@@ -18,8 +18,8 @@ jobs:
       - name: get minecraft versions
         id: get-versions
         run: |
-          # Extract versions from version_properties directory
-          versions=$(find version_properties/ -name "*.properties" -exec basename {} .properties \; | jq -R -s -c 'split("\n")[:-1]')
+          chmod +x .github/scripts/get-all-versions.sh
+          versions=$(.github/scripts/get-all-versions.sh)
           echo "versions=$versions" >> $GITHUB_OUTPUT
           echo "Found versions: $versions"
 
@@ -40,7 +40,7 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'microsoft'
 
       - name: make gradle wrapper executable

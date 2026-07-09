@@ -5,14 +5,18 @@ import com.showcase.utils.ContainerTitleResolver;
 import com.showcase.utils.ReadOnlyInventory;
 import com.showcase.utils.TextUtils;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.*;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.village.TradeOfferList;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.CrafterMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.MerchantMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.trading.MerchantOffers;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,11 +27,11 @@ public class ContainerOpenWatcher {
     private static final Map<UUID, WatchMerchant> watchMerchantPending = new ConcurrentHashMap<>();
 
     public interface ContainerCallback {
-        void onOpened(ServerPlayerEntity player, ReadOnlyInventory inventory);
+        void onOpened(ServerPlayer player, ReadOnlyInventory inventory);
     }
 
     public interface MerchantGuiCallback {
-        void onOpened(ServerPlayerEntity player, MerchantContext merchantContext);
+        void onOpened(ServerPlayer player, MerchantContext merchantContext);
     }
 
     private static class WatchContainer {
@@ -54,26 +58,26 @@ public class ContainerOpenWatcher {
         }
     }
 
-    public static void awaitMerchantGuiOpened(ServerPlayerEntity player, int duration,
+    public static void awaitMerchantGuiOpened(ServerPlayer player, int duration,
                                               MerchantGuiCallback onSuccess, Runnable onTimeout) {
         if (player == null) return;
 
-        watchMerchantPending.put(player.getUuid(), new WatchMerchant(onSuccess, onTimeout, duration));
+        watchMerchantPending.put(player.getUUID(), new WatchMerchant(onSuccess, onTimeout, duration));
     }
 
-    public static void awaitContainerOpened(ServerPlayerEntity player, int duration,
+    public static void awaitContainerOpened(ServerPlayer player, int duration,
                                             ContainerCallback onSuccess, Runnable onTimeout) {
         if (player == null) return;
 
-        watchContainerPending.put(player.getUuid(), new WatchContainer(onSuccess, onTimeout, duration));
+        watchContainerPending.put(player.getUUID(), new WatchContainer(onSuccess, onTimeout, duration));
     }
 
-    public static void onMerchantGuiOpened(ServerPlayerEntity player, NamedScreenHandlerFactory factory) {
+    public static void onMerchantGuiOpened(ServerPlayer player, MenuProvider factory) {
         if (player == null) return;
 
-        UUID playerId = player.getUuid();
+        UUID playerId = player.getUUID();
         WatchMerchant entry = watchMerchantPending.remove(playerId);
-        ScreenHandler handler = player.currentScreenHandler;
+        AbstractContainerMenu handler = player.containerMenu;
 
         if (handler == null || entry == null) return;
 
@@ -87,18 +91,18 @@ public class ContainerOpenWatcher {
         entry.onSuccess.onOpened(player, merchantContext);
     }
 
-    private static MerchantContext getMerchantContext(ScreenHandler handler, Text name) {
-        if (!(handler instanceof MerchantScreenHandler merchantHandler)) return null;
+    private static MerchantContext getMerchantContext(AbstractContainerMenu handler, Component name) {
+        if (!(handler instanceof MerchantMenu merchantHandler)) return null;
 
         try {
-            TradeOfferList offers = merchantHandler.getRecipes();
-            int level = merchantHandler.getExperience();
-            int experience = merchantHandler.getLevelProgress();
+            MerchantOffers offers = merchantHandler.getOffers();
+            int level = merchantHandler.getTraderLevel();
+            int experience = merchantHandler.getTraderXp();
             return new MerchantContext(
                     offers,
                     level,
                     experience,
-                    merchantHandler.isLeveled(),
+                    merchantHandler.showProgressBar(),
                     name
             );
         } catch (Exception e) {
@@ -106,25 +110,25 @@ public class ContainerOpenWatcher {
         }
     }
 
-    public static void onContainerOpened(ServerPlayerEntity player, NamedScreenHandlerFactory factory) {
+    public static void onContainerOpened(ServerPlayer player, MenuProvider factory) {
         if (player == null) return;
 
-        UUID playerId = player.getUuid();
+        UUID playerId = player.getUUID();
         WatchContainer entry = watchContainerPending.remove(playerId);
         if (entry == null) return;
 
-        ScreenHandler handler = player.currentScreenHandler;
+        AbstractContainerMenu handler = player.containerMenu;
         if (handler == null) {
             if (entry.onTimeout != null) entry.onTimeout.run();
             return;
         }
 
         // Use the new resolver to get accurate container title
-        Text name = ContainerTitleResolver.resolveContainerTitle(player, handler, factory);
-        ScreenHandlerType<?> type = handler.getType() == ScreenHandlerType.CRAFTER_3X3 ? ScreenHandlerType.CRAFTING : handler.getType();
+        Component name = ContainerTitleResolver.resolveContainerTitle(player, handler, factory);
+        MenuType<?> type = handler.getType() == MenuType.CRAFTER_3x3 ? MenuType.GENERIC_3x3 : handler.getType();
         ReadOnlyInventory tempInv;
 
-        if (handler instanceof GenericContainerScreenHandler containerHandler) {
+        if (handler instanceof ChestMenu containerHandler) {
             tempInv = createGenericContainerInventory(containerHandler, name, type);
         } else {
             tempInv = createSlotBasedInventory(handler, player, name, type);
@@ -138,30 +142,46 @@ public class ContainerOpenWatcher {
         entry.onSuccess.onOpened(player, tempInv);
     }
 
-    private static ReadOnlyInventory createGenericContainerInventory(GenericContainerScreenHandler containerHandler,
-                                                                     Text name, ScreenHandlerType<?> type) {
-        Inventory containerInventory = containerHandler.getInventory();
-        ReadOnlyInventory tempInv = new ReadOnlyInventory(containerInventory.size(), name, type);
+    private static ReadOnlyInventory createGenericContainerInventory(ChestMenu containerHandler,
+                                                                     Component name, MenuType<?> type) {
+        Container containerInventory = containerHandler.getContainer();
+        ReadOnlyInventory tempInv = new ReadOnlyInventory(containerInventory.getContainerSize(), name, type);
 
-        for (int i = 0; i < containerInventory.size(); i++) {
-            ItemStack stack = containerInventory.getStack(i);
-            tempInv.setStack(i, isValid(stack) ? stack.copy() : ItemStack.EMPTY);
+        for (int i = 0; i < containerInventory.getContainerSize(); i++) {
+            ItemStack stack = containerInventory.getItem(i);
+            tempInv.setItem(i, isValid(stack) ? stack.copy() : ItemStack.EMPTY);
         }
 
         return tempInv;
     }
 
-    private static ReadOnlyInventory createSlotBasedInventory(ScreenHandler handler, ServerPlayerEntity player,
-                                                              Text name, ScreenHandlerType<?> type) {
+    private static ReadOnlyInventory createSlotBasedInventory(AbstractContainerMenu handler, ServerPlayer player,
+                                                              Component name, MenuType<?> type) {
+        if (handler instanceof CrafterMenu crafterMenu) {
+            return createCrafterInventory(crafterMenu, name);
+        }
+
         List<Slot> nonPlayerSlots = handler.slots.stream()
-                .filter(slot -> slot.inventory != player.getInventory())
+                .filter(slot -> slot.container != player.getInventory())
                 .toList();
 
         ReadOnlyInventory tempInv = new ReadOnlyInventory(nonPlayerSlots.size(), name, type);
 
         for (int i = 0; i < nonPlayerSlots.size(); i++) {
-            ItemStack stack = nonPlayerSlots.get(i).getStack();
-            tempInv.setStack(i, isValid(stack) ? stack.copy() : ItemStack.EMPTY);
+            ItemStack stack = nonPlayerSlots.get(i).getItem();
+            tempInv.setItem(i, isValid(stack) ? stack.copy() : ItemStack.EMPTY);
+        }
+
+        return tempInv;
+    }
+
+    private static ReadOnlyInventory createCrafterInventory(CrafterMenu crafterMenu, Component name) {
+        Container container = crafterMenu.getContainer();
+        ReadOnlyInventory tempInv = new ReadOnlyInventory(9, name, MenuType.GENERIC_3x3);
+
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = container.getItem(i);
+            tempInv.setItem(i, isValid(stack) ? stack.copy() : ItemStack.EMPTY);
         }
 
         return tempInv;
@@ -171,7 +191,7 @@ public class ContainerOpenWatcher {
      * @deprecated Use ContainerTitleResolver.resolveContainerTitle() instead
      */
     @Deprecated
-    public static Text resolveContainerTitle(NamedScreenHandlerFactory factory) {
+    public static Component resolveContainerTitle(MenuProvider factory) {
         return ContainerTitleResolver.resolveContainerTitle(factory);
     }
 

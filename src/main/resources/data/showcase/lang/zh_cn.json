@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§r§9点击查看",
   "showcase.message.invalid_or_expired": "§r该展示链接无效或已过期",
 
+  
+  "showcase.name.container": "容器",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s的%s",
   "showcase.screen.hotbar_title": "§r%s的%s",

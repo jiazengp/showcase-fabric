@@ -1,36 +1,25 @@
 package com.showcase.utils.compat;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Compatibility layer for ServerPlayerEntity APIs across different Minecraft versions.
- * Handles API differences in 1.21.9+.
+ * Helpers around ServerPlayer accessors on the 26.x mainline.
  */
 public class ServerPlayerCompat {
 
     /**
-     * Gets the MinecraftServer from a ServerPlayerEntity.
-     * In 1.21.9+, getServer() was removed, use getEntityWorld().getServer() instead.
+     * Gets the MinecraftServer from a ServerPlayer.
      */
-    public static MinecraftServer getServer(ServerPlayerEntity player) {
-        #if MC_VER >= 1219
-        return player.getEntityWorld().getServer();
-        #else
-        return player.getServer();
-        #endif
+    public static MinecraftServer getServer(ServerPlayer player) {
+        return player.level().getServer();
     }
 
     /**
-     * Gets the ServerWorld from a ServerPlayerEntity.
-     * In 1.21.9+, getWorld() was replaced with getEntityWorld().
+     * Gets the ServerLevel from a ServerPlayer.
      */
-    public static ServerWorld getWorld(ServerPlayerEntity player) {
-        #if MC_VER >= 1219
-        return player.getEntityWorld();
-        #else
-        return (ServerWorld) player.getWorld();
-        #endif
+    public static ServerLevel getWorld(ServerPlayer player) {
+        return player.level();
     }
 }

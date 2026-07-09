@@ -25,6 +25,9 @@
   "showcase.message.click_to_view": "§rKlik for at se",
   "showcase.message.invalid_or_expired": "§rDette delingslink er ugyldigt eller udløbet",
 
+  
+  "showcase.name.container": "Container",
+
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%ss %s",
   "showcase.screen.hotbar_title": "§r%ss %s",

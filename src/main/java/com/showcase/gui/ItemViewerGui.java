@@ -4,10 +4,8 @@ import com.showcase.utils.BookOpener;
 import com.showcase.utils.MapViewer;
 import com.showcase.utils.StackUtils;
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
+import eu.pb4.sgui.api.elements.GuiElement;
+import net.minecraft.world.inventory.ContainerInput;
 
 public class ItemViewerGui extends BaseWorldGui {
     public ItemViewerGui(ItemViewerContext context, int slot) {
@@ -32,7 +30,7 @@ public class ItemViewerGui extends BaseWorldGui {
     }
 
     @Override
-    public boolean onClick(int index, ClickType type, SlotActionType action, GuiElementInterface element) {
+    public boolean onClick(int index, ClickType type, ContainerInput action, GuiElement element) {
         if (type == ClickType.DROP || type == ClickType.CTRL_DROP) {
             this.close();
             return true;
@@ -61,10 +59,5 @@ public class ItemViewerGui extends BaseWorldGui {
         }
 
         return super.onClick(index, type, action, element);
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
     }
 }

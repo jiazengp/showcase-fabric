@@ -2,12 +2,12 @@ package com.showcase.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.showcase.utils.permissions.PermissionChecker;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class AdminShowcaseCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, String command) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, String command) {
         dispatcher.register(literal(command)
                 .requires(PermissionChecker::isOp)
                 .executes(ctx -> ShareCommandExecutor.shareItem(ctx, ShareCommandUtils.getSenderPlayer(ctx), null, null, null))

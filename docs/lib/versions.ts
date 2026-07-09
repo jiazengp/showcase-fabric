@@ -30,6 +30,11 @@ function parsePropertiesFile(filePath: string): Record<string, string> {
   return properties;
 }
 
+function isSupportedMainlineVersion(version: string): boolean {
+  const major = Number.parseInt(version.split('.')[0] ?? '', 10);
+  return Number.isFinite(major) && major >= 26;
+}
+
 /**
  * Get all available Minecraft versions from version_properties directory
  */
@@ -38,15 +43,16 @@ export function getAvailableMinecraftVersions(): string[] {
 
   if (!fs.existsSync(versionPropsDir)) {
     console.warn('version_properties directory not found, using fallback versions');
-    return ['1.21.2', '1.21.4', '1.21.5', '1.21.6'];
+    return ['26.2'];
   }
 
   const files = fs.readdirSync(versionPropsDir);
   const versions = files
     .filter(file => file.endsWith('.properties'))
     .map(file => file.replace('.properties', ''))
+    .filter(isSupportedMainlineVersion)
     .sort((a, b) => {
-      // Sort versions properly (1.21.2 < 1.21.4 < 1.21.5 < 1.21.6)
+      // Sort versions numerically so future 26.x entries stay ordered.
       const parseVersion = (v: string) => v.split('.').map(n => parseInt(n, 10));
       const aParts = parseVersion(a);
       const bParts = parseVersion(b);
@@ -112,7 +118,7 @@ export function getAllVersionInfo(): VersionInfo[] {
  */
 export function getLatestMinecraftVersion(): string {
   const versions = getAvailableMinecraftVersions();
-  return versions[versions.length - 1] || '1.21.6';
+  return versions[versions.length - 1] || '26.2';
 }
 
 /**

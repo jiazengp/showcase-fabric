@@ -1,12 +1,12 @@
 package com.showcase.utils;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
 
 public class HotbarSnapshotInventory extends ReadOnlyInventory {
-    public HotbarSnapshotInventory(PlayerInventory playerInv) {
-        super(9, TextUtils.HOTBAR, ScreenHandlerType.GENERIC_9X1);
+    public HotbarSnapshotInventory(Inventory playerInv) {
+        super(9, TextUtils.HOTBAR, MenuType.GENERIC_9x1);
 
-        for (int i = 0; i < 9; i++) setStack(i, playerInv.getStack(i).copy());
+        for (int i = 0; i < 9; i++) setItem(i, playerInv.getItem(i).copy());
     }
 }

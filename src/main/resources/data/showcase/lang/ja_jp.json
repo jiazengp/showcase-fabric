@@ -23,6 +23,9 @@
   "showcase.message.expiry_notice": "§r（このリンクはあと §l%d §r分で無効になります）",
   "showcase.message.click_to_view": "§r§bクリックして表示",
   "showcase.message.invalid_or_expired": "§rこの共有リンクは無効または期限切れです。",
+
+  
+  "showcase.name.container": "Container",
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s の %s",
   "showcase.screen.hotbar_title": "§r%s の %s",

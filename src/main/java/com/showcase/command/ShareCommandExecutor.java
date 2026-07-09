@@ -12,46 +12,45 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.data.ShareEntry;
 import com.showcase.listener.ContainerOpenWatcher;
 import com.showcase.utils.*;
-import com.showcase.utils.ShareConstants;
 import com.showcase.utils.countdown.CountdownBossBar;
 import com.showcase.utils.countdown.CountdownBossBarManager;
 import com.showcase.utils.stats.StatUtils;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.greedyString;
 import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static com.showcase.command.ShareCommandUtils.*;
 import static com.showcase.command.ShowcaseCommand.*;
 import static com.showcase.utils.permissions.PermissionChecker.isOp;
-import static net.minecraft.server.command.CommandManager.argument;
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 import static com.showcase.command.ShowcaseManager.ShareType.*;
 
 public class ShareCommandExecutor {
     @FunctionalInterface
     private interface ShareExecutor {
-        int execute(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receiver, Integer durationSeconds);
+        int execute(CommandContext<CommandSourceStack> ctx, ServerPlayer sourcePlayer, String description, Collection<ServerPlayer> receiver, Integer durationSeconds);
     }
 
     @FunctionalInterface
     private interface SimpleShareExecutor {
-        int execute(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer durationSeconds);
+        int execute(CommandContext<CommandSourceStack> ctx, String description, Collection<ServerPlayer> receivers, Integer durationSeconds);
     }
 
     /**
      * Returns a RequiredArgumentBuilder for duration input with suggestions and validation
      */
-    public static RequiredArgumentBuilder<ServerCommandSource, String> shareDurationArgument() {
+    public static RequiredArgumentBuilder<CommandSourceStack, String> shareDurationArgument() {
         return argument(DURATION_ARG, StringArgumentType.word())
                 .suggests(TIME_SUGGESTIONS);
     }
@@ -59,7 +58,7 @@ public class ShareCommandExecutor {
     /**
      * Suggestion provider for time duration with validation feedback
      */
-    private static final SuggestionProvider<ServerCommandSource> TIME_SUGGESTIONS = (context, builder) -> {
+    private static final SuggestionProvider<CommandSourceStack> TIME_SUGGESTIONS = (context, builder) -> {
         String input = builder.getRemaining().toLowerCase();
         int min = ModConfigManager.getShareLinkMinExpiry();
         int max = ModConfigManager.getShareLinkDefaultExpiry();
@@ -67,7 +66,7 @@ public class ShareCommandExecutor {
         // Check if player is OP
         boolean isOp = false;
         try {
-            ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+            ServerPlayer player = context.getSource().getPlayerOrException();
             isOp = isOp(player);
         } catch (Exception ignored) {
             // Player not available, default to non-OP
@@ -85,12 +84,12 @@ public class ShareCommandExecutor {
             String midFormat = TimeUtils.formatDurationShort(suggestedMid);
             String maxFormat = TimeUtils.formatDurationShort(suggestedMax);
 
-            builder.suggest(minFormat, Text.translatable("showcase.command.duration.suggestion.minimum", TimeUtils.formatSeconds(suggestedMin)));
-            builder.suggest(midFormat, Text.translatable("showcase.command.duration.suggestion.recommended", TimeUtils.formatSeconds(suggestedMid)));
-            builder.suggest(maxFormat, Text.translatable("showcase.command.duration.suggestion.maximum", TimeUtils.formatSeconds(suggestedMax)));
+            builder.suggest(minFormat, Component.translatable("showcase.command.duration.suggestion.minimum", TimeUtils.formatSeconds(suggestedMin)));
+            builder.suggest(midFormat, Component.translatable("showcase.command.duration.suggestion.recommended", TimeUtils.formatSeconds(suggestedMid)));
+            builder.suggest(maxFormat, Component.translatable("showcase.command.duration.suggestion.maximum", TimeUtils.formatSeconds(suggestedMax)));
 
             if (isOp) {
-                builder.suggest("1h", Text.translatable("showcase.command.duration.suggestion.op_only"));
+                builder.suggest("1h", Component.translatable("showcase.command.duration.suggestion.op_only"));
             }
         } else {
             // Try to parse the input and validate
@@ -99,14 +98,14 @@ public class ShareCommandExecutor {
 
                 if (!isOp && (seconds < min || seconds > max)) {
                     // Show validation error in tooltip
-                    builder.suggest(input, Text.translatable("showcase.command.duration.error.out_of_range",
+                    builder.suggest(input, Component.translatable("showcase.command.duration.error.out_of_range",
                         TimeUtils.formatSeconds(min), TimeUtils.formatSeconds(max)));
                 } else {
                     // Show valid time in tooltip
                     String timeDisplay = TimeUtils.formatSeconds(seconds);
-                    Text status = isOp ?
-                        Text.translatable("showcase.command.duration.valid.op", timeDisplay) :
-                        Text.translatable("showcase.command.duration.valid", timeDisplay);
+                    Component status = isOp ?
+                        Component.translatable("showcase.command.duration.valid.op", timeDisplay) :
+                        Component.translatable("showcase.command.duration.valid", timeDisplay);
                     builder.suggest(input, status);
                 }
             } catch (IllegalArgumentException e) {
@@ -114,17 +113,17 @@ public class ShareCommandExecutor {
                 if (input.matches("\\d+")) {
                     try {
                         int numValue = Integer.parseInt(input);
-                        builder.suggest(input + "s", Text.translatable("showcase.command.duration.hint.add_seconds"));
-                        builder.suggest(input + "m", Text.translatable("showcase.command.duration.hint.add_minutes"));
+                        builder.suggest(input + "s", Component.translatable("showcase.command.duration.hint.add_seconds"));
+                        builder.suggest(input + "m", Component.translatable("showcase.command.duration.hint.add_minutes"));
                         if (isOp || numValue <= max / 60) {
-                            builder.suggest(input + "h", Text.translatable("showcase.command.duration.hint.add_hours"));
+                            builder.suggest(input + "h", Component.translatable("showcase.command.duration.hint.add_hours"));
                         }
                     } catch (NumberFormatException nfe) {
                         // Number too large, show error
-                        builder.suggest(input, Text.translatable("showcase.command.duration.error.invalid_format"));
+                        builder.suggest(input, Component.translatable("showcase.command.duration.error.invalid_format"));
                     }
                 } else {
-                    builder.suggest(input, Text.translatable("showcase.command.duration.error.invalid_format"));
+                    builder.suggest(input, Component.translatable("showcase.command.duration.error.invalid_format"));
                 }
             }
         }
@@ -132,62 +131,62 @@ public class ShareCommandExecutor {
         return builder.buildFuture();
     };
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createItemShareCommand(boolean withSource) {
+    public static LiteralArgumentBuilder<CommandSourceStack> createItemShareCommand(boolean withSource) {
         return createShareCommand(ShareConstants.ITEM, withSource, ShareCommandExecutor::shareItem);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createStatsShareCommand(boolean withSource) {
+    public static LiteralArgumentBuilder<CommandSourceStack> createStatsShareCommand(boolean withSource) {
         return createShareCommand(ShareConstants.STATS, withSource, ShareCommandExecutor::shareStats);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createInventoryShareCommand(boolean withSource) {
+    public static LiteralArgumentBuilder<CommandSourceStack> createInventoryShareCommand(boolean withSource) {
         return createShareCommand(ShareConstants.INVENTORY, withSource, ShareCommandExecutor::shareInventory);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createHotbarShareCommand(boolean withSource) {
+    public static LiteralArgumentBuilder<CommandSourceStack> createHotbarShareCommand(boolean withSource) {
         return createShareCommand(ShareConstants.HOTBAR, withSource, ShareCommandExecutor::shareHotbar);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createEnderChestShareCommand(boolean withSource) {
+    public static LiteralArgumentBuilder<CommandSourceStack> createEnderChestShareCommand(boolean withSource) {
         return createShareCommand(ShareConstants.ENDER_CHEST, withSource, ShareCommandExecutor::shareEnderChest);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createContainerShareCommand() {
+    public static LiteralArgumentBuilder<CommandSourceStack> createContainerShareCommand() {
         return createSimpleShareCommand(ShareConstants.CONTAINER, ShareCommandExecutor::shareContainer);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> shareMerchantShareCommand() {
+    public static LiteralArgumentBuilder<CommandSourceStack> shareMerchantShareCommand() {
         return createSimpleShareCommand(ShareConstants.MERCHANT, ShareCommandExecutor::shareMerchant);
     }
 
-    public static LiteralArgumentBuilder<ServerCommandSource> createCancelCommand() {
+    public static LiteralArgumentBuilder<CommandSourceStack> createCancelCommand() {
         return literal(ShareConstants.CANCEL)
                 .then(argument("id", string())
                         .suggests((ctx, builder) -> {
-                            ServerPlayerEntity player = getSenderPlayer(ctx);
+                            ServerPlayer player = getSenderPlayer(ctx);
                             if (player != null) {
                                 ShowcaseManager.getUnmodifiableActiveShares().entrySet().stream()
-                                        .filter(e -> e.getValue().getOwnerUuid().equals(player.getUuid()))
+                                        .filter(e -> e.getValue().getOwnerUuid().equals(player.getUUID()))
                                         .map(Map.Entry::getKey)
                                         .forEach(builder::suggest);
                             }
                             return builder.buildFuture();
                         })
                         .executes(ctx -> {
-                            ServerPlayerEntity player = getSenderPlayer(ctx);
+                            ServerPlayer player = getSenderPlayer(ctx);
                             String id = StringArgumentType.getString(ctx, "id");
                             return cancelShare(player, id);
                         }));
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> createShareCommand(String commandName, boolean withSource, ShareExecutor executor) {
+    private static LiteralArgumentBuilder<CommandSourceStack> createShareCommand(String commandName, boolean withSource, ShareExecutor executor) {
         var command = literal(commandName)
                 .executes(ctx -> executor.execute(ctx, null, null, null, null));
 
         if (withSource) {
-            command.then(argument(SOURCE_ARG, EntityArgumentType.player())
+            command.then(argument(SOURCE_ARG, EntityArgument.player())
                     .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, null, null))
-                    .then(argument(RECEIVERS_ARG, EntityArgumentType.players())
+                    .then(argument(RECEIVERS_ARG, EntityArgument.players())
                             .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, getReceivers(ctx), null))
                             .then(shareDurationArgument()
                                     .executes(ctx -> executor.execute(ctx, getSourcePlayer(ctx), null, getReceivers(ctx), getValidatedDuration(ctx)))
@@ -198,7 +197,7 @@ public class ShareCommandExecutor {
                     )
             );
         } else {
-            command.then(argument(RECEIVERS_ARG, EntityArgumentType.players())
+            command.then(argument(RECEIVERS_ARG, EntityArgument.players())
                     .executes(ctx -> executor.execute(ctx, null, null, getReceivers(ctx), null))
                     .then(shareDurationArgument()
                             .executes(ctx -> executor.execute(ctx, null, null, getReceivers(ctx), getValidatedDuration(ctx)))
@@ -212,11 +211,11 @@ public class ShareCommandExecutor {
         return command;
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> createSimpleShareCommand(String commandName, SimpleShareExecutor executor) {
+    private static LiteralArgumentBuilder<CommandSourceStack> createSimpleShareCommand(String commandName, SimpleShareExecutor executor) {
         var command = literal(commandName)
                 .executes(ctx -> executor.execute(ctx, null, null, null));
 
-        command.then(argument(RECEIVERS_ARG, EntityArgumentType.players())
+        command.then(argument(RECEIVERS_ARG, EntityArgument.players())
                 .executes(ctx -> executor.execute(ctx, null, getReceivers(ctx), null))
                 .then(shareDurationArgument()
                         .executes(ctx -> executor.execute(ctx, null, getReceivers(ctx), getValidatedDuration(ctx)))
@@ -230,50 +229,50 @@ public class ShareCommandExecutor {
     }
 
     private static int executeShare(
-            CommandContext<ServerCommandSource> ctx,
+            CommandContext<CommandSourceStack> ctx,
             ShowcaseManager.ShareType type,
-            @Nullable Function<ServerPlayerEntity, ItemStack> stackSupplier,
+            @Nullable Function<ServerPlayer, ItemStack> stackSupplier,
             @Nullable String emptyMessageKey,
-            QuadFunction<ServerPlayerEntity, @Nullable ItemStack, Integer, Collection<ServerPlayerEntity>, String> shareCreator,
-            Text defaultDisplayName,
+            QuadFunction<ServerPlayer, @Nullable ItemStack, Integer, Collection<ServerPlayer>, String> shareCreator,
+            Component defaultDisplayName,
             String description,
-            Collection<ServerPlayerEntity> receivers,
+            Collection<ServerPlayer> receivers,
             Integer duration
     ) {
         try {
-            ServerPlayerEntity sender = getSenderPlayer(ctx);
+            ServerPlayer sender = getSenderPlayer(ctx);
             if (sender == null) return 0;
             if (ShowcaseManager.isOnCooldown(sender, type)) return 0;
 
             // Check sub-permissions for optional parameters
             if (receivers != null && !ShareCommandUtils.canSpecifyReceivers(sender, type)) {
-                sender.sendMessage(TextUtils.error(Text.translatable("showcase.command.no_permission.receivers")));
+                sender.sendSystemMessage(TextUtils.error(Component.translatable("showcase.command.no_permission.receivers")));
                 return 0;
             }
             
             if (duration != null && !ShareCommandUtils.canSpecifyDuration(sender, type)) {
-                sender.sendMessage(TextUtils.error(Text.translatable("showcase.command.no_permission.duration")));
+                sender.sendSystemMessage(TextUtils.error(Component.translatable("showcase.command.no_permission.duration")));
                 return 0;
             }
             
             if (description != null && !description.isEmpty() && !ShareCommandUtils.canSpecifyDescription(sender, type)) {
-                sender.sendMessage(TextUtils.error(Text.translatable("showcase.command.no_permission.description")));
+                sender.sendSystemMessage(TextUtils.error(Component.translatable("showcase.command.no_permission.description")));
                 return 0;
             }
 
-            ServerPlayerEntity source = getSourceOrSender(ctx);
+            ServerPlayer source = getSourceOrSender(ctx);
             ItemStack stack = ItemStack.EMPTY;
 
             if (stackSupplier != null) {
                 stack = stackSupplier.apply(source).copy();
                 if (stack.isEmpty()) {
-                    sender.sendMessage(TextUtils.error(Text.translatable(emptyMessageKey)));
+                    sender.sendSystemMessage(TextUtils.error(Component.translatable(emptyMessageKey)));
                     return 0;
                 }
             }
 
             String shareId = shareCreator.apply(source, stackSupplier != null ? stack : null, duration, receivers);
-            Text displayName = (stackSupplier != null ? StackUtils.getDisplayName(stack) : defaultDisplayName);
+            Component displayName = (stackSupplier != null ? StackUtils.getDisplayName(stack) : defaultDisplayName);
 
             ShareCommandUtils.sendShareMessage(sender, source, receivers, description, type, displayName, duration, shareId);
             ShowcaseManager.setCooldown(sender, type);
@@ -285,33 +284,33 @@ public class ShareCommandExecutor {
         }
     }
 
-    public static int shareItem(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
+    public static int shareItem(CommandContext<CommandSourceStack> ctx, ServerPlayer sourcePlayer, String description, Collection<ServerPlayer> receivers, Integer duration) {
         return executeShare(
                 ctx,
                 ITEM,
-                player -> player.getEquippedStack(EquipmentSlot.MAINHAND),
+                player -> player.getItemBySlot(EquipmentSlot.MAINHAND),
                 "showcase.message.no_item",
                 ShowcaseManager::createItemShare,
-                Text.empty(),
+                Component.empty(),
                 description, receivers, duration
         );
     }
 
-    public static int shareStats(CommandContext<ServerCommandSource> ctx, ServerPlayerEntity sourcePlayer, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
+    public static int shareStats(CommandContext<CommandSourceStack> ctx, ServerPlayer sourcePlayer, String description, Collection<ServerPlayer> receivers, Integer duration) {
         return executeShare(
                 ctx,
                 STATS,
                 StatUtils::createStatsBook,
                 "showcase.message.no_stats",
                 ShowcaseManager::createStatsShare,
-                Text.empty(),
+                Component.empty(),
                 description, receivers, duration
         );
     }
 
-    public static int shareInventory(CommandContext<ServerCommandSource> ctx,
-                                     ServerPlayerEntity sourcePlayer, String description,
-                                     Collection<ServerPlayerEntity> receivers, Integer duration) {
+    public static int shareInventory(CommandContext<CommandSourceStack> ctx,
+                                     ServerPlayer sourcePlayer, String description,
+                                     Collection<ServerPlayer> receivers, Integer duration) {
         return executeShare(
                 ctx,
                 INVENTORY,
@@ -323,9 +322,9 @@ public class ShareCommandExecutor {
         );
     }
 
-    public static int shareHotbar(CommandContext<ServerCommandSource> ctx,
-                                  ServerPlayerEntity sourcePlayer, String description,
-                                  Collection<ServerPlayerEntity> receivers, Integer duration) {
+    public static int shareHotbar(CommandContext<CommandSourceStack> ctx,
+                                  ServerPlayer sourcePlayer, String description,
+                                  Collection<ServerPlayer> receivers, Integer duration) {
         return executeShare(
                 ctx,
                 HOTBAR,
@@ -337,9 +336,9 @@ public class ShareCommandExecutor {
         );
     }
 
-    public static int shareEnderChest(CommandContext<ServerCommandSource> ctx,
-                                      ServerPlayerEntity sourcePlayer, String description,
-                                      Collection<ServerPlayerEntity> receivers, Integer duration) {
+    public static int shareEnderChest(CommandContext<CommandSourceStack> ctx,
+                                      ServerPlayer sourcePlayer, String description,
+                                      Collection<ServerPlayer> receivers, Integer duration) {
         return executeShare(
                 ctx,
                 ENDER_CHEST,
@@ -351,16 +350,16 @@ public class ShareCommandExecutor {
         );
     }
 
-    public static int shareContainer(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        ServerPlayerEntity sender = getSenderPlayer(ctx);
+    public static int shareContainer(CommandContext<CommandSourceStack> ctx, String description, Collection<ServerPlayer> receivers, Integer duration) {
+        ServerPlayer sender = getSenderPlayer(ctx);
         if (sender == null) return 0;
 
         if (ShowcaseManager.isOnCooldown(sender, CONTAINER)) return 0;
 
         int durationSeconds = ModConfigManager.getShareSettings(CONTAINER).listeningDuration;
-        Text message = Text.translatable("showcase.message.share_container_tip", durationSeconds);
+        Component message = Component.translatable("showcase.message.share_container_tip", durationSeconds);
 
-        sender.sendMessage(message, true);
+        sender.sendSystemMessage(message, true);
         CountdownBossBar countdown = new CountdownBossBar(sender, message, durationSeconds);
         countdown.start();
         CountdownBossBarManager.add(countdown);
@@ -373,22 +372,22 @@ public class ShareCommandExecutor {
                     CountdownBossBarManager.remove(countdown);
                 },
                 () -> {
-                    sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_container_expiry")), true);
+                    sender.sendSystemMessage(TextUtils.warning(Component.translatable("showcase.message.share_container_expiry")), true);
                     CountdownBossBarManager.remove(countdown);
                 });
 
         return Command.SINGLE_SUCCESS;
     }
 
-    public static int shareMerchant(CommandContext<ServerCommandSource> ctx, String description, Collection<ServerPlayerEntity> receivers, Integer duration) {
-        ServerPlayerEntity sender = getSenderPlayer(ctx);
+    public static int shareMerchant(CommandContext<CommandSourceStack> ctx, String description, Collection<ServerPlayer> receivers, Integer duration) {
+        ServerPlayer sender = getSenderPlayer(ctx);
         if (sender == null) return 0;
 
         if (ShowcaseManager.isOnCooldown(sender, MERCHANT)) return 0;
 
         int durationSeconds = ModConfigManager.getShareSettings(MERCHANT).listeningDuration;
-        Text message = Text.translatable("showcase.message.share_merchant_tip", durationSeconds);
-        sender.sendMessage(message, true);
+        Component message = Component.translatable("showcase.message.share_merchant_tip", durationSeconds);
+        sender.sendSystemMessage(message, true);
         CountdownBossBar countdown = new CountdownBossBar(sender, message, durationSeconds);
         countdown.start();
         CountdownBossBarManager.add(countdown);
@@ -401,38 +400,38 @@ public class ShareCommandExecutor {
                     CountdownBossBarManager.remove(countdown);
                 },
                 () -> {
-                    sender.sendMessage(TextUtils.warning(Text.translatable("showcase.message.share_merchant_expiry")), true);
+                    sender.sendSystemMessage(TextUtils.warning(Component.translatable("showcase.message.share_merchant_expiry")), true);
                     CountdownBossBarManager.remove(countdown);
                 });
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int cancelShare(ServerPlayerEntity player, String id) {
+    private static int cancelShare(ServerPlayer player, String id) {
         if (player == null) return 0;
 
         ShareEntry entry = ShowcaseManager.getShareById(id);
 
         if (entry == null) {
-            player.sendMessage(TextUtils.error(Text.translatable("showcase.message.invalid_id")));
+            player.sendSystemMessage(TextUtils.error(Component.translatable("showcase.message.invalid_id")));
             return 0;
         }
 
-        if (!entry.getOwnerUuid().equals(player.getUuid())) {
-            player.sendMessage(TextUtils.warning(Text.translatable("showcase.message.cancel_not_owner")));
+        if (!entry.getOwnerUuid().equals(player.getUUID())) {
+            player.sendSystemMessage(TextUtils.warning(Component.translatable("showcase.message.cancel_not_owner")));
             return 0;
         }
 
         boolean success = ShowcaseManager.expireShareById(id);
-        Text message = success ?
-                TextUtils.success(Text.translatable("showcase.message.cancel_success")) :
-                TextUtils.error(Text.translatable("showcase.message.cancel_failed"));
+        Component message = success ?
+                TextUtils.success(Component.translatable("showcase.message.cancel_success")) :
+                TextUtils.error(Component.translatable("showcase.message.cancel_failed"));
 
-        player.sendMessage(message);
+        player.sendSystemMessage(message);
         return success ? Command.SINGLE_SUCCESS : 0;
     }
 
-    private static int getValidatedDuration(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+    private static int getValidatedDuration(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         String timeString = StringArgumentType.getString(ctx, DURATION_ARG);
         int requested;
 
@@ -440,14 +439,14 @@ public class ShareCommandExecutor {
             requested = TimeUtils.parseTimeToSeconds(timeString);
         } catch (IllegalArgumentException e) {
             throw new SimpleCommandExceptionType(
-                    Text.translatable("showcase.command.invalid_time_format")
+                    Component.translatable("showcase.command.invalid_time_format")
             ).create();
         }
 
         int min = ModConfigManager.getShareLinkMinExpiry();
         int max = ModConfigManager.getShareLinkDefaultExpiry();
 
-        ServerPlayerEntity player = ctx.getSource().getPlayer();
+        ServerPlayer player = ctx.getSource().getPlayer();
 
         if (isOp(player)) {
             return requested;
@@ -455,7 +454,7 @@ public class ShareCommandExecutor {
 
         if (requested < min || requested > max) {
             throw new SimpleCommandExceptionType(
-                    Text.translatable("showcase.message.invalid_duration_exception", min, max)
+                    Component.translatable("showcase.message.invalid_duration_exception", min, max)
             ).create();
         }
 

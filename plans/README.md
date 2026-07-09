@@ -8,7 +8,7 @@ honor its STOP conditions, and update your row when done.
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 001  | Align maintainer docs with the 26.x / Next.js mainline reality and ignore local plans | P2 | S | — | TODO |
+| 001  | Align maintainer docs with the 26.x / Next.js mainline reality and ignore local plans | P2 | S | — | REJECTED (operator chose to abandon the plan after execution review) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJECTED (with one-line rationale — finding fixed independently or approach abandoned)
 

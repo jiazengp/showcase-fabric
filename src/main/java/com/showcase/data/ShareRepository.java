@@ -1,12 +1,12 @@
 package com.showcase.data;
 
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Repository class for managing share data storage and retrieval.
@@ -79,8 +79,8 @@ public final class ShareRepository {
      * @return a list of shares owned by the player
      */
     @NotNull
-    public static List<ShareEntry> getPlayerShares(@NotNull ServerPlayerEntity player) {
-        return getPlayerShares(player.getUuid().toString());
+    public static List<ShareEntry> getPlayerShares(@NotNull ServerPlayer player) {
+        return getPlayerShares(player.getUUID().toString());
     }
 
     /**

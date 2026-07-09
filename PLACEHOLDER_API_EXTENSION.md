@@ -222,7 +222,7 @@ Potential future additions:
 
 ## Compatibility
 
-- **Minecraft Versions**: 1.21.2, 1.21.4, 1.21.5, 1.21.6
+- **Minecraft Versions**: 26.2+ on the current mainline branch
 - **Placeholder API**: eu.pb4:placeholder-api
 - **Dependencies**: Fabric API, LuckPerms (optional)
 

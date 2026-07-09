@@ -4,21 +4,17 @@ import com.showcase.config.ModConfigManager;
 import com.showcase.gui.MapViewerContext;
 import com.showcase.gui.MapViewerGui;
 import com.showcase.utils.compat.ServerPlayerCompat;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.containerwrappers.SlotBasedWrapperMenu;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.*;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-#if MC_VER < 1212
-import net.minecraft.util.TypedActionResult;
-#endif
-
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,14 +26,14 @@ public final class MapViewer {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             if (viewingSessions.isEmpty()) return;
 
-            int currentTick = server.getTicks();
+            int currentTick = server.getTickCount();
             List<UUID> toRemove = new ArrayList<>();
 
             for (var entry : viewingSessions.entrySet()) {
                 UUID playerId = entry.getKey();
                 ViewingSession session = entry.getValue();
 
-                ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerId);
+                ServerPlayer player = server.getPlayerList().getPlayer(playerId);
                 if (player == null || currentTick >= session.autoRestoreTick) {
                     closeSession(player);
                     toRemove.add(playerId);
@@ -47,31 +43,27 @@ public final class MapViewer {
             toRemove.forEach(viewingSessions::remove);
         });
 
-        #if MC_VER >= 1212
-        UseItemCallback.EVENT.register((player, world, hand) -> (ActionResult) com.showcase.utils.compat.CallbackCompat.getUseItemCallbackResult(player, getCheckResult(player)));
-        #else
-        UseItemCallback.EVENT.register((player, world, hand) -> (TypedActionResult) com.showcase.utils.compat.CallbackCompat.getUseItemCallbackResult(player, getCheckResult(player)));
-        #endif
+        UseItemCallback.EVENT.register((player, world, hand) -> com.showcase.utils.compat.CallbackCompat.getUseItemCallbackResult(player, getCheckResult(player)));
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> getCheckResult(player));
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> getCheckResult(player));
     }
 
-    private static ActionResult getCheckResult(PlayerEntity player) {
-        if (!(player instanceof ServerPlayerEntity serverPlayer)) return ActionResult.PASS;
-        return isPlayerViewingMap(serverPlayer) ? ActionResult.FAIL : ActionResult.PASS;
+    private static InteractionResult getCheckResult(Player player) {
+        if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
+        return isPlayerViewingMap(serverPlayer) ? InteractionResult.FAIL : InteractionResult.PASS;
     }
 
-    public static void open(ServerPlayerEntity player, ItemStack map, int displaySeconds) {
+    public static void open(ServerPlayer player, ItemStack map, int displaySeconds) {
         if (player == null || player.isSpectator() || !StackUtils.isMap(map)) return;
 
-        UUID playerId = player.getUuid();
+        UUID playerId = player.getUUID();
         closeSession(player);
 
         ItemStack displayMap = map.copy();
-        NbtComponent customData = displayMap.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT);
-        NbtCompound nbt = customData.copyNbt();
+        CustomData customData = displayMap.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        CompoundTag nbt = customData.copyTag();
         nbt.putBoolean(MAP_MARK, true);
-        displayMap.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+        displayMap.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
         MapViewerContext context = new MapViewerContext(player, displayMap, displaySeconds);
         context.setCloseCallback(() -> handleMapViewerClose(player, displayMap));
@@ -79,10 +71,10 @@ public final class MapViewer {
         MapViewerGui gui = new MapViewerGui(context, 0);
         gui.open();
 
-        viewingSessions.put(playerId, new ViewingSession(displayMap, ServerPlayerCompat.getWorld(player).getServer().getTicks() + displaySeconds * 20));
+        viewingSessions.put(playerId, new ViewingSession(displayMap, ServerPlayerCompat.getWorld(player).getServer().getTickCount() + displaySeconds * 20));
     }
 
-    public static void viewMap(ServerPlayerEntity player, ItemStack mapItem) {
+    public static void viewMap(ServerPlayer player, ItemStack mapItem) {
         if (player != null && mapItem != null) {
             int mapViewDuration = ModConfigManager.getConfig().mapViewDuration;
             if (mapViewDuration == -1) {
@@ -93,23 +85,22 @@ public final class MapViewer {
         }
     }
 
-    private static void handleMapViewerClose(ServerPlayerEntity player, ItemStack mapItem) {
-        UUID playerId = player.getUuid();
+    private static void handleMapViewerClose(ServerPlayer player, ItemStack mapItem) {
+        UUID playerId = player.getUUID();
         viewingSessions.remove(playerId);
     }
 
-    public static boolean isPlayerViewingMap(ServerPlayerEntity player) {
-        return viewingSessions.containsKey(player.getUuid());
+    public static boolean isPlayerViewingMap(ServerPlayer player) {
+        return viewingSessions.containsKey(player.getUUID());
     }
 
-    public static void closeSession(ServerPlayerEntity player) {
+    public static void closeSession(ServerPlayer player) {
         if (player == null) return;
 
-        var currentGui = GuiHelpers.getCurrentGui(player);
-        if (currentGui instanceof MapViewerGui viewerGui) {
-            viewerGui.close();
+        if (player.containerMenu instanceof SlotBasedWrapperMenu) {
+            player.closeContainer();
         } else {
-            UUID playerId = player.getUuid();
+            UUID playerId = player.getUUID();
             ViewingSession session = viewingSessions.get(playerId);
             if (session != null) {
                 handleMapViewerClose(player, session.displayMap);
@@ -119,7 +110,7 @@ public final class MapViewer {
 
     public static void restoreAll(MinecraftServer server) {
         for (UUID playerId : new ArrayList<>(viewingSessions.keySet())) {
-            ServerPlayerEntity player = server.getPlayerManager().getPlayer(playerId);
+            ServerPlayer player = server.getPlayerList().getPlayer(playerId);
             if (player != null) {
                 closeSession(player);
             }
@@ -131,22 +122,22 @@ public final class MapViewer {
         return viewingSessions.size();
     }
 
-    public static boolean extendViewingTime(ServerPlayerEntity player, int additionalSeconds) {
-        UUID playerId = player.getUuid();
+    public static boolean extendViewingTime(ServerPlayer player, int additionalSeconds) {
+        UUID playerId = player.getUUID();
         ViewingSession session = viewingSessions.get(playerId);
         if (session == null) return false;
 
-        int currentTick = ServerPlayerCompat.getWorld(player).getServer().getTicks();
+        int currentTick = ServerPlayerCompat.getWorld(player).getServer().getTickCount();
         int newTick = currentTick + additionalSeconds * 20;
         viewingSessions.put(playerId, new ViewingSession(session.displayMap, newTick));
         return true;
     }
 
-    public static int getRemainingViewingTime(ServerPlayerEntity player) {
-        ViewingSession session = viewingSessions.get(player.getUuid());
+    public static int getRemainingViewingTime(ServerPlayer player) {
+        ViewingSession session = viewingSessions.get(player.getUUID());
         if (session == null) return 0;
 
-        int currentTick = ServerPlayerCompat.getWorld(player).getServer().getTicks();
+        int currentTick = ServerPlayerCompat.getWorld(player).getServer().getTickCount();
         return Math.max(0, (session.autoRestoreTick - currentTick) / 20);
     }
 

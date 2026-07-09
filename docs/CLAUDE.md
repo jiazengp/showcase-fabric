@@ -67,11 +67,11 @@ The documentation uses custom components that automatically read version informa
 
 #### Dynamic Placeholders
 Code examples support these automatic replacements:
-- `{MC_VERSION}` - Current Minecraft version (e.g., "1.21.6")
+- `{MC_VERSION}` - Current Minecraft version (e.g., "26.2")
 - `{FABRIC_VERSION}` - Fabric API version
 - `{LOADER_VERSION}` - Fabric Loader version
 - `{PLACEHOLDER_API_VERSION}` - PlaceholderAPI version
-- `{MOD_VERSION}` - Showcase mod version (e.g., "2.3.1+mc1.21.6")
+- `{MOD_VERSION}` - Showcase mod version (e.g., "2.5.0+26.2")
 
 ### Content Guidelines
 

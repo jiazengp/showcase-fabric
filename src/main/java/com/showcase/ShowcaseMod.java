@@ -18,8 +18,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import com.showcase.utils.DevUtils;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ import static com.showcase.data.ShareEntry.SHARE_ENTRY_CODEC;
 public class ShowcaseMod implements ModInitializer {
 	public static final String MOD_ID = "showcase";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static final Identifier PLAYER_SHARE_STORAGE_ID = Identifier.of(MOD_ID, "showcase_storage");
+	public static final Identifier PLAYER_SHARE_STORAGE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "showcase_storage");
 	public static final Codec<Map<String, ShareEntry>> PLAYER_SHARE_ENTRY_CODEC =
 			Codec.unboundedMap(Codec.STRING, SHARE_ENTRY_CODEC);
 	public static final JsonCodecDataStorage<Map<String, ShareEntry>> PLAYER_SHARE_STORAGE =

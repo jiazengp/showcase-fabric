@@ -2,7 +2,7 @@ package com.showcase.utils;
 
 import com.showcase.ShowcaseMod;
 import com.showcase.command.ShowcaseManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 /**
  * Centralized constants for share types and actions to avoid hardcoded strings throughout the codebase
@@ -22,11 +22,11 @@ public final class ShareConstants {
 
     // Placeholder identifiers
     public static final class PlaceholderIds {
-        public static final Identifier ITEM = Identifier.of(ShowcaseMod.MOD_ID, ShareConstants.ITEM);
-        public static final Identifier INVENTORY = Identifier.of(ShowcaseMod.MOD_ID, ShareConstants.INVENTORY);
-        public static final Identifier HOTBAR = Identifier.of(ShowcaseMod.MOD_ID, ShareConstants.HOTBAR);
-        public static final Identifier ENDER_CHEST = Identifier.of(ShowcaseMod.MOD_ID, ShareConstants.ENDER_CHEST);
-        public static final Identifier STATS = Identifier.of(ShowcaseMod.MOD_ID, ShareConstants.STATS);
+        public static final Identifier ITEM = Identifier.fromNamespaceAndPath(ShowcaseMod.MOD_ID, ShareConstants.ITEM);
+        public static final Identifier INVENTORY = Identifier.fromNamespaceAndPath(ShowcaseMod.MOD_ID, ShareConstants.INVENTORY);
+        public static final Identifier HOTBAR = Identifier.fromNamespaceAndPath(ShowcaseMod.MOD_ID, ShareConstants.HOTBAR);
+        public static final Identifier ENDER_CHEST = Identifier.fromNamespaceAndPath(ShowcaseMod.MOD_ID, ShareConstants.ENDER_CHEST);
+        public static final Identifier STATS = Identifier.fromNamespaceAndPath(ShowcaseMod.MOD_ID, ShareConstants.STATS);
         
         private PlaceholderIds() {}
     }

@@ -1,8 +1,7 @@
 package com.showcase.utils.stats;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-
 import java.util.Map;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Interface for collecting different types of player statistics
@@ -15,7 +14,7 @@ public interface StatProvider {
      * @param player the player to collect stats for
      * @return map of stat names to values
      */
-    Map<String, Integer> collect(ServerPlayerEntity player);
+    Map<String, Integer> collect(ServerPlayer player);
     
     /**
      * Gets the category name for this stat provider

@@ -7,10 +7,9 @@ import com.showcase.data.JsonCodecDataStorage;
 import com.showcase.data.PlayerStatisticsData;
 import com.showcase.data.ServerStatisticsData;
 import com.showcase.utils.StatisticsCache;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.server.level.ServerPlayer;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -28,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ShowcaseStatistics {
 
     // Storage identifiers
-    public static final Identifier STATISTICS_STORAGE_ID = Identifier.of("showcase", "statistics");
+    public static final Identifier STATISTICS_STORAGE_ID = Identifier.fromNamespaceAndPath("showcase", "statistics");
     public static final JsonCodecDataStorage<ServerStatisticsData> STATISTICS_STORAGE =
             new JsonCodecDataStorage<>("showcase_statistics", ServerStatisticsData.CODEC);
 
@@ -86,46 +85,46 @@ public class ShowcaseStatistics {
     /**
      * Get active share count for a player
      */
-    public static int getActiveShareCount(ServerPlayerEntity player) {
+    public static int getActiveShareCount(ServerPlayer player) {
         if (player == null) return 0;
 
         return (int) ShowcaseManager.getUnmodifiableActiveShares().values().stream()
-            .filter(entry -> entry.getOwnerUuid().equals(player.getUuid()))
+            .filter(entry -> entry.getOwnerUuid().equals(player.getUUID()))
             .count();
     }
 
     /**
      * Get last share type for a player
      */
-    public static ShowcaseManager.ShareType getLastShareType(ServerPlayerEntity player) {
+    public static ShowcaseManager.ShareType getLastShareType(ServerPlayer player) {
         if (player == null) return null;
-        return lastShareType.get(player.getUuidAsString());
+        return lastShareType.get(player.getStringUUID());
     }
 
     /**
      * Get last share time for a player
      */
-    public static Instant getLastShareTime(ServerPlayerEntity player) {
+    public static Instant getLastShareTime(ServerPlayer player) {
         if (player == null) return null;
-        Long timeMs = lastShareTime.get(player.getUuidAsString());
+        Long timeMs = lastShareTime.get(player.getStringUUID());
         return timeMs != null ? Instant.ofEpochMilli(timeMs) : null;
     }
 
     /**
      * Get next share expiry time for a player
      */
-    public static Instant getNextShareExpiry(ServerPlayerEntity player) {
+    public static Instant getNextShareExpiry(ServerPlayer player) {
         if (player == null) return null;
-        return nextShareExpiry.get(player.getUuidAsString());
+        return nextShareExpiry.get(player.getStringUUID());
     }
 
     /**
      * Get total views received by a player (cached)
      */
-    public static long getTotalViewsForPlayer(ServerPlayerEntity player) {
+    public static long getTotalViewsForPlayer(ServerPlayer player) {
         if (player == null) return 0;
 
-        String cacheKey = StatisticsCache.playerKey(player.getUuidAsString(), "total_views");
+        String cacheKey = StatisticsCache.playerKey(player.getStringUUID(), "total_views");
         Long cached = cache.get(cacheKey, Long.class);
         if (cached != null) {
             return cached;
@@ -141,10 +140,10 @@ public class ShowcaseStatistics {
     /**
      * Get most shared type for a player (cached)
      */
-    public static ShowcaseManager.ShareType getMostSharedType(ServerPlayerEntity player) {
+    public static ShowcaseManager.ShareType getMostSharedType(ServerPlayer player) {
         if (player == null) return null;
 
-        String cacheKey = StatisticsCache.playerKey(player.getUuidAsString(), "most_shared_type");
+        String cacheKey = StatisticsCache.playerKey(player.getStringUUID(), "most_shared_type");
         ShowcaseManager.ShareType cached = cache.get(cacheKey, ShowcaseManager.ShareType.class);
         if (cached != null) {
             return cached;
@@ -160,10 +159,10 @@ public class ShowcaseStatistics {
     /**
      * Get shares created today by a player (cached)
      */
-    public static int getSharesCreatedToday(ServerPlayerEntity player) {
+    public static int getSharesCreatedToday(ServerPlayer player) {
         if (player == null) return 0;
 
-        String cacheKey = StatisticsCache.playerKey(player.getUuidAsString(), "shares_today");
+        String cacheKey = StatisticsCache.playerKey(player.getStringUUID(), "shares_today");
         Integer cached = cache.get(cacheKey, Integer.class);
         if (cached != null) {
             return cached;
@@ -180,10 +179,10 @@ public class ShowcaseStatistics {
     /**
      * Get shares created this week by a player (cached)
      */
-    public static int getSharesCreatedThisWeek(ServerPlayerEntity player) {
+    public static int getSharesCreatedThisWeek(ServerPlayer player) {
         if (player == null) return 0;
 
-        String cacheKey = StatisticsCache.playerKey(player.getUuidAsString(), "shares_week");
+        String cacheKey = StatisticsCache.playerKey(player.getStringUUID(), "shares_week");
         Integer cached = cache.get(cacheKey, Integer.class);
         if (cached != null) {
             return cached;
@@ -208,10 +207,10 @@ public class ShowcaseStatistics {
     /**
      * Get average share duration for a player (cached)
      */
-    public static Duration getAverageShareDuration(ServerPlayerEntity player) {
+    public static Duration getAverageShareDuration(ServerPlayer player) {
         if (player == null) return Duration.ZERO;
 
-        String cacheKey = StatisticsCache.playerKey(player.getUuidAsString(), "avg_duration");
+        String cacheKey = StatisticsCache.playerKey(player.getStringUUID(), "avg_duration");
         Duration cached = cache.get(cacheKey, Duration.class);
         if (cached != null) {
             return cached;
@@ -236,7 +235,7 @@ public class ShowcaseStatistics {
     /**
      * Get cooldown remaining for a specific share type
      */
-    public static long getCooldownRemaining(ServerPlayerEntity player, ShowcaseManager.ShareType type) {
+    public static long getCooldownRemaining(ServerPlayer player, ShowcaseManager.ShareType type) {
         if (player == null) return 0;
         return com.showcase.utils.CooldownManager.getRemainingCooldown(player, type);
     }
@@ -245,7 +244,7 @@ public class ShowcaseStatistics {
      * Get chat keyword cooldown remaining
      * Note: Currently, chat keywords use the same cooldown as ITEM shares
      */
-    public static long getChatKeywordCooldown(ServerPlayerEntity player) {
+    public static long getChatKeywordCooldown(ServerPlayer player) {
         if (player == null) return 0;
         // Use ITEM share cooldown as chat keywords typically trigger item sharing
         return com.showcase.utils.CooldownManager.getRemainingCooldown(player, ShowcaseManager.ShareType.ITEM);
@@ -254,7 +253,7 @@ public class ShowcaseStatistics {
     /**
      * Check if player is on any cooldown
      */
-    public static boolean isOnAnyCooldown(ServerPlayerEntity player) {
+    public static boolean isOnAnyCooldown(ServerPlayer player) {
         if (player == null) return false;
 
         for (ShowcaseManager.ShareType type : ShowcaseManager.ShareType.values()) {
@@ -332,8 +331,8 @@ public class ShowcaseStatistics {
     /**
      * Get or create player statistics
      */
-    private static PlayerStats getPlayerStats(ServerPlayerEntity player) {
-        String uuid = player.getUuidAsString();
+    private static PlayerStats getPlayerStats(ServerPlayer player) {
+        String uuid = player.getStringUUID();
         return playerStatistics.computeIfAbsent(uuid, k -> new PlayerStats());
     }
 
@@ -342,10 +341,10 @@ public class ShowcaseStatistics {
     /**
      * Record a new share creation
      */
-    public static void recordShareCreation(ServerPlayerEntity player, ShowcaseManager.ShareType type, Duration duration) {
+    public static void recordShareCreation(ServerPlayer player, ShowcaseManager.ShareType type, Duration duration) {
         if (player == null) return;
 
-        String uuid = player.getUuidAsString();
+        String uuid = player.getStringUUID();
         PlayerStats stats = getPlayerStats(player);
 
         // Update player statistics
@@ -384,7 +383,7 @@ public class ShowcaseStatistics {
     /**
      * Record a share view
      */
-    public static void recordShareView(ServerPlayerEntity creator, ServerPlayerEntity viewer) {
+    public static void recordShareView(ServerPlayer creator, ServerPlayer viewer) {
         if (creator == null) return;
 
         PlayerStats stats = getPlayerStats(creator);
@@ -392,7 +391,7 @@ public class ShowcaseStatistics {
         totalViewsEver.incrementAndGet();
 
         // Clear cache
-        clearCacheForPlayer(creator.getUuidAsString());
+        clearCacheForPlayer(creator.getStringUUID());
 
         // Trigger periodic save
         scheduleAsyncSave();
@@ -401,13 +400,13 @@ public class ShowcaseStatistics {
     /**
      * Record share expiry or cancellation
      */
-    public static void recordShareExpiry(ServerPlayerEntity player, ShowcaseManager.ShareType type) {
+    public static void recordShareExpiry(ServerPlayer player, ShowcaseManager.ShareType type) {
         if (player == null) return;
 
         totalActiveShares.decrementAndGet();
 
         // Update next expiry time
-        String uuid = player.getUuidAsString();
+        String uuid = player.getStringUUID();
         updateNextExpiryTime(uuid);
 
         clearCacheForPlayer(uuid);
@@ -633,7 +632,7 @@ public class ShowcaseStatistics {
     /**
      * Get player statistics summary
      */
-    public static Map<String, Object> getPlayerStatisticsSummary(ServerPlayerEntity player) {
+    public static Map<String, Object> getPlayerStatisticsSummary(ServerPlayer player) {
         if (player == null) return new HashMap<>();
 
         PlayerStats stats = getPlayerStats(player);
