@@ -3,16 +3,19 @@ package com.showcase.gametest;
 import com.showcase.utils.minecraft.BlockCategoryCache;
 import com.showcase.utils.minecraft.BlockCategoryRegistry;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Optimized GameTest for BlockCategories utility class.
@@ -20,155 +23,171 @@ import java.util.List;
  */
 public class BlockCategoriesGameTest {
 
+    /**
+     * Resolves a dyed block through the block registry.
+     *
+     * <p>26.2 folded the per-colour {@code Blocks.RED_WOOL}-style constants into {@code ColorCollection}
+     * fields while 26.1.2 still exposes them individually, so the registry id is the only spelling that
+     * holds across every supported row.
+     */
+    private static Block dyedBlock(String path) {
+        return Objects.requireNonNull(
+            BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("minecraft", path)),
+            "Missing block: minecraft:" + path);
+    }
+
     @GameTest
-    public void testBlockCategorizationByType(TestContext context) {
+    public void testBlockCategorizationByType(GameTestHelper context) {
         try {
             // Test-colored blocks
-            testCategoryGroup(context, ItemGroups.COLORED_BLOCKS, "COLORED_BLOCKS",
-                Arrays.asList(Blocks.RED_WOOL, Blocks.BLUE_CONCRETE, Blocks.WHITE_TERRACOTTA));
-            
+            testCategoryGroup(context, CreativeModeTabs.COLORED_BLOCKS, "COLORED_BLOCKS",
+                Arrays.asList(dyedBlock("red_wool"), dyedBlock("blue_concrete"), dyedBlock("white_terracotta")));
+
             // Test natural blocks
-            testCategoryGroup(context, ItemGroups.NATURAL, "NATURAL",
+            testCategoryGroup(context, CreativeModeTabs.NATURAL_BLOCKS, "NATURAL_BLOCKS",
                 Arrays.asList(Blocks.STONE, Blocks.GRASS_BLOCK, Blocks.OAK_LOG, Blocks.IRON_ORE));
-            
+
             // Test building blocks
-            testCategoryGroup(context, ItemGroups.BUILDING_BLOCKS, "BUILDING_BLOCKS",
+            testCategoryGroup(context, CreativeModeTabs.BUILDING_BLOCKS, "BUILDING_BLOCKS",
                 Arrays.asList(Blocks.OAK_PLANKS, Blocks.STONE_BRICKS, Blocks.POLISHED_GRANITE));
-            
+
             // Test redstone blocks
-            testCategoryGroup(context, ItemGroups.REDSTONE, "REDSTONE",
+            testCategoryGroup(context, CreativeModeTabs.REDSTONE_BLOCKS, "REDSTONE_BLOCKS",
                 Arrays.asList(Blocks.REDSTONE_BLOCK, Blocks.PISTON, Blocks.HOPPER, Blocks.LEVER));
-            
+
         } catch (Exception e) {
-            context.throwGameTestException(Text.of("Block categorization test failed: " + e.getMessage()));
+            context.fail(Component.literal("Block categorization test failed: " + e.getMessage()));
+            return;
         }
-        
-        context.complete();
+
+        context.succeed();
     }
 
     @GameTest
-    public void testSpecialBlockCategories(TestContext context) {
+    public void testSpecialBlockCategories(GameTestHelper context) {
         try {
             // Test functional blocks
-            testCategoryGroup(context, ItemGroups.FUNCTIONAL, "FUNCTIONAL",
+            testCategoryGroup(context, CreativeModeTabs.FUNCTIONAL_BLOCKS, "FUNCTIONAL_BLOCKS",
                 Arrays.asList(Blocks.CRAFTING_TABLE, Blocks.FURNACE, Blocks.CHEST, Blocks.ANVIL));
-            
+
             // Test combat blocks
-            testCategoryGroup(context, ItemGroups.COMBAT, "COMBAT",
+            testCategoryGroup(context, CreativeModeTabs.COMBAT, "COMBAT",
                 Arrays.asList(Blocks.TNT, Blocks.MAGMA_BLOCK, Blocks.CACTUS));
-            
+
             // Test edge cases and defaults
             testEdgeCases(context);
-            
+
         } catch (Exception e) {
-            context.throwGameTestException(Text.of("Special categories test failed: " + e.getMessage()));
+            context.fail(Component.literal("Special categories test failed: " + e.getMessage()));
+            return;
         }
-        
-        context.complete();
+
+        context.succeed();
     }
 
     @GameTest
-    public void testSystemConsistencyAndTranslations(TestContext context) {
+    public void testSystemConsistencyAndTranslations(GameTestHelper context) {
         try {
             // Test categorization consistency
             testCategorizationConsistency(context);
-            
+
             // Test translation keys
             testTranslationKeys(context);
-            
+
         } catch (Exception e) {
-            context.throwGameTestException(Text.of("Consistency and translations test failed: " + e.getMessage()));
+            context.fail(Component.literal("Consistency and translations test failed: " + e.getMessage()));
+            return;
         }
-        
-        context.complete();
+
+        context.succeed();
     }
 
     // Helper Methods
-    
-    private void testCategoryGroup(TestContext context, RegistryKey<ItemGroup> expectedCategory, String categoryName, List<Block> blocks) {
+
+    private void testCategoryGroup(GameTestHelper context, ResourceKey<CreativeModeTab> expectedCategory, String categoryName, List<Block> blocks) {
         for (Block block : blocks) {
             var blockItem = block.asItem();
             if (blockItem != null) {
-                RegistryKey<ItemGroup> actualCategory = BlockCategoryCache.getCachedCategory(blockItem);
+                ResourceKey<CreativeModeTab> actualCategory = BlockCategoryCache.getCachedCategory(blockItem);
                 context.assertTrue(
                     actualCategory.equals(expectedCategory),
-                    Text.of(String.format("%s should be categorized as %s, but got: %s", 
-                        block.getTranslationKey(), categoryName, actualCategory))
+                    Component.literal(String.format("%s should be categorized as %s, but got: %s",
+                        block.getDescriptionId(), categoryName, actualCategory))
                 );
             }
         }
     }
-    
-    private void testEdgeCases(TestContext context) {
+
+    private void testEdgeCases(GameTestHelper context) {
         // Test that bedrock is categorized as NATURAL
         var bedrockItem = Blocks.BEDROCK.asItem();
         if (bedrockItem != null) {
-            RegistryKey<ItemGroup> bedrockCategory = BlockCategoryCache.getCachedCategory(bedrockItem);
+            ResourceKey<CreativeModeTab> bedrockCategory = BlockCategoryCache.getCachedCategory(bedrockItem);
             context.assertTrue(
-                bedrockCategory.equals(ItemGroups.NATURAL),
-                Text.of("Bedrock should be categorized as NATURAL, but got: " + bedrockCategory)
+                bedrockCategory.equals(CreativeModeTabs.NATURAL_BLOCKS),
+                Component.literal("Bedrock should be categorized as NATURAL_BLOCKS, but got: " + bedrockCategory)
             );
         }
 
         // Test that air gets default category
         var airItem = Blocks.AIR.asItem();
         if (airItem != null) {
-            RegistryKey<ItemGroup> airCategory = BlockCategoryCache.getCachedCategory(airItem);
+            ResourceKey<CreativeModeTab> airCategory = BlockCategoryCache.getCachedCategory(airItem);
             context.assertTrue(
-                airCategory.equals(ItemGroups.BUILDING_BLOCKS),
-                Text.of("Air should get default category BUILDING_BLOCKS, but got: " + airCategory)
+                airCategory.equals(CreativeModeTabs.BUILDING_BLOCKS),
+                Component.literal("Air should get default category BUILDING_BLOCKS, but got: " + airCategory)
             );
         }
     }
-    
-    private void testCategorizationConsistency(TestContext context) {
+
+    private void testCategorizationConsistency(GameTestHelper context) {
         // Test that categorization is consistent across multiple calls
         var diamondBlockItem = Blocks.DIAMOND_BLOCK.asItem();
         if (diamondBlockItem != null) {
-            RegistryKey<ItemGroup> firstCall = BlockCategoryCache.getCachedCategory(diamondBlockItem);
-            RegistryKey<ItemGroup> secondCall = BlockCategoryCache.getCachedCategory(diamondBlockItem);
-            
+            ResourceKey<CreativeModeTab> firstCall = BlockCategoryCache.getCachedCategory(diamondBlockItem);
+            ResourceKey<CreativeModeTab> secondCall = BlockCategoryCache.getCachedCategory(diamondBlockItem);
+
             context.assertTrue(
                 firstCall.equals(secondCall),
-                Text.of("Block categorization should be consistent across calls")
+                Component.literal("Block categorization should be consistent across calls")
             );
         }
 
         // Test multiple blocks of the same expected category
-        var redWoolItem = Blocks.RED_WOOL.asItem();
-        var blueWoolItem = Blocks.BLUE_WOOL.asItem();
-        var greenWoolItem = Blocks.GREEN_WOOL.asItem();
-        
+        var redWoolItem = dyedBlock("red_wool").asItem();
+        var blueWoolItem = dyedBlock("blue_wool").asItem();
+        var greenWoolItem = dyedBlock("green_wool").asItem();
+
         if (redWoolItem != null && blueWoolItem != null && greenWoolItem != null) {
-            RegistryKey<ItemGroup> redWool = BlockCategoryCache.getCachedCategory(redWoolItem);
-            RegistryKey<ItemGroup> blueWool = BlockCategoryCache.getCachedCategory(blueWoolItem);
-            RegistryKey<ItemGroup> greenWool = BlockCategoryCache.getCachedCategory(greenWoolItem);
+            ResourceKey<CreativeModeTab> redWool = BlockCategoryCache.getCachedCategory(redWoolItem);
+            ResourceKey<CreativeModeTab> blueWool = BlockCategoryCache.getCachedCategory(blueWoolItem);
+            ResourceKey<CreativeModeTab> greenWool = BlockCategoryCache.getCachedCategory(greenWoolItem);
 
             context.assertTrue(
                 redWool.equals(blueWool) && blueWool.equals(greenWool),
-                Text.of("All colored wool should have the same category")
+                Component.literal("All colored wool should have the same category")
             );
         }
     }
-    
-    private void testTranslationKeys(TestContext context) {
+
+    private void testTranslationKeys(GameTestHelper context) {
         // Test critical translation keys
-        String buildingKey = BlockCategoryRegistry.getTranslationKey(ItemGroups.BUILDING_BLOCKS);
+        String buildingKey = BlockCategoryRegistry.getTranslationKey(CreativeModeTabs.BUILDING_BLOCKS);
         context.assertTrue(
             "showcase.stats.block.building_blocks".equals(buildingKey),
-            Text.of("Building blocks translation key should be 'showcase.stats.block.building_blocks', but got: " + buildingKey)
+            Component.literal("Building blocks translation key should be 'showcase.stats.block.building_blocks', but got: " + buildingKey)
         );
 
-        String coloredKey = BlockCategoryRegistry.getTranslationKey(ItemGroups.COLORED_BLOCKS);
+        String coloredKey = BlockCategoryRegistry.getTranslationKey(CreativeModeTabs.COLORED_BLOCKS);
         context.assertTrue(
             "showcase.stats.block.colored_blocks".equals(coloredKey),
-            Text.of("Colored blocks translation key should be 'showcase.stats.block.colored_blocks', but got: " + coloredKey)
+            Component.literal("Colored blocks translation key should be 'showcase.stats.block.colored_blocks', but got: " + coloredKey)
         );
 
-        String naturalKey = BlockCategoryRegistry.getTranslationKey(ItemGroups.NATURAL);
+        String naturalKey = BlockCategoryRegistry.getTranslationKey(CreativeModeTabs.NATURAL_BLOCKS);
         context.assertTrue(
             "showcase.stats.block.natural_blocks".equals(naturalKey),
-            Text.of("Natural blocks translation key should be 'showcase.stats.block.natural_blocks', but got: " + naturalKey)
+            Component.literal("Natural blocks translation key should be 'showcase.stats.block.natural_blocks', but got: " + naturalKey)
         );
     }
 }

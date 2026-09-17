@@ -1,10 +1,10 @@
 package com.showcase.gametest;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.test.TestContext;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
 
@@ -13,14 +13,14 @@ import java.util.UUID;
  * Provides consistent player creation methods across all game tests.
  */
 public final class GameTestPlayerUtils {
-    
+
     private GameTestPlayerUtils() {
         throw new UnsupportedOperationException("Utility class");
     }
 
     private static final String[] TEST_UUIDS = {
         "9cffa718-9571-4c6b-a683-b4f62dd72047",
-        "ec561538-f3fd-461d-aff5-086b22154bce", 
+        "ec561538-f3fd-461d-aff5-086b22154bce",
         "8667ba71-b85a-4004-af54-457a9734eed7",
         "d8d5a923-7b20-43d8-883b-1150148d6955",
         "1168c028-de65-4698-bbde-9ae674404829",
@@ -31,20 +31,13 @@ public final class GameTestPlayerUtils {
 
     /**
      * Creates a test player with a specific name using a predefined UUID.
-     * This method cycles through the available UUIDs to ensure uniqueness.
      *
      * @param context the test context
      * @param name the player name
-     * @return a new ServerPlayerEntity for testing
+     * @return a new ServerPlayer for testing
      */
-    public static ServerPlayerEntity createTestPlayer(TestContext context, String name) {
-        ServerWorld world = context.getWorld();
-        return new ServerPlayerEntity(
-                context.getWorld().getServer(),
-                world,
-                new GameProfile(UUID.fromString(TEST_UUIDS[playerCounter % TEST_UUIDS.length]), name),
-                SyncedClientOptions.createDefault()
-        );
+    public static ServerPlayer createTestPlayer(GameTestHelper context, String name) {
+        return createPlayer(context, name, playerCounter % TEST_UUIDS.length);
     }
 
     /**
@@ -53,16 +46,19 @@ public final class GameTestPlayerUtils {
      *
      * @param context the test context
      * @param name the player name
-     * @return a new ServerPlayerEntity for testing
+     * @return a new ServerPlayer for testing
      */
-    public static ServerPlayerEntity createTestPlayerCalled(TestContext context, String name) {
-        int index = playerCounter++;
-        ServerWorld world = context.getWorld();
-        return new ServerPlayerEntity(
-                context.getWorld().getServer(),
-                world,
+    public static ServerPlayer createTestPlayerCalled(GameTestHelper context, String name) {
+        return createPlayer(context, name, playerCounter++);
+    }
+
+    private static ServerPlayer createPlayer(GameTestHelper context, String name, int index) {
+        ServerLevel level = context.getLevel();
+        return new ServerPlayer(
+                level.getServer(),
+                level,
                 new GameProfile(UUID.fromString(TEST_UUIDS[index % TEST_UUIDS.length]), name),
-                SyncedClientOptions.createDefault()
+                ClientInformation.createDefault()
         );
     }
 
@@ -88,10 +84,10 @@ public final class GameTestPlayerUtils {
      * @param context the test context
      * @param baseName the base name for players (will be suffixed with numbers)
      * @param count the number of players to create
-     * @return an array of ServerPlayerEntity instances
+     * @return an array of ServerPlayer instances
      */
-    public static ServerPlayerEntity[] createMultipleTestPlayers(TestContext context, String baseName, int count) {
-        ServerPlayerEntity[] players = new ServerPlayerEntity[count];
+    public static ServerPlayer[] createMultipleTestPlayers(GameTestHelper context, String baseName, int count) {
+        ServerPlayer[] players = new ServerPlayer[count];
         for (int i = 0; i < count; i++) {
             players[i] = createTestPlayerCalled(context, baseName + (i + 1));
         }

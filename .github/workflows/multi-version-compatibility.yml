@@ -109,10 +109,10 @@ jobs:
           echo "✓ JAR file created successfully: $(basename "$jar_file") ($jar_size bytes)"
 
       - name: run compatibility tests
-        if: matrix.minecraft-version == '26.2'
+        if: matrix.minecraft-version == '26.3'
         run: |
           echo "Running compatibility tests for Minecraft ${{ matrix.minecraft-version }}..."
-          ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }} || echo "GameTest not available for this version - skipping"
+          ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }}
 
       - name: verify mod metadata
         run: |

@@ -97,6 +97,28 @@ manifold {
 	manifoldVersion = "2025.1.29"
 }
 
+// GameTests live outside the main source set so they are never bundled in the published JAR.
+// They are compiled as part of `check` and executed by the `runGameTest` configuration.
+sourceSets {
+	gametest {
+		compileClasspath += sourceSets.main.output + configurations.compileClasspath
+		runtimeClasspath += sourceSets.main.output + configurations.runtimeClasspath
+	}
+}
+
+loom {
+	runs {
+		gameTest {
+			server()
+			name = "GameTest"
+			source sourceSets.gametest
+			vmArg "-Dfabric-api.gametest=true"
+			vmArg "-Dfabric-api.gametest.report-file=${layout.buildDirectory.get()}/gametest-report.xml"
+			runDir "build/gametest"
+		}
+	}
+}
+
 base {
 	archivesName = project.archives_base_name
 }
@@ -133,6 +155,9 @@ dependencies {
     // Manifold preprocessor for supported-version compatibility.
 	annotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 	testAnnotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
+	// The manifold plugin adds -Xplugin:Manifold to every JavaCompile task, so each custom
+	// source set needs a path to the Manifold compiler plugin as well.
+	gametestAnnotationProcessor 'systems.manifold:manifold-preprocessor:2025.1.27'
 
 	// Test dependencies
 	testImplementation "net.fabricmc:fabric-loader-junit:${versionProperties.getProperty("fabric_loader_version")}"
@@ -190,6 +215,11 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}" }
 	}
+}
+
+// Keep the GameTest sources compiling as part of the normal verification lifecycle.
+tasks.named('check') {
+	dependsOn tasks.named('compileGametestJava')
 }
 
 

@@ -44,11 +44,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: GameTest for Minecraft ${{ matrix.minecraft-version }}
-        if: matrix.minecraft-version == '26.2'
-        run: ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }} || echo "GameTest not available for this version - skipping"
+        if: matrix.minecraft-version == '26.3'
+        run: ./gradlew runGameTest -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Unit Tests for Minecraft ${{ matrix.minecraft-version }}
-        if: matrix.minecraft-version == '26.2'
+        if: matrix.minecraft-version == '26.3'
         run: ./gradlew test -PmcVer=${{ matrix.minecraft-version }}
 
       - name: Store reports
@@ -59,3 +59,4 @@ jobs:
           path: |
             **/build/reports/
             **/build/test-results/
+            build/gametest-report.xml
