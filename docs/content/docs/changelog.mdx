@@ -8,6 +8,38 @@ category: overview
 
 Track the latest features, bug fixes, and improvements in Showcase mod releases.
 
+## Version 2.6.0
+
+**Minecraft**: 26.1.2 - 26.3 | Released: September 17, 2026
+
+### 🚀 Major Changes
+
+- Added support for Minecraft 26.3 (Fabric API 0.160.6+26.3, Fabric Loader 0.19.5)
+- The same release line still ships 26.1.2 and 26.2 builds
+
+### 🐛 Fixes
+
+- Fixed the "Viewing Content" progress bar continuing to count down after the preview was closed early
+- Closing a map preview no longer leaves the viewer flagged as watching, which had been swallowing item use, attacks and entity interactions until the timer expired
+- Fixed shared inventory titles showing the raw translation key
+- Container and merchant broadcasts no longer claim the content belongs to the player — a shared chest may be one standing in the world, and a merchant belongs to a villager
+
+### 🌍 Translations
+
+- Completed every locale: 21 keys (command duration feedback, viewer countdown, permission errors) were missing from all 15 non-English files and fell back to English
+- Fixed swapped placeholders in Spanish, French, Italian, Portuguese, Polish and Russian, which rendered the owner and the shared content the wrong way round
+- Reworked the English broadcast copy, which read "Steve I showcased my Hotbar"
+- Unified the Chinese copy and aligned the Traditional and Cantonese variants
+
+### 🧪 Testing And Tooling
+
+- Revived the Fabric GameTest suite (13 tests) and wired `runGameTest` into CI, covering bundle and shulker-box slot ordering
+- Added a static translation checker to CI that fails on missing keys, placeholder drift, call-site argument mismatches, and broadcast copy slipping out of the third person
+
+### 📦 Requirements
+
+Java 25, Fabric API, Simple GUI • Optional: LuckPerms, PlaceholderAPI
+
 ## Version 2.5.0
 
 **Minecraft**: 26.1 - 26.2 | Released: July 9, 2026
