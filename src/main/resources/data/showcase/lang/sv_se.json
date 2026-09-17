@@ -12,8 +12,8 @@
   "showcase.message.other_item_shared": "§r%s visade %ss %s",
   "showcase.message.other_stats_shared": "§r%s visade %ss %s",
   "showcase.message.other_container_shared": "§r%s visade %ss %s",
-  "showcase.message.other_merchant_shared": "§r%s visade %ss %s",
-  "showcase.message.container_shared": "§r%s visade sin %s",
+  "showcase.message.other_merchant_shared": "§r%s visade %ss %s-handelsgränssnitt",
+  "showcase.message.container_shared": "§r%s visade en %s",
   "showcase.message.merchant_shared": "§r%s visade %ss handelsgränssnitt",
   "showcase.message.private_share_tip": "§rDu har delat %ss %s med %s",
   "showcase.message.player_description": "§r%s %s %s",
@@ -27,6 +27,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "Inventering",
+  "showcase.inventory.hotbar": "Snabbvalsfält",
 
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%ss %s",
@@ -109,5 +111,25 @@
   "showcase.stats.block.unknown": "Okända Block",
   
   "showcase.stats.message.create_date": "Skapelsedatum",
-  "showcase.stats.message.total_pages": "Totalt Sidor"
+  "showcase.stats.message.total_pages": "Totalt Sidor",
+
+  "showcase.command.duration.suggestion.minimum": "§aMinimum: %s",
+  "showcase.command.duration.suggestion.recommended": "§bRekommenderat: %s",
+  "showcase.command.duration.suggestion.maximum": "§eMax: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 timme (endast OP)",
+  "showcase.command.duration.error.out_of_range": "§c✗ Måste vara mellan %s och %s",
+  "showcase.command.duration.error.invalid_format": "§c✗ Ogiltigt format (använd: 1h30m eller 5m eller 30s)",
+  "showcase.command.duration.valid": "§a✓ Giltigt - %s",
+  "showcase.command.duration.valid.op": "§a✓ Giltigt (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7Lägg till 's' för sekunder",
+  "showcase.command.duration.hint.add_minutes": "§7Lägg till 'm' för minuter",
+  "showcase.command.duration.hint.add_hours": "§7Lägg till 'h' för timmar",
+  "showcase.command.invalid_time_format": "§rOgiltigt tidsformat. Använd t.ex. '30s', '5m', '1h' eller '1h30m'",
+  "showcase.command.time_out_of_range": "§rTiden måste vara mellan §l%d§r och §l%d§r sekunder",
+  "showcase.command.no_permission.receivers": "§cDu har inte behörighet att ange mottagare",
+  "showcase.command.no_permission.duration": "§cDu har inte behörighet att ange en anpassad varaktighet",
+  "showcase.command.no_permission.description": "§cDu har inte behörighet att lägga till en beskrivning",
+  "showcase.screen.player_level": "§rNivå %d",
+  "showcase.viewer.countdown_title": "Visar innehåll",
+  "showcase.viewer.instructions": "§r§7Tryck på §fQ §7eller släpp föremålet för att stänga • Använd mushjulet för att navigera"
 }

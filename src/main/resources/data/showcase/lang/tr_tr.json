@@ -13,7 +13,7 @@
   "showcase.message.other_stats_shared": "§r%s, %s oyuncusunun %s istatistiklerini gösterdi",
   "showcase.message.other_container_shared": "§r%s, %s oyuncusunun %s konteynerini gösterdi",
   "showcase.message.other_merchant_shared": "§r%s, %s oyuncusunun %s ticaret arayüzünü gösterdi",
-  "showcase.message.container_shared": "§r%s %s konteynerini gösterdi",
+  "showcase.message.container_shared": "§r%s bir %s gösterdi",
   "showcase.message.merchant_shared": "§r%s, %s ticaret arayüzünü gösterdi",
   "showcase.message.private_share_tip": "§r%s oyuncusunun %s eşyasını %s ile paylaştınız",
   "showcase.message.player_description": "§r%s %s %s",
@@ -27,6 +27,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "Envanter",
+  "showcase.inventory.hotbar": "Kısayol çubuğu",
 
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s oyuncusunun %s",
@@ -109,5 +111,25 @@
   "showcase.stats.block.unknown": "Bilinmeyen Bloklar",
   
   "showcase.stats.message.create_date": "Oluşturma Tarihi",
-  "showcase.stats.message.total_pages": "Toplam Sayfa"
+  "showcase.stats.message.total_pages": "Toplam Sayfa",
+
+  "showcase.command.duration.suggestion.minimum": "§aMinimum: %s",
+  "showcase.command.duration.suggestion.recommended": "§bÖnerilen: %s",
+  "showcase.command.duration.suggestion.maximum": "§eMaksimum: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 saat (yalnızca OP)",
+  "showcase.command.duration.error.out_of_range": "§c✗ %s ile %s arasında olmalıdır",
+  "showcase.command.duration.error.invalid_format": "§c✗ Geçersiz biçim (kullanım: 1h30m veya 5m veya 30s)",
+  "showcase.command.duration.valid": "§a✓ Geçerli - %s",
+  "showcase.command.duration.valid.op": "§a✓ Geçerli (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7Saniye için 's' ekleyin",
+  "showcase.command.duration.hint.add_minutes": "§7Dakika için 'm' ekleyin",
+  "showcase.command.duration.hint.add_hours": "§7Saat için 'h' ekleyin",
+  "showcase.command.invalid_time_format": "§rGeçersiz zaman biçimi. '30s', '5m', '1h' veya '1h30m' gibi biçimler kullanın",
+  "showcase.command.time_out_of_range": "§rSüre §l%d§r ile §l%d§r saniye arasında olmalıdır",
+  "showcase.command.no_permission.receivers": "§cAlıcı belirleme izniniz yok",
+  "showcase.command.no_permission.duration": "§cÖzel süre ayarlama izniniz yok",
+  "showcase.command.no_permission.description": "§cAçıklama ekleme izniniz yok",
+  "showcase.screen.player_level": "§rSeviye %d",
+  "showcase.viewer.countdown_title": "İçerik görüntüleniyor",
+  "showcase.viewer.instructions": "§r§7Kapatmak için §fQ §7tuşuna basın veya eşyayı bırakın • Gezinmek için fare tekerleğini kullanın"
 }

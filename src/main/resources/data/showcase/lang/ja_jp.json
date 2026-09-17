@@ -11,9 +11,9 @@
   "showcase.message.other_item_shared": "§r%s が %s の %s を共有しました。",
   "showcase.message.other_stats_shared": "§r%s が %s の %s を共有しました。",
   "showcase.message.other_container_shared": "§r%s が %s の %s を共有しました。",
-  "showcase.message.other_merchant_shared": "§r%s が %s の %s を共有しました。",
+  "showcase.message.other_merchant_shared": "§r%s が %s の %s の取引画面を共有しました。",
   "showcase.message.container_shared": "§r%s が %s を共有しました。",
-  "showcase.message.merchant_shared": "§r%s が 商人の取引画面 を共有しました。",
+  "showcase.message.merchant_shared": "§r%s が %s の取引画面を共有しました。",
   "showcase.message.private_share_tip": "§r%s の %s を %s に個別共有しました。",
   "showcase.message.player_description": "§r%s：%s %s",
   "showcase.message.share_container_tip": "§r%d 秒以内にコンテナを開いてください。",
@@ -26,6 +26,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "インベントリ",
+  "showcase.inventory.hotbar": "ホットバー",
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s の %s",
   "showcase.screen.hotbar_title": "§r%s の %s",
@@ -37,7 +39,7 @@
   "showcase.message.default.hotbar": "§r%s が %s を共有しました。",
   "showcase.message.default.item": "§r%s が %s を共有しました。",
   "showcase.message.default.container": "§r%s が %s を共有しました。",
-  "showcase.message.default.merchant": "§r%s が 商人の取引内容 を共有しました。",
+  "showcase.message.default.merchant": "§r%s が %s の取引画面を共有しました。",
   "showcase.message.invalid_id": "§r無効な共有 ID です。",
   "showcase.message.cancel_not_owner": "§rあなたは自分の共有のみキャンセルできます。",
   "showcase.message.cancel_success": "§r共有が正常にキャンセルされました。",
@@ -100,5 +102,27 @@
   "showcase.stats.block.unknown": "未知のブロック",
   
   "showcase.stats.message.create_date": "作成日",
-  "showcase.stats.message.total_pages": "総ページ数"
+  "showcase.stats.message.total_pages": "総ページ数",
+
+  "showcase.command.duration.suggestion.minimum": "§a最小: %s",
+  "showcase.command.duration.suggestion.recommended": "§b推奨: %s",
+  "showcase.command.duration.suggestion.maximum": "§e最大: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 時間 (OP のみ)",
+  "showcase.command.duration.error.out_of_range": "§c✗ %s ～ %s の間でなければなりません",
+  "showcase.command.duration.error.invalid_format": "§c✗ 形式が正しくありません (使用例: 1h30m / 5m / 30s)",
+  "showcase.command.duration.valid": "§a✓ 有効 - %s",
+  "showcase.command.duration.valid.op": "§a✓ 有効 (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7秒には 's' を付けます",
+  "showcase.command.duration.hint.add_minutes": "§7分には 'm' を付けます",
+  "showcase.command.duration.hint.add_hours": "§7時間には 'h' を付けます",
+  "showcase.command.invalid_time_format": "§r時間の形式が正しくありません。'30s'、'5m'、'1h'、'1h30m' のように指定してください",
+  "showcase.command.time_out_of_range": "§r時間は %d ～ %d 秒の間でなければなりません。",
+  "showcase.command.no_permission.receivers": "§c受信者を指定する権限がありません",
+  "showcase.command.no_permission.duration": "§cカスタム期間を設定する権限がありません",
+  "showcase.command.no_permission.description": "§c説明を追加する権限がありません",
+  "showcase.screen.player_level": "§rレベル %d",
+  "showcase.viewer.countdown_title": "内容を表示中",
+  "showcase.viewer.instructions": "§r§7§fQ §7キーまたはアイテムを捨てて閉じる • スクロールホイールで移動",
+  "showcase.message.stats_shared": "§r%s が %s を共有しました。",
+  "showcase.message.default.stats": "§r%s が %s を共有しました。"
 }

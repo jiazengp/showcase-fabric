@@ -12,8 +12,8 @@
   "showcase.message.other_item_shared": "§r%s zeigte %ss %s",
   "showcase.message.other_stats_shared": "§r%s zeigte %ss %s",
   "showcase.message.other_container_shared": "§r%s zeigte %ss %s",
-  "showcase.message.other_merchant_shared": "§r%s zeigte %ss %s",
-  "showcase.message.container_shared": "§r%s zeigte seinen %s",
+  "showcase.message.other_merchant_shared": "§r%s zeigte %ss %s-Handelsschnittstelle",
+  "showcase.message.container_shared": "§r%s zeigte einen %s",
   "showcase.message.merchant_shared": "§r%s zeigte %ss Handelsschnittstelle",
   "showcase.message.private_share_tip": "§rDu hast %ss %s mit %s geteilt",
   "showcase.message.player_description": "§r%s %s %s",
@@ -27,6 +27,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "Inventar",
+  "showcase.inventory.hotbar": "Schnellzugriffsleiste",
 
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%ss %s",
@@ -109,5 +111,25 @@
   "showcase.stats.block.unknown": "Unbekannte Blöcke",
   
   "showcase.stats.message.create_date": "Erstellungsdatum",
-  "showcase.stats.message.total_pages": "Gesamtseiten"
+  "showcase.stats.message.total_pages": "Gesamtseiten",
+
+  "showcase.command.duration.suggestion.minimum": "§aMinimum: %s",
+  "showcase.command.duration.suggestion.recommended": "§bEmpfohlen: %s",
+  "showcase.command.duration.suggestion.maximum": "§eMaximum: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 Stunde (nur OP)",
+  "showcase.command.duration.error.out_of_range": "§c✗ Muss zwischen %s und %s liegen",
+  "showcase.command.duration.error.invalid_format": "§c✗ Ungültiges Format (nutze: 1h30m oder 5m oder 30s)",
+  "showcase.command.duration.valid": "§a✓ Gültig - %s",
+  "showcase.command.duration.valid.op": "§a✓ Gültig (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7Füge 's' für Sekunden hinzu",
+  "showcase.command.duration.hint.add_minutes": "§7Füge 'm' für Minuten hinzu",
+  "showcase.command.duration.hint.add_hours": "§7Füge 'h' für Stunden hinzu",
+  "showcase.command.invalid_time_format": "§rUngültiges Zeitformat. Nutze z. B. '30s', '5m', '1h' oder '1h30m'",
+  "showcase.command.time_out_of_range": "§rDie Zeit muss zwischen §l%d§r und §l%d§r Sekunden liegen",
+  "showcase.command.no_permission.receivers": "§cDu hast keine Berechtigung, Empfänger anzugeben",
+  "showcase.command.no_permission.duration": "§cDu hast keine Berechtigung, eine eigene Dauer festzulegen",
+  "showcase.command.no_permission.description": "§cDu hast keine Berechtigung, eine Beschreibung hinzuzufügen",
+  "showcase.screen.player_level": "§rStufe %d",
+  "showcase.viewer.countdown_title": "Inhalt ansehen",
+  "showcase.viewer.instructions": "§r§7Drücke §fQ §7oder lasse den Gegenstand fallen zum Schließen • Mit dem Mausrad navigieren"
 }

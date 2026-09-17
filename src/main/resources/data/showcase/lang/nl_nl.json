@@ -12,8 +12,8 @@
   "showcase.message.other_item_shared": "§r%s toonde %s's %s",
   "showcase.message.other_stats_shared": "§r%s toonde %s's %s",
   "showcase.message.other_container_shared": "§r%s toonde %s's %s",
-  "showcase.message.other_merchant_shared": "§r%s toonde %s's %s",
-  "showcase.message.container_shared": "§r%s toonde zijn %s",
+  "showcase.message.other_merchant_shared": "§r%s toonde %s's %s-handelsinterface",
+  "showcase.message.container_shared": "§r%s toonde een %s",
   "showcase.message.merchant_shared": "§r%s toonde %s's handelsinterface",
   "showcase.message.private_share_tip": "§rJe hebt %s's %s gedeeld met %s",
   "showcase.message.player_description": "§r%s %s %s",
@@ -27,6 +27,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "Inventaris",
+  "showcase.inventory.hotbar": "Snelbalk",
 
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s's %s",
@@ -109,5 +111,25 @@
   "showcase.stats.block.unknown": "Onbekende Blokken",
   
   "showcase.stats.message.create_date": "Aanmaakdatum",
-  "showcase.stats.message.total_pages": "Totaal Pagina's"
+  "showcase.stats.message.total_pages": "Totaal Pagina's",
+
+  "showcase.command.duration.suggestion.minimum": "§aMinimum: %s",
+  "showcase.command.duration.suggestion.recommended": "§bAanbevolen: %s",
+  "showcase.command.duration.suggestion.maximum": "§eMaximum: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 uur (alleen OP)",
+  "showcase.command.duration.error.out_of_range": "§c✗ Moet tussen %s en %s zijn",
+  "showcase.command.duration.error.invalid_format": "§c✗ Ongeldig formaat (gebruik: 1h30m of 5m of 30s)",
+  "showcase.command.duration.valid": "§a✓ Geldig - %s",
+  "showcase.command.duration.valid.op": "§a✓ Geldig (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7Voeg 's' toe voor seconden",
+  "showcase.command.duration.hint.add_minutes": "§7Voeg 'm' toe voor minuten",
+  "showcase.command.duration.hint.add_hours": "§7Voeg 'h' toe voor uren",
+  "showcase.command.invalid_time_format": "§rOngeldig tijdformaat. Gebruik bijv. '30s', '5m', '1h' of '1h30m'",
+  "showcase.command.time_out_of_range": "§rTijd moet tussen §l%d§r en §l%d§r seconden zijn",
+  "showcase.command.no_permission.receivers": "§cJe hebt geen toestemming om ontvangers op te geven",
+  "showcase.command.no_permission.duration": "§cJe hebt geen toestemming om een aangepaste duur in te stellen",
+  "showcase.command.no_permission.description": "§cJe hebt geen toestemming om een beschrijving toe te voegen",
+  "showcase.screen.player_level": "§rNiveau %d",
+  "showcase.viewer.countdown_title": "Inhoud bekijken",
+  "showcase.viewer.instructions": "§r§7Druk op §fQ §7of laat het voorwerp vallen om te sluiten • Gebruik het scrollwiel om te navigeren"
 }

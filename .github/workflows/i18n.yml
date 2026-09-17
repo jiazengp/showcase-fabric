@@ -1,0 +1,35 @@
+# Guards the translation files and the way code refers to them. Runs without Gradle because
+# the checks are static: they read data/showcase/lang/*.json and scan the sources for
+# translatable(...) call sites.
+#
+# The failure modes this catches are invisible in a build and only show up in game: a key
+# missing from en_us renders the raw key on every client, a locale that falls behind renders
+# English, and a placeholder that drifts or is ordered wrongly renders a literal %s or the
+# wrong nouns.
+name: 'i18n'
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '!**'
+  pull_request:
+    branches:
+      - main
+      - minor
+      - 26.X
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Translation files
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: check translation files
+        run: python3 .github/scripts/check-translations.py

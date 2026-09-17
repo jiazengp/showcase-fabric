@@ -12,8 +12,8 @@
   "showcase.message.other_item_shared": "§r%s viste %ss %s",
   "showcase.message.other_stats_shared": "§r%s viste %ss %s",
   "showcase.message.other_container_shared": "§r%s viste %ss %s",
-  "showcase.message.other_merchant_shared": "§r%s viste %ss %s",
-  "showcase.message.container_shared": "§r%s viste sin %s",
+  "showcase.message.other_merchant_shared": "§r%s viste %ss %s-handelsgrænseflade",
+  "showcase.message.container_shared": "§r%s viste en %s",
   "showcase.message.merchant_shared": "§r%s viste %ss handelsgrænseflade",
   "showcase.message.private_share_tip": "§rDu har delt %ss %s med %s",
   "showcase.message.player_description": "§r%s %s %s",
@@ -27,6 +27,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "Inventar",
+  "showcase.inventory.hotbar": "Værktøjslinje",
 
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%ss %s",
@@ -109,5 +111,25 @@
   "showcase.stats.block.unknown": "Ukendte Blokke",
   
   "showcase.stats.message.create_date": "Oprettelsesdato",
-  "showcase.stats.message.total_pages": "Samlede Sider"
+  "showcase.stats.message.total_pages": "Samlede Sider",
+
+  "showcase.command.duration.suggestion.minimum": "§aMinimum: %s",
+  "showcase.command.duration.suggestion.recommended": "§bAnbefalet: %s",
+  "showcase.command.duration.suggestion.maximum": "§eMaksimum: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1 time (kun OP)",
+  "showcase.command.duration.error.out_of_range": "§c✗ Skal være mellem %s og %s",
+  "showcase.command.duration.error.invalid_format": "§c✗ Ugyldigt format (brug: 1h30m eller 5m eller 30s)",
+  "showcase.command.duration.valid": "§a✓ Gyldig - %s",
+  "showcase.command.duration.valid.op": "§a✓ Gyldig (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7Tilføj 's' for sekunder",
+  "showcase.command.duration.hint.add_minutes": "§7Tilføj 'm' for minutter",
+  "showcase.command.duration.hint.add_hours": "§7Tilføj 'h' for timer",
+  "showcase.command.invalid_time_format": "§rUgyldigt tidsformat. Brug f.eks. '30s', '5m', '1h' eller '1h30m'",
+  "showcase.command.time_out_of_range": "§rTiden skal være mellem §l%d§r og §l%d§r sekunder",
+  "showcase.command.no_permission.receivers": "§cDu har ikke tilladelse til at angive modtagere",
+  "showcase.command.no_permission.duration": "§cDu har ikke tilladelse til at angive en brugerdefineret varighed",
+  "showcase.command.no_permission.description": "§cDu har ikke tilladelse til at tilføje en beskrivelse",
+  "showcase.screen.player_level": "§rLevel %d",
+  "showcase.viewer.countdown_title": "Viser indhold",
+  "showcase.viewer.instructions": "§r§7Tryk §fQ §7eller slip genstanden for at lukke • Brug rullehjulet til at navigere"
 }

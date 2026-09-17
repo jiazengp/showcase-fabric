@@ -12,7 +12,7 @@
   "showcase.message.other_item_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
   "showcase.message.other_stats_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
   "showcase.message.other_container_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
-  "showcase.message.other_merchant_shared": "§r%s님이 %s의 %s을(를) 보여주었습니다",
+  "showcase.message.other_merchant_shared": "§r%s님이 %s의 %s 거래 인터페이스를 보여주었습니다",
   "showcase.message.container_shared": "§r%s님이 %s을(를) 보여주었습니다",
   "showcase.message.merchant_shared": "§r%s님이 %s의 거래 인터페이스를 보여주었습니다",
   "showcase.message.private_share_tip": "§r%s의 %s을(를) %s님과 공유했습니다",
@@ -27,6 +27,8 @@
 
   
   "showcase.name.container": "Container",
+  "showcase.name.inventory": "인벤토리",
+  "showcase.inventory.hotbar": "핫바",
 
   "showcase.screen.inventory_title": "§r%s",
   "showcase.screen.ender_chest_title": "§r%s의 %s",
@@ -109,5 +111,25 @@
   "showcase.stats.block.unknown": "알 수 없는 블록",
   
   "showcase.stats.message.create_date": "생성 날짜",
-  "showcase.stats.message.total_pages": "총 페이지"
+  "showcase.stats.message.total_pages": "총 페이지",
+
+  "showcase.command.duration.suggestion.minimum": "§a최소: %s",
+  "showcase.command.duration.suggestion.recommended": "§b권장: %s",
+  "showcase.command.duration.suggestion.maximum": "§e최대: %s",
+  "showcase.command.duration.suggestion.op_only": "§d1시간 (OP 전용)",
+  "showcase.command.duration.error.out_of_range": "§c✗ %s에서 %s 사이여야 합니다",
+  "showcase.command.duration.error.invalid_format": "§c✗ 잘못된 형식 (사용: 1h30m 또는 5m 또는 30s)",
+  "showcase.command.duration.valid": "§a✓ 유효함 - %s",
+  "showcase.command.duration.valid.op": "§a✓ 유효함 (OP) - %s",
+  "showcase.command.duration.hint.add_seconds": "§7초에는 's'를 붙이세요",
+  "showcase.command.duration.hint.add_minutes": "§7분에는 'm'을 붙이세요",
+  "showcase.command.duration.hint.add_hours": "§7시간에는 'h'를 붙이세요",
+  "showcase.command.invalid_time_format": "§r시간 형식이 잘못되었습니다. '30s', '5m', '1h', '1h30m' 형식을 사용하세요",
+  "showcase.command.time_out_of_range": "§r시간은 §l%d§r초에서 §l%d§r초 사이여야 합니다",
+  "showcase.command.no_permission.receivers": "§c수신자를 지정할 권한이 없습니다",
+  "showcase.command.no_permission.duration": "§c사용자 지정 시간을 설정할 권한이 없습니다",
+  "showcase.command.no_permission.description": "§c설명을 추가할 권한이 없습니다",
+  "showcase.screen.player_level": "§r레벨 %d",
+  "showcase.viewer.countdown_title": "내용 보는 중",
+  "showcase.viewer.instructions": "§r§7§fQ §7키를 누르거나 아이템을 버려서 닫기 • 휠로 이동"
 }
