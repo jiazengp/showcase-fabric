@@ -39,6 +39,9 @@ replay_*.log
 *.hprof
 *.jfr
 
+# dev server / gametest run logs
+run-logs/
+
 .locale.env
 /CLAUDE.md
 /plans/

@@ -6,10 +6,10 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ### Single Version Building and Testing
 - `./gradlew build` - Build the mod for the default Minecraft version, generates JAR in `build/libs/`
-- `./gradlew build -PmcVer=26.2` - Build for the supported Minecraft version explicitly
+- `./gradlew build -PmcVer=26.3` - Build for the supported Minecraft version explicitly
 - `./gradlew runServer` - Run development server for testing
-- `./gradlew runShowcaseE2ETest` - Run E2E integration tests for the default version
-- `./gradlew runShowcaseE2ETest -PmcVer=26.2` - Run E2E tests for the supported version explicitly
+- `./gradlew runGameTest` - Run the Fabric GameTest suite for the default Minecraft version
+- `./gradlew runGameTest -PmcVer=26.3` - Run GameTests for a specific supported version
 - `./gradlew test` - Run unit tests
 - `./gradlew clean` - Clean build artifacts
 
@@ -17,7 +17,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 - `./buildAll.sh` (Linux/Mac) or `buildAll.bat` (Windows) - Build for every version listed in `version_properties/`
 - `./gradlew listVersions` - List all available Minecraft versions for building
 - Output JARs are collected in `build/buildAllJars/` directory
-- Current supported baseline: 26.2
+- Current supported baseline: 26.3
 - Version-specific dependencies are loaded from `version_properties/{version}.properties`
 
 ### Development Server
@@ -54,7 +54,7 @@ The release workflow uses a matrix strategy to publish separate releases for eac
 4. Tag a release (e.g., `git tag v2.3.1 && git push --tags`) to trigger automatic publishing
 
 **Publishing Features:**
-- **Separate releases per Minecraft version** (currently 26.2 on the mainline branch)
+- **Separate releases per Minecraft version** (currently 26.3 on the mainline branch)
 - **Dynamic version configuration** from `version_properties/` files
 - **Version-specific compatibility detection** using `compatible_minecraft_versions` field
 - **Flexible release types** (release/beta/alpha) based on `release_type` property  
@@ -123,20 +123,58 @@ The release workflow uses a matrix strategy to publish separate releases for eac
 
 ### Testing Infrastructure
 
-**E2E Test Suite** (`src/main/java/com/showcase/test/`):
-- `ShowcaseTestClient` - Main E2E test client with conditional execution
-- Tests run in real Minecraft client environment with `runShowcaseE2ETest`
-- Conditional execution controlled by `showcase.test.e2e` system property
-- Automatic client initialization detection and basic framework validation
-- Results output with proper exit codes for CI/CD integration
+**GameTest Suite** (`src/gametest/`):
+- Own `gametest` source set, kept out of the published JAR and compiled as part of `check`
+- `GameTestPlayerUtils` - Shared helper for constructing `ServerPlayer` instances inside tests
+- `BlockCategoriesGameTest` - Block categorization and translation-key coverage
+- `ContainerContentsGameTest` - Bundle and shulker-box unpacking, including slot ordering
+- `EventSystemGameTest` - `ShowcaseEvents` / `ShowcaseAPI` listener semantics
+- `DataPersistenceGameTest` - `ShareRepository` CRUD, bulk operations and load edge cases
+- Classes are registered through the `fabric-gametest` entrypoint in `src/gametest/resources/fabric.mod.json`
+- Run with `./gradlew runGameTest -PmcVer=<version>`; the task sets `-Dfabric-api.gametest=true`,
+  writes `build/gametest-report.xml`, and fails the build when a required test does not pass
+- Tests must call `GameTestHelper#succeed()` (or `fail(...)`) — returning normally is not enough
+
+### Translation Files
+
+Translations live in `data/showcase/lang/*.json` and are delivered by server-translations-api.
+Every locale's set is the **union of that locale with `en_us`**, which drives two failure modes:
+
+- a key missing from `en_us` is sent for **no** locale, so every client renders the raw key;
+- a key missing from one locale falls back to the English text, so it renders untranslated.
+
+`./gradlew build` cannot see either, so run the static check before pushing:
+
+```
+python3 .github/scripts/check-translations.py
+```
+
+It is wired into `.github/workflows/i18n.yml` and fails on: a locale whose key set differs from
+`en_us`, placeholder count/type drift, a key used by `translatable(...)` but absent from `en_us`,
+a call site whose argument count does not match `en_us`, and broadcast copy that regressed to the
+first person or (for Chinese) lost the reflexive 自己. It also warns about keys nothing references.
+
+When adding or changing a message:
+
+- Add the key to **`en_us` first** — that is the fallback every other locale inherits.
+- Keep the placeholder count, order and `%s`/`%d` types identical to `en_us`; the order must match
+  the argument order at the call site, which is not always the order the target language prefers.
+- `*_shared` / `other_*_shared` / `default.*` are **broadcast** to every player, including the one
+  who acted, so they name players in the third person. Messages addressed to a single viewer or
+  actor may use 你.
+- Within those broadcasts, content the acting player genuinely owns — item, inventory, hotbar,
+  ender chest, statistics — is described as "their own" (Chinese: 自己的). **Containers and
+  merchants are the exception**: a container may be a chest standing in the world and a merchant
+  belongs to a villager, so those use the indefinite form (English "a container", Chinese 一个容器)
+  and must not claim ownership.
 
 ### Configuration
 
 **Version Targeting**:
-- Version-specific properties in `version_properties/` (currently 26.2 on the mainline branch)
+- Version-specific properties in `version_properties/` (currently 26.3 on the mainline branch)
 - Automatic version detection and dependency resolution via `build.gradle:8-22`
 - Preprocessor definitions generated in `build.properties` for conditional compilation
-- Each version has isolated dependencies: Fabric API, Yarn mappings, Loader versions
+- Each version pins its own Fabric API, Fabric Loader and mod dependency coordinates
 - Multi-version build scripts: `buildAll.sh`/`buildAll.bat` for cross-platform support
 - CI/CD matrix builds test all versions in parallel
 
