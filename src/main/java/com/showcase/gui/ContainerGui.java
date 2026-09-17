@@ -3,6 +3,7 @@ package com.showcase.gui;
 import com.showcase.utils.BookOpener;
 import com.showcase.utils.MapViewer;
 import com.showcase.utils.StackUtils;
+import com.showcase.utils.compat.ContainerContentsCompat;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.SimpleGuiElement;
@@ -95,9 +96,7 @@ public class ContainerGui extends SimpleGui {
     private static NonNullList<ItemStack> getShulkerBoxContents(ItemStack shulkerBox) {
         ItemContainerContents container = shulkerBox.get(DataComponents.CONTAINER);
         if (container != null) {
-            NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
-            container.copyInto(items);
-            return items;
+            return ContainerContentsCompat.containerItems(container, 27);
         }
         return NonNullList.create();
     }
@@ -106,7 +105,7 @@ public class ContainerGui extends SimpleGui {
         NonNullList<ItemStack> items = NonNullList.create();
         BundleContents bundleContents = bundle.get(DataComponents.BUNDLE_CONTENTS);
         if (bundleContents != null) {
-            bundleContents.itemCopyStream().forEach(items::add);
+            items.addAll(ContainerContentsCompat.bundleItems(bundleContents));
         }
         return items;
     }

@@ -1,6 +1,7 @@
 package com.showcase.utils;
 
 import com.showcase.ShowcaseMod;
+import com.showcase.utils.compat.ContainerContentsCompat;
 import com.showcase.utils.compat.ProfileCompat;
 import com.showcase.utils.ui.ItemIconProvider;
 import net.minecraft.ChatFormatting;
@@ -123,7 +124,7 @@ public class StackUtils {
 
         if (StackUtils.isBundle(stack)) {
             BundleContents bundle = stack.get(DataComponents.BUNDLE_CONTENTS);
-            if (bundle != null) bundle.itemCopyStream().forEach(tmp::add);
+            if (bundle != null) tmp.addAll(ContainerContentsCompat.bundleItems(bundle));
             int rows = Math.min(6, Math.max(1, (tmp.size() + 8) / 9));
             int size = rows * 9;
             ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, handlerTypeForRows(rows));
@@ -135,7 +136,7 @@ public class StackUtils {
         if (StackUtils.isShulkerBox(stack)) {
             try {
                 ItemContainerContents container = stack.get(DataComponents.CONTAINER);
-                if (container != null) tmp.addAll(container.allItemsCopyStream().toList());
+                if (container != null) tmp.addAll(ContainerContentsCompat.containerItems(container, 27));
                 int size = 27;
                 ReadOnlyInventory inv = new ReadOnlyInventory(size, itemName, MenuType.SHULKER_BOX);
                 for (int i = 0; i < tmp.size() && i < size; i++) inv.setItem(i, tmp.get(i));
