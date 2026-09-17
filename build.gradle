@@ -119,7 +119,7 @@ dependencies {
 	implementation "net.fabricmc:fabric-loader:${versionProperties.getProperty("fabric_loader_version")}"
 
 	implementation "net.fabricmc.fabric-api:fabric-api:${versionProperties.getProperty("fabric_version")}"
-	implementation "net.fabricmc.fabric-api:fabric-permission-api-v1:1.0.3+b7020ca29e"
+	implementation "net.fabricmc.fabric-api:fabric-permission-api-v1:${versionProperties.getProperty("fabric_permission_api_version")}"
 	implementation include("eu.pb4:placeholder-api:${versionProperties.getProperty("placeholder_api_version")}")
 	implementation include("eu.pb4:sgui:${versionProperties.getProperty("sgui_api_version")}")
 	implementation include("xyz.nucleoid:server-translations-api:${versionProperties.getProperty("server_translations_api_version")}")
