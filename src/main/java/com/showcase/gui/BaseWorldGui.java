@@ -161,6 +161,17 @@ public abstract class BaseWorldGui extends HotbarGui {
     }
 
     @Override
+    public void close() {
+        // A hotbar viewer has no container screen, so sgui never reports a container close for a Q/drop
+        // exit. Tearing the viewer context down here is the only place that catches every exit path.
+        // switchUi() detaches the context before opening the replacement UI, so switching is unaffected.
+        if (this.context != null) {
+            this.context.close();
+        }
+        super.close();
+    }
+
+    @Override
     public void onPlayerClose(boolean ignored) {
         if (this.context != null) {
             this.context.close();

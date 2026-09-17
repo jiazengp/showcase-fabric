@@ -100,9 +100,14 @@ public abstract class BaseViewerContext {
     }
 
     public void close() {
+        // Manual exits and the countdown completing can both land here, so the teardown must be idempotent.
+        if (this.closed) {
+            return;
+        }
+
         closeCountdown();
         this.closed = true;
-        
+
         if (closeCallback != null) {
             closeCallback.onViewerClose();
         }
